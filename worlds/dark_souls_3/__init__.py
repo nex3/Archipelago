@@ -599,6 +599,22 @@ class DarkSouls3World(World):
         for location in self.yhorm_location.locations:
             self._add_location_rule(location, "Storm Ruler")
 
+        # Grave Key Skip
+        if self.options.grave_key_expected:
+            self._add_location_rule([
+                "FS: Saint's Ring - Irina",
+                "FS: Heal - Irina",
+                "FS: Replenishment - Irina",
+                "FS: Caressing Tears - Irina",
+                "FS: Homeward - Irina",
+                "FS: Med Heal - Irina for Tome of Carim",
+                "FS: Tears of Denial - Irina for Tome of Carim",
+                "FS: Force - Irina for Tome of Carim",
+                "FS: Bountiful Light - Irina for Tome of Lothric",
+                "FS: Magic Barrier - Irina for Tome of Lothric",
+                "FS: Blessed Weapon - Irina for Tome of Lothric"
+            ], "Grave Key")
+
         self.multiworld.completion_condition[self.player] = lambda state: \
             state.has("Cinders of a Lord - Abyss Watcher", self.player) and \
             state.has("Cinders of a Lord - Yhorm the Giant", self.player) and \
