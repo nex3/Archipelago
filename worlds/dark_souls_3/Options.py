@@ -328,6 +328,11 @@ class EnableNGPOption(Toggle):
     display_name = "Enable NG+"
 
 
+class GraveKeyExpected(DefaultOnToggle):
+    """Whether you are expected to use the Grave Key instead of skipping it by dropping down from above"""
+    display_name = "Gravy Key Expected"
+
+
 class RandomizeEnemiesOption(DefaultOnToggle):
     """Whether to randomize enemy and boss placements.
 
@@ -486,6 +491,7 @@ class DarkSouls3Options(PerGameCommonOptions):
     death_link: DeathLink
     enable_dlc: EnableDLCOption
     enable_ngp: EnableNGPOption
+    grave_key_expected: GraveKeyExpected
     randomize_enemies: RandomizeEnemiesOption
     random_enemy_preset: RandomEnemyPresetOption
     randomize_mimics_with_enemies: RandomizeMimicsWithEnemiesOption
