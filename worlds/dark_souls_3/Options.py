@@ -328,7 +328,7 @@ class EnableNGPOption(Toggle):
     display_name = "Enable NG+"
 
 
-class GraveKeyExpected(DefaultOnToggle):
+class GraveKeyExpected(Toggle):
     """Whether you are expected to use the Grave Key instead of skipping it by dropping down from above"""
     display_name = "Gravy Key Expected"
 
