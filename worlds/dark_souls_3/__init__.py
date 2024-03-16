@@ -472,11 +472,13 @@ class DarkSouls3World(World):
                     "Pyromancy Flame" not in randomized_items
                     or state.has("Pyromancy Flame", self.player)
                 )
-                # This isn't really necessary, but it ensures that the game logic knows players will
-                # want to do Lothric Castle after at least being _able_ to access Catacombs. This is
-                # useful for smooth item placement.
-                and self._has_any_scroll(state)
             ))
+
+            if self.options.late_basin_of_vows > 1: # After Catacombs
+                self._add_entrance_rule("Lothric Castle", self._has_any_scroll)
+
+            if self.options.late_basin_of_vows > 2: # After Small Doll
+                self._add_entrance_rule("Lothric Castle", "Small Doll")
 
         # DLC Access Rules Below
         if self.options.enable_dlc:
@@ -527,11 +529,13 @@ class DarkSouls3World(World):
                     "Pyromancy Flame" not in randomized_items
                     or state.has("Pyromancy Flame", self.player)
                 )
-                # This isn't really necessary, but it ensures that the game logic knows players will
-                # want to do Lothric Castle after at least being _able_ to access Catacombs. This is
-                # useful for smooth item placement.
-                and self._has_any_scroll(state)
             ))
+
+            if self.options.late_basin_of_vows > 1: # After Catacombs
+                self._add_location_rule("HWL: Soul of the Dancer", self._has_any_scroll)
+
+            if self.options.late_basin_of_vows > 2: # After Small Doll
+                self._add_location_rule("HWL: Soul of the Dancer", "Small Doll")
 
         self._add_location_rule([
             "LC: Grand Archives Key - by Grand Archives door, after PC and AL bosses",
