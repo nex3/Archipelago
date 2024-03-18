@@ -487,11 +487,14 @@ class DarkSouls3World(World):
             self._add_entrance_rule("Dreg Heap", "PW2 -> DH")
             self._add_entrance_rule("Ringed City", "Small Envoy Banner")
 
-            if self.options.late_dlc:
-                self._add_entrance_rule(
-                    "Painted World of Ariandel (Before Contraption)",
-                    "Small Doll"
-                )
+            if self.options.late_dlc: # After Catacombs
+                self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", self._has_any_scroll)
+
+            if self.options.late_dlc > 1: # After Small Doll
+                self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Small Doll")
+            
+            if self.options.late_dlc > 2: # After Basin
+                self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
 
         # Define the access rules to some specific locations
         if self._is_location_available("FS: Lift Chamber Key - Leonhard"):
@@ -925,12 +928,6 @@ class DarkSouls3World(World):
         self._add_location_rule("FK: Soul of the Blood of the Wolf", self._has_any_scroll)
         self._add_location_rule("FK: Cinders of a Lord - Abyss Watcher", self._has_any_scroll)
         self._add_entrance_rule("Catacombs of Carthus", self._has_any_scroll)
-        # Not really necessary but ensures players can decide which way to go
-        if self.options.enable_dlc:
-            self._add_entrance_rule(
-                "Painted World of Ariandel (After Contraption)",
-                self._has_any_scroll
-            )
 
 
     def _add_transposition_rules(self) -> None:
