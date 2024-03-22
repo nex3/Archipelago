@@ -377,10 +377,13 @@ class DarkSouls3World(World):
             itempool.append(self.create_item(item.name))
 
         # Removing items that will get placed during pre_fill
+        # If Yhorm is at Iudex Gundyr, Storm Ruler must be randomized, so it can always be removed
         if self.yhorm_location.name == 'Iudex Gundyr':
             itempool.remove(self.create_item("Storm Ruler"))
+        # If the Coiled Sword is vanilla, it is early enough and doesn't need to be removed
         if self._is_location_available("CA: Coiled Sword - boss drop"):
             itempool.remove(self.create_item("Coiled Sword"))
+        # If the HWL Raw Gem is vanilla, it is early enough and doesn't need to be removed
         if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
             itempool.remove(self.create_item("Raw Gem"))
 
