@@ -78,7 +78,7 @@ class DarkSouls3World(World):
         self.locked_locations = []
         self.main_path_locations = []
         self.enabled_location_categories = set()
-
+        self.all_excluded_locations = set()
 
     def generate_early(self):
         if not self.options.enable_weapon_locations:
@@ -97,6 +97,8 @@ class DarkSouls3World(World):
             self._exclude_location_group("Unique")
         if not self.options.enable_health_upgrade_locations:
             self._exclude_location_group("Healing")
+
+        self.all_excluded_locations.update(self.options.exclude_locations.value)
 
         # Randomize Yhorm manually so that we know where to place the Storm Ruler.
         if self.options.randomize_enemies:
@@ -373,6 +375,14 @@ class DarkSouls3World(World):
         for item in self.multiworld.random.sample(injectable_items, k=number_to_inject):
             num_required_extra_items -= 1
             itempool.append(self.create_item(item.name))
+
+        # Removing items that will get placed during pre_fill
+        if self.yhorm_location.name == 'Iudex Gundyr':
+            itempool.remove(self.create_item("Storm Ruler"))
+        if self._is_location_available("CA: Coiled Sword - boss drop"):
+            itempool.remove(self.create_item("Coiled Sword"))
+        if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
+            itempool.remove(self.create_item("Raw Gem"))
 
         # Extra filler items for locations containing skip items
         itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
@@ -1139,7 +1149,7 @@ class DarkSouls3World(World):
             and (not data.ngp or self.options.enable_ngp)
             and not (
                 self.options.excluded_locations == "unrandomized"
-                and data.name in self.options.exclude_locations
+                and data.name in self.all_excluded_locations
             )
             and not (
                 self.options.missable_locations == "unrandomized"
@@ -1160,44 +1170,35 @@ class DarkSouls3World(World):
         # doesn't get locked out by bad rolls on the next two fills.
         if self.yhorm_location.name == 'Iudex Gundyr':
             self._fill_local_item("Storm Ruler", {"Cemetery of Ash"},
-                                  lambda location: location.name != "CA: Coiled Sword - boss drop",
-                                  mandatory = True)
+                                  lambda location: location.name != "CA: Coiled Sword - boss drop")
 
         # Don't place this in the multiworld because it's necessary almost immediately, and don't
         # mark it as a blocker for HWL because having a miniscule Sphere 1 screws with progression
         # balancing.
-        self._fill_local_item("Coiled Sword", ["Cemetery of Ash", "Firelink Shrine"])
+        if self._is_location_available("CA: Coiled Sword - boss drop"):
+            self._fill_local_item("Coiled Sword", ["Cemetery of Ash", "Firelink Shrine"])
 
         # If upgrade smoothing is enabled, make sure one raw gem is available early for SL1 players
-        if self.options.smooth_upgrade_items:
+        if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
             self._fill_local_item("Raw Gem", [
                 "Cemetery of Ash",
                 "Firelink Shrine",
                 "High Wall of Lothric"
             ])
 
-
     def _fill_local_item(
         self, name: str,
         regions: List[str],
         additional_condition: Optional[Callable[[DarkSouls3Location], bool]] = None,
-        mandatory = False,
     ) -> None:
         """Chooses a valid location for the item with the given name and places it there.
         
         This always chooses a local location among the given regions. If additional_condition is
         passed, only locations meeting that condition will be considered.
 
-        If mandatory is True, this will throw an error if the item could not be filled in.
+        If the item could not be placed, it will be added to starting inventory.
         """
-        item = next(
-            (
-                item for item in self.multiworld.itempool
-                if item.player == self.player and item.name == name
-            ),
-            None
-        )
-        if not item: return
+        item = self.create_item(name)
 
         candidate_locations = [
             location for location in (
@@ -1214,12 +1215,11 @@ class DarkSouls3World(World):
         ]
 
         if not candidate_locations:
-            if not mandatory: return
-            raise Exception(f"No valid locations to place {name}")
+            warning(f"Couldn't place \"{name}\" in a valid location for {self.multiworld.get_player_name(self.player)}. Adding it to starting inventory instead.")
+            self.multiworld.push_precollected(self.create_item(name))
 
         location = self.multiworld.random.choice(candidate_locations)
         location.place_locked_item(item)
-        self.multiworld.itempool.remove(item)
 
     def post_fill(self):
         """If item smoothing is enabled, rearrange items so they scale up smoothly through the run.
