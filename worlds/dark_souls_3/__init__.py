@@ -376,6 +376,9 @@ class DarkSouls3World(World):
             num_required_extra_items -= 1
             itempool.append(self.create_item(item.name))
 
+        # Extra filler items for locations containing skip items
+        itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
+
         # Removing items that will get placed during pre_fill
         # If Yhorm is at Iudex Gundyr, Storm Ruler must be randomized, so it can always be removed
         if self.yhorm_location.name == 'Iudex Gundyr':
@@ -386,9 +389,6 @@ class DarkSouls3World(World):
         # If the HWL Raw Gem is vanilla, it is early enough and doesn't need to be removed
         if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
             itempool.remove(self.create_item("Raw Gem"))
-
-        # Extra filler items for locations containing skip items
-        itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
 
         # Add items to itempool
         self.multiworld.itempool += itempool
