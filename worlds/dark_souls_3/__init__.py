@@ -2,6 +2,7 @@
 from collections.abc import Sequence
 from collections import defaultdict
 import json
+from logging import warning
 from typing import Callable, Dict, Set, List, Optional, TextIO, Union
 
 from BaseClasses import CollectionState, MultiWorld, Region, Item, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
@@ -110,11 +111,11 @@ class DarkSouls3World(World):
                 self.yhorm_location.name == "Iudex Gundyr" or
                 self.yhorm_location.name == "Vordt of the Boreal Valley" or (
                     self.yhorm_location.name == "Dancer of the Boreal Valley" and
-                    not self.multiworld.late_basin_of_vows
+                    not self.options.late_basin_of_vows
                 )
             ):
                 self.multiworld.early_items[self.player]['Storm Ruler'] = 1
-                self.multiworld.worlds[self.player].options.local_items.value.add('Storm Ruler')
+                self.options.local_items.value.add('Storm Ruler')
         else:
             self.yhorm_location = default_yhorm_location
 
@@ -288,12 +289,6 @@ class DarkSouls3World(World):
 
             new_region.locations.append(new_location)
 
-        # If we allow useful  items in the excluded locations, we don't want Archipelago's fill
-        # algorithm to consider them excluded because it never allows useful items there. Instead,
-        # we manually add item rules to exclude important items.
-        if self.options.excluded_locations == "unnecessary":
-            self.options.exclude_locations.value.clear()
-
         self.multiworld.regions.append(new_region)
         return new_region
 
@@ -325,11 +320,6 @@ class DarkSouls3World(World):
 
         # A list of items we can replace
         removable_items = [item for item in itempool if item.classification == ItemClassification.filler]
-
-        guaranteed_items = {"Path of the Dragon": 1}
-        guaranteed_items.update(self.options.guaranteed_items)
-        if len(removable_items) == 0 and num_required_extra_items == 0:
-            raise Exception("Can't add Path of the Dragon to the item pool")
 
         for item_name in guaranteed_items:
             # Break early just in case nothing is removable (if user is trying to guarantee more
@@ -366,15 +356,9 @@ class DarkSouls3World(World):
 
                 itempool.append(self.create_item(item_name))
 
-        injectable_items = [
-            item for item
-            in item_dictionary.values()
-            if item.inject and (not item.is_dlc or self.options.enable_dlc)
-        ]
-        number_to_inject = min(num_required_extra_items, len(injectable_items))
-        for item in self.multiworld.random.sample(injectable_items, k=number_to_inject):
-            num_required_extra_items -= 1
-            itempool.append(self.create_item(item.name))
+        injectables = self._create_injectable_items(num_required_extra_items)
+        num_required_extra_items -= len(injectables)
+        itempool.extend(injectables)
 
         # Extra filler items for locations containing skip items
         itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
@@ -393,6 +377,49 @@ class DarkSouls3World(World):
         # Add items to itempool
         self.multiworld.itempool += itempool
 
+
+    def _create_injectable_items(self, num_required_extra_items: int) -> List[Item]:
+        """Returns a list of items to inject into the multiworld instead of skipped items.
+
+        If there isn't enough room to inject all the necessary progression items
+        that are in missable locations by default, this adds them to the
+        player's starting inventoy.
+        """
+
+        all_injectable_items = [
+            item for item
+            in item_dictionary.values()
+            if item.inject and (not item.is_dlc or self.options.enable_dlc)
+        ]
+        injectable_progression = [
+            item for item in all_injectable_items
+            if item.classification == ItemClassification.progression
+        ]
+        injectable_non_progression = [
+            item for item in all_injectable_items
+            if item.classification != ItemClassification.progression
+        ]
+
+        number_to_inject = min(num_required_extra_items, len(all_injectable_items))
+        items = (
+            self.multiworld.random.sample(injectable_progression, k=min(3, number_to_inject)) +
+            self.multiworld.random.sample(
+                injectable_non_progression,
+                k=max(0, number_to_inject - len(injectable_progression))
+            )
+        )
+
+        if number_to_inject < len(injectable_progression):
+            for item in injectable_progression:
+                if item in items: continue
+                self.multiworld.push_precollected(self.create_item(item))
+                warning(
+                    f"Couldn't add \"{item}\" to the item pool for " + 
+                    f"{self.multiworld.get_player_name(self.player)}. Adding it to the starting " +
+                    f"inventory instead."
+                )
+
+        return [self.create_item(item) for item in items]
 
 
     def create_item(self, item: Union[str, DS3ItemData]) -> Item:
@@ -472,7 +499,8 @@ class DarkSouls3World(World):
             lambda state: state.has("Cinders of a Lord - Abyss Watcher", self.player) and
                           state.has("Cinders of a Lord - Yhorm the Giant", self.player) and
                           state.has("Cinders of a Lord - Aldrich", self.player) and
-                          state.has("Cinders of a Lord - Lothric Prince", self.player))
+                          state.has("Cinders of a Lord - Lothric Prince", self.player) and
+                          state.has("Transposing Kiln", self.player))
 
         if self.options.late_basin_of_vows:
             self._add_entrance_rule("Lothric Castle", lambda state: (
@@ -501,8 +529,7 @@ class DarkSouls3World(World):
             if self.options.late_dlc:
                 self._add_entrance_rule(
                     "Painted World of Ariandel (Before Contraption)",
-                    "Small Doll"
-                )
+                    lambda state: state.has("Small Doll") and self._has_any_scroll(state))
 
         # Define the access rules to some specific locations
         if self._is_location_available("FS: Lift Chamber Key - Leonhard"):
@@ -511,10 +538,13 @@ class DarkSouls3World(World):
         self._add_location_rule("ID: Bellowing Dragoncrest Ring - drop from B1 towards pit",
                                 "Jailbreaker's Key")
         self._add_location_rule("ID: Covetous Gold Serpent Ring - Siegward's cell", "Old Cell Key")
-        self._add_location_rule(
+        self._add_location_rule([
             "UG: Hornet Ring - environs, right of main path after killing FK boss",
-            lambda state: self._can_get(state, "FK: Cinders of a Lord - Abyss Watcher"),
-        )
+            "UG: Wolf Knight Helm - shop after killing FK boss",
+            "UG: Wolf Knight Armor - shop after killing FK boss",
+            "UG: Wolf Knight Gauntlets - shop after killing FK boss",
+            "UG: Wolf Knight Leggings - shop after killing FK boss"
+        ], lambda state: self._can_get(state, "FK: Cinders of a Lord - Abyss Watcher"))
         self._add_location_rule(
             "ID: Prisoner Chief's Ashes - B2 near, locked cell by stairs",
             "Jailer's Key Ring"
@@ -792,12 +822,16 @@ class DarkSouls3World(World):
         ], "Pale Tongue")
 
         self._add_location_rule([
+            "AL: Crescent Moon Sword - Leonhard drop",
+            "AL: Silver Mask - Leonhard drop",
+            "AL: Soul of Rosaria - Leonhard drop",
+        ] + [
             f"FS: {item} - shop after killing Leonhard"
             for item in ["Leonhard's Garb", "Leonhard's Gauntlets", "Leonhard's Trousers"]
         ], "Black Eye Orb")
 
         ## Hawkwood
-
+        
         # After Hawkwood leaves and once you have the Torso Stone, you can fight him for dragon
         # stones. Andre will give Swordgrass as a hint as well
         self._add_location_rule([
@@ -835,6 +869,11 @@ class DarkSouls3World(World):
         self._add_location_rule([
             "FS: Mail Breaker - Sirris for killing Creighton",
             "FS: Silvercat Ring - Sirris for killing Creighton",
+            "IBV: Creighton's Steel Mask - bridge after killing Creighton",
+            "IBV: Mirrah Chain Gloves - bridge after killing Creighton",
+            "IBV: Mirrah Chain Leggings - bridge after killing Creighton",
+            "IBV: Mirrah Chain Mail - bridge after killing Creighton",
+            "IBV: Dragonslayer's Axe - Creighton drop"
         ], lambda state: (
             self._can_get(state, "US: Soul of the Rotted Greatwood")
             and state.has("Dreamchaser's Ashes", self.player)
@@ -929,10 +968,26 @@ class DarkSouls3World(World):
             and state.has("Sage's Scroll", self.player)
         ))
 
-        # Make sure that the player can keep Orbeck around by giving him at least one scroll
-        # before killing Abyss Watchers.
-        self._add_location_rule("FK: Soul of the Blood of the Wolf", self._has_any_scroll)
-        self._add_location_rule("FK: Cinders of a Lord - Abyss Watcher", self._has_any_scroll)
+        self._add_location_rule([
+            "FS: Pestilent Mist - Orbeck for any scroll",
+            "FS: Young Dragon Ring - Orbeck for one scroll and buying three spells",
+            # Make sure that the player can keep Orbeck around by giving him at least one scroll
+            # before killing Abyss Watchers.
+            "FK: Soul of the Blood of the Wolf",
+            "FK: Cinders of a Lord - Abyss Watcher",
+            "FS: Undead Legion Helm - shop after killing FK boss",
+            "FS: Undead Legion Armor - shop after killing FK boss",
+            "FS: Undead Legion Gauntlet - shop after killing FK boss",
+            "FS: Undead Legion Leggings - shop after killing FK boss",
+            "FS: Farron Ring - Hawkwood",
+            "FS: Hawkwood's Shield - gravestone after Hawkwood leaves",
+            "UG: Hornet Ring - environs, right of main path after killing FK boss",
+            "UG: Wolf Knight Helm - shop after killing FK boss",
+            "UG: Wolf Knight Armor - shop after killing FK boss",
+            "UG: Wolf Knight Gauntlets - shop after killing FK boss",
+            "UG: Wolf Knight Leggings - shop after killing FK boss",
+        ], self._has_any_scroll)
+
         self._add_entrance_rule("Catacombs of Carthus", self._has_any_scroll)
         # Not really necessary but ensures players can decide which way to go
         if self.options.enable_dlc:
@@ -940,6 +995,27 @@ class DarkSouls3World(World):
                 "Painted World of Ariandel (After Contraption)",
                 self._has_any_scroll
             )
+
+        ## Anri
+
+        # Anri only leaves Road of Sacrifices once Deacons is defeated
+        self._add_location_rule([
+            "IBV: Ring of the Evil Eye - Anri",
+            "AL: Chameleon - tomb after marrying Anri",
+        ], lambda state: self._can_get(state, "CD: Soul of the Deacons of the Deep"))
+
+        # If the player does Anri's non-marriage quest, they'll need to defeat the AL boss as well
+        # before it's complete.
+        self._add_location_rule([
+            "AL: Anri's Straight Sword - Anri quest",
+            "FS: Elite Knight Helm - shop after Anri quest",
+            "FS: Elite Knight Armor - shop after Anri quest",
+            "FS: Elite Knight Gauntlets - shop after Anri quest",
+            "FS: Elite Knight Leggings - shop after Anri quest",
+        ], lambda state: (
+            self._can_get(state, "IBV: Ring of the Evil Eye - Anri") and
+            self._can_get(state, "AL: Soul of Aldrich")
+        ))
 
 
     def _add_transposition_rules(self) -> None:
@@ -1040,7 +1116,12 @@ class DarkSouls3World(World):
 
 
     def _add_unnecessary_location_rules(self) -> None:
-        """Adds rules for locations that can contain useful but not necessary items."""
+        """Adds rules for locations that can contain useful but not necessary items.
+
+        If we allow useful items in the excluded locations, we don't want Archipelago's fill
+        algorithm to consider them excluded because it never allows useful items there. Instead, we
+        manually add item rules to exclude important items.
+        """
 
         unnecessary_locations = (
             self.options.exclude_locations.value
@@ -1060,6 +1141,9 @@ class DarkSouls3World(World):
                 location,
                 lambda item: not item.advancement
             )
+
+        if self.options.excluded_locations == "unnecessary":
+            self.options.exclude_locations.value.clear()
 
 
     def _add_early_item_rules(self, randomized_items: Set[str]) -> None:
