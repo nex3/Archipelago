@@ -179,7 +179,9 @@ class DS3ItemData():
             DS3ItemCategory.SOUL: "Small Souls",
             DS3ItemCategory.UPGRADE: "Upgrade",
             DS3ItemCategory.HEALING: "Healing",
-        }[default_item.category])
+        }[self.category])
+
+        return names
 
     def counts(self, counts: List[int]) -> Generator["DS3ItemData", None, None]:
         """Returns an iterable of copies of this item with the given counts."""
@@ -1290,9 +1292,10 @@ _vanilla_items = flatten([
     DS3ItemData("Easterner's Ashes",                   0x40000868, DS3ItemCategory.UNIQUE,
                 classification = ItemClassification.progression),
 
-    # Fake item for controlling access to Archdragon Peak
+    # Fake item for controlling access to Archdragon Peak. The real drop isn't actually an item as
+    # such so we have to inject this because there's no slot for it to come from.
     DS3ItemData("Path of the Dragon",                  0x40002346, DS3ItemCategory.UNIQUE,
-                classification = ItemClassification.progression),
+                inject = True, classification = ItemClassification.progression),
 
     # Spells
     DS3ItemData("Farron Dart",                         0x40124F80, DS3ItemCategory.SPELL),
@@ -1687,6 +1690,10 @@ item_descriptions = {
 
 
 _all_items = _vanilla_items + _dlc_items
+
+for item_data in _all_items:
+  for group_name in item_data.item_groups():
+    item_name_groups[group_name].add(item_data.name)
 
 filler_item_names = [item_data.name for item_data in _all_items if item_data.filler]
 item_dictionary = {item_data.name: item_data for item_data in _all_items}
