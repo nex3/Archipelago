@@ -489,7 +489,6 @@ class DarkSouls3World(World):
                           state.has("Cinders of a Lord - Lothric Prince", self.player) and
                           state.has("Transposing Kiln", self.player))
 
-        self._add_entrance_rule("Lothric Castle", self._has_any_scroll)
         if self.options.late_basin_of_vows:
             self._add_entrance_rule("Lothric Castle", lambda state: (
                 state.has("Small Lothric Banner", self.player)
