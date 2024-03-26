@@ -519,7 +519,7 @@ class DarkSouls3World(World):
             if self.options.late_dlc:
                 self._add_entrance_rule(
                     "Painted World of Ariandel (Before Contraption)",
-                    lambda state: state.has("Small Doll", self.player) and self._has_any_scroll(state))
+                    lambda state: state.has("Small Doll") and self._has_any_scroll(state))
 
             if self.options.late_dlc > 1: # After Basin
                 self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
