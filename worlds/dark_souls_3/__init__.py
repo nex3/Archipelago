@@ -428,7 +428,7 @@ class DarkSouls3World(World):
             and data.category.upgrade_level
             # Because we require the Pyromancy Flame to be available early, don't upgrade it so it
             # doesn't get shuffled around by weapon smoothing.
-            and not data.name == "Pyromancy FLame"
+            and not data.name == "Pyromancy Flame"
         ):
             # if the user made an error and set a min higher than the max we default to the max
             max_5 = self.options.max_levels_in_5
@@ -501,6 +501,10 @@ class DarkSouls3World(World):
                     "Pyromancy Flame" not in randomized_items
                     or state.has("Pyromancy Flame", self.player)
                 )
+                # This isn't really necessary, but it ensures that the game logic knows players will
+                # want to do Lothric Castle after at least being _able_ to access Catacombs. This is
+                # useful for smooth item placement.
+                and self._has_any_scroll
             ))
 
             if self.options.late_basin_of_vows > 1: # After Small Doll
@@ -508,15 +512,16 @@ class DarkSouls3World(World):
 
         # DLC Access Rules Below
         if self.options.enable_dlc:
-            self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", self._has_any_scroll)
             self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "CD -> PW1")
             self._add_entrance_rule("Painted World of Ariandel (After Contraption)", "Contraption Key")
             self._add_entrance_rule("Dreg Heap", "PW2 -> DH")
             self._add_entrance_rule("Ringed City", "Small Envoy Banner")
 
-            if self.options.late_dlc: # After Small Doll
-                self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Small Doll")
-            
+            if self.options.late_dlc:
+                self._add_entrance_rule(
+                    "Painted World of Ariandel (Before Contraption)",
+                    lambda state: state.has("Small Doll", self.player) and self._has_any_scroll)
+
             if self.options.late_dlc > 1: # After Basin
                 self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
 
@@ -548,7 +553,6 @@ class DarkSouls3World(World):
 
         # Lump Soul of the Dancer in with LC for locations that should not be reachable
         # before having access to US. (Prevents requiring getting Basin to fight Dancer to get SLB to go to US)
-        self._add_location_rule("HWL: Soul of the Dancer", self._has_any_scroll)
         if self.options.late_basin_of_vows:
             self._add_location_rule("HWL: Soul of the Dancer", lambda state: (
                 state.has("Small Lothric Banner", self.player)
@@ -560,6 +564,10 @@ class DarkSouls3World(World):
                     "Pyromancy Flame" not in randomized_items
                     or state.has("Pyromancy Flame", self.player)
                 )
+                # This isn't really necessary, but it ensures that the game logic knows players will
+                # want to do Lothric Castle after at least being _able_ to access Catacombs. This is
+                # useful for smooth item placement.
+                and self._has_any_scroll
             ))
 
             if self.options.late_basin_of_vows > 1: # After Small Doll
