@@ -503,7 +503,7 @@ class DarkSouls3World(World):
                 # This isn't really necessary, but it ensures that the game logic knows players will
                 # want to do Lothric Castle after at least being _able_ to access Catacombs. This is
                 # useful for smooth item placement.
-                and self._has_any_scroll
+                and self._has_any_scroll(state)
             ))
 
             if self.options.late_basin_of_vows > 1: # After Small Doll
@@ -519,7 +519,7 @@ class DarkSouls3World(World):
             if self.options.late_dlc:
                 self._add_entrance_rule(
                     "Painted World of Ariandel (Before Contraption)",
-                    lambda state: state.has("Small Doll", self.player) and self._has_any_scroll)
+                    lambda state: state.has("Small Doll", self.player) and self._has_any_scroll(state))
 
             if self.options.late_dlc > 1: # After Basin
                 self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
@@ -566,7 +566,7 @@ class DarkSouls3World(World):
                 # This isn't really necessary, but it ensures that the game logic knows players will
                 # want to do Lothric Castle after at least being _able_ to access Catacombs. This is
                 # useful for smooth item placement.
-                and self._has_any_scroll
+                and self._has_any_scroll(state)
             ))
 
             if self.options.late_basin_of_vows > 1: # After Small Doll
