@@ -363,34 +363,32 @@ class DarkSouls3World(World):
         # Extra filler items for locations containing skip items
         itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
 
+        # Add items to itempool
+        self.multiworld.itempool += itempool
+
+        # Remove certain items and place them early.
         # If Yhorm is at Iudex Gundyr, Storm Ruler must be randomized, so it can always be removed
+        # Don't place this in the multiworld because it's necessary almost immediately, and don't
+        # mark it as a blocker for HWL because having a miniscule Sphere 1 screws with progression balancing.
         if self.yhorm_location.name == 'Iudex Gundyr':
-            itempool.remove(self.create_item("Storm Ruler"))
-            # Don't place this in the multiworld because it's necessary almost immediately, and don't
-            # mark it as a blocker for HWL because having a miniscule Sphere 1 screws with progression balancing.
             self._fill_local_item("Storm Ruler", ["Cemetery of Ash"],
                                   lambda location: location.name != "CA: Coiled Sword - boss drop")
 
         # If the Coiled Sword is vanilla, it is early enough and doesn't need to be removed
+        # Fill this manually so that, if very few slots are available in Cemetery of Ash, this
+        # doesn't get locked out by bad rolls on the next two fills.
         if self._is_location_available("CA: Coiled Sword - boss drop"):
-            itempool.remove(self.create_item("Coiled Sword"))
-            # Fill this manually so that, if very few slots are available in Cemetery of Ash, this
-            # doesn't get locked out by bad rolls on the next two fills.
             self._fill_local_item("Coiled Sword", ["Cemetery of Ash", "Firelink Shrine"])
 
         # If the HWL Raw Gem is vanilla, it is early enough and doesn't need to be removed
+        # If upgrade smoothing is enabled, make sure one raw gem is available early for SL1 players
         if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
-            itempool.remove(self.create_item("Raw Gem"))
-            # If upgrade smoothing is enabled, make sure one raw gem is available early for SL1 players
-            if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
-                self._fill_local_item("Raw Gem", [
-                                      "Cemetery of Ash",
-                                      "Firelink Shrine",
-                                      "High Wall of Lothric"
-                                      ])
-
-        # Add items to itempool
-        self.multiworld.itempool += itempool
+        if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
+            self._fill_local_item("Raw Gem", [
+                                  "Cemetery of Ash",
+                                  "Firelink Shrine",
+                                  "High Wall of Lothric"
+                                  ])
 
 
     def _create_injectable_items(self, num_required_extra_items: int) -> List[Item]:
@@ -1301,11 +1299,12 @@ class DarkSouls3World(World):
             self.multiworld.push_precollected(self.create_item(name))
 
             # If the item can't be placed, it was randomized, which means an item has to replace it.
-            self.itempool.append(self.create_filler())
+            self.multiworld.itempool.append(self.create_filler())
             return
 
         location = self.random.choice(candidate_locations)
         location.place_locked_item(item)
+        self.multiworld.itempool.remove(item)
 
     def post_fill(self):
         """If item smoothing is enabled, rearrange items so they scale up smoothly through the run.
