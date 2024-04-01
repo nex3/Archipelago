@@ -383,7 +383,6 @@ class DarkSouls3World(World):
         # If the HWL Raw Gem is vanilla, it is early enough and doesn't need to be removed
         # If upgrade smoothing is enabled, make sure one raw gem is available early for SL1 players
         if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
-        if self._is_location_available("HWL: Raw Gem - fort roof, lizard") and self.options.smooth_upgrade_items:
             self._fill_local_item("Raw Gem", [
                                   "Cemetery of Ash",
                                   "Firelink Shrine",
