@@ -368,15 +368,15 @@ class DarkSouls3World(World):
 
         # Remove certain items and place them early.
         # If Yhorm is at Iudex Gundyr, Storm Ruler must be randomized, so it can always be removed
-        # Don't place this in the multiworld because it's necessary almost immediately, and don't
-        # mark it as a blocker for HWL because having a miniscule Sphere 1 screws with progression balancing.
+        # Fill this manually so that, if very few slots are available in Cemetery of Ash, this
+        # doesn't get locked out by bad rolls on the next two fills.
         if self.yhorm_location.name == 'Iudex Gundyr':
             self._fill_local_item("Storm Ruler", ["Cemetery of Ash"],
                                   lambda location: location.name != "CA: Coiled Sword - boss drop")
 
         # If the Coiled Sword is vanilla, it is early enough and doesn't need to be removed
-        # Fill this manually so that, if very few slots are available in Cemetery of Ash, this
-        # doesn't get locked out by bad rolls on the next two fills.
+        # Don't place this in the multiworld because it's necessary almost immediately, and don't
+        # mark it as a blocker for HWL because having a miniscule Sphere 1 screws with progression balancing.
         if self._is_location_available("CA: Coiled Sword - boss drop"):
             self._fill_local_item("Coiled Sword", ["Cemetery of Ash", "Firelink Shrine"])
 
