@@ -1275,7 +1275,6 @@ class DarkSouls3World(World):
         passed, only locations meeting that condition will be considered.
 
         If the item could not be placed, it will be added to starting inventory.
-        A filler item will also be added to the itempool.
         """
         item = self.create_item(name)
 
@@ -1296,9 +1295,6 @@ class DarkSouls3World(World):
         if not candidate_locations:
             warning(f"Couldn't place \"{name}\" in a valid location for {self.multiworld.get_player_name(self.player)}. Adding it to starting inventory instead.")
             self.multiworld.push_precollected(self.create_item(name))
-
-            # If the item can't be placed, it was randomized, which means an item has to replace it.
-            self.multiworld.itempool.append(self.create_filler())
             return
 
         location = self.random.choice(candidate_locations)
