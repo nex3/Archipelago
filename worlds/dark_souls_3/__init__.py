@@ -328,7 +328,7 @@ class DarkSouls3World(World):
         # Add items to itempool
         self.multiworld.itempool += itempool
 
-        self._place_manual_items()
+        self._fill_local_items()
 
 
     def _create_injectable_items(self, num_required_extra_items: int) -> List[Item]:
@@ -427,7 +427,7 @@ class DarkSouls3World(World):
         return DarkSouls3Item(self.player, data, classification=classification)
 
 
-    def _place_manual_items(self) -> None:
+    def _fill_local_items(self) -> None:
         """Removes certain items from the item pool and manually places them in the local world.
 
         We can't do this in pre_fill because the itempool may not be modified after create_items.
