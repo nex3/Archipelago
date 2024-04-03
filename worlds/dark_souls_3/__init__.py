@@ -994,6 +994,13 @@ class DarkSouls3World(World):
             "UG: Wolf Knight Leggings - shop after killing FK boss",
         ], self._has_any_scroll)
 
+        # Not really necessary but ensures players can decide which way to go
+        if self.options.enable_dlc:
+            self._add_entrance_rule(
+                "Painted World of Ariandel (After Contraption)",
+                self._has_any_scroll
+            )
+
         ## Anri
 
         # Anri only leaves Road of Sacrifices once Deacons is defeated
