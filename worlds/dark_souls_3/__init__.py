@@ -470,7 +470,14 @@ class DarkSouls3World(World):
 
         If the item could not be placed, it will be added to starting inventory.
         """
-        item = self.create_item(name)
+        item = next(
+            (
+                item for item in self.multiworld.itempool
+                if item.player == self.player and item.name == name
+            ),
+            None
+        )
+        if not item: return
 
         candidate_locations = [
             location for location in (
