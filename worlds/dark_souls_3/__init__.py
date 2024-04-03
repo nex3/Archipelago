@@ -103,7 +103,7 @@ class DarkSouls3World(World):
 
         # Randomize Yhorm manually so that we know where to place the Storm Ruler.
         if self.options.randomize_enemies:
-            self.yhorm_location = self.multiworld.random.choice(
+            self.yhorm_location = self.random.choice(
                 [boss for boss in all_bosses if self._allow_boss_for_yhorm(boss)])
 
             # If Yhorm is early, make sure the Storm Ruler is easily available to avoid BK
@@ -318,44 +318,6 @@ class DarkSouls3World(World):
                     item_set.add(location.data.default_item_name)
                     itempool.append(self.create_item(location.data.default_item_name))
 
-        # A list of items we can replace
-        removable_items = [item for item in itempool if item.classification == ItemClassification.filler]
-
-        for item_name in guaranteed_items:
-            # Break early just in case nothing is removable (if user is trying to guarantee more
-            # items than the pool can hold, for example)
-            if len(removable_items) == 0 and num_required_extra_items == 0:
-                break
-
-            num_existing_copies = len([item for item in itempool if item.name == item_name])
-            for _ in range(guaranteed_items[item_name]):
-                if num_existing_copies > 0:
-                    num_existing_copies -= 1
-                    continue
-
-                if num_required_extra_items > 0:
-                    # We can just add them instead of using filler later
-                    num_required_extra_items -= 1
-                else:
-                    if len(removable_items) == 0:
-                        break
-
-                    # Try to construct a list of items with the same category that can be removed
-                    # If none exist, just remove something at random
-                    removable_shortlist = [
-                        item for item
-                        in removable_items
-                        if item_dictionary[item.name].category == item_dictionary[item_name].category
-                    ]
-                    if len(removable_shortlist) == 0:
-                        removable_shortlist = removable_items
-
-                    removed_item = self.multiworld.random.choice(removable_shortlist)
-                    removable_items.remove(removed_item) # To avoid trying to replace the same item twice
-                    itempool.remove(removed_item)
-
-                itempool.append(self.create_item(item_name))
-
         injectables = self._create_injectable_items(num_required_extra_items)
         num_required_extra_items -= len(injectables)
         itempool.extend(injectables)
@@ -382,30 +344,40 @@ class DarkSouls3World(World):
             in item_dictionary.values()
             if item.inject and (not item.is_dlc or self.options.enable_dlc)
         ]
-        injectable_progression = [
+        injectable_mandatory = [
             item for item in all_injectable_items
             if item.classification == ItemClassification.progression
+        ] + [
+            item
+            for (item, count) in self.options.guaranteed_items.items()
+            for _ in range(0, count)
         ]
-        injectable_non_progression = [
+        injectable_optional = [
             item for item in all_injectable_items
             if item.classification != ItemClassification.progression
         ]
 
         number_to_inject = min(num_required_extra_items, len(all_injectable_items))
         items = (
-            self.multiworld.random.sample(injectable_progression, k=min(3, number_to_inject)) +
-            self.multiworld.random.sample(
-                injectable_non_progression,
-                k=max(0, number_to_inject - len(injectable_progression))
+            self.random.sample(
+                injectable_mandatory,
+                k=min(len(injectable_mandatory), number_to_inject)
+            )
+            + self.random.sample(
+                injectable_optional,
+                k=max(0, number_to_inject - len(injectable_mandatory))
             )
         )
 
-        if number_to_inject < len(injectable_progression):
-            for item in injectable_progression:
+        if number_to_inject < len(injectable_mandatory):
+            # It's worth considering the possibility of _removing_ unimportant
+            # items from the pool to inject these instead rather than just
+            # making them part of the starting health back
+            for item in injectable_mandatory:
                 if item in items: continue
                 self.multiworld.push_precollected(self.create_item(item))
                 warning(
-                    f"Couldn't add \"{item}\" to the item pool for " + 
+                    f"Couldn't add \"{item.name}\" to the item pool for " + 
                     f"{self.multiworld.get_player_name(self.player)}. Adding it to the starting " +
                     f"inventory instead."
                 )
@@ -432,7 +404,7 @@ class DarkSouls3World(World):
             and data.category.upgrade_level
             # Because we require the Pyromancy Flame to be available early, don't upgrade it so it
             # doesn't get shuffled around by weapon smoothing.
-            and not data.name == "Pyromancy FLame"
+            and not data.name == "Pyromancy Flame"
         ):
             # if the user made an error and set a min higher than the max we default to the max
             max_5 = self.options.max_levels_in_5
@@ -441,16 +413,16 @@ class DarkSouls3World(World):
             min_10 = min(self.options.min_levels_in_10, max_10)
             weapon_level_percentage = self.options.randomize_weapon_level_percentage
 
-            if self.multiworld.random.randint(0, 99) < weapon_level_percentage:
+            if self.random.randint(0, 99) < weapon_level_percentage:
                 if data.category.upgrade_level == 5:
-                    data = data.upgrade(self.multiworld.random.randint(min_5, max_5))
+                    data = data.upgrade(self.random.randint(min_5, max_5))
                 elif data.category.upgrade_level == 10:
-                    data = data.upgrade(self.multiworld.random.randint(min_10, max_10))
+                    data = data.upgrade(self.random.randint(min_10, max_10))
 
         if self.options.randomize_infusion and data.category.is_infusible:
             infusion_percentage = self.options.randomize_infusion_percentage
-            if self.multiworld.random.randint(0, 99) < infusion_percentage:
-                data = data.infuse(self.multiworld.random.choice(list(Infusion)))
+            if self.random.randint(0, 99) < infusion_percentage:
+                data = data.infuse(self.random.choice(list(Infusion)))
 
         return DarkSouls3Item(self.player, data, classification=classification)
 
@@ -526,7 +498,7 @@ class DarkSouls3World(World):
 
 
     def get_filler_item_name(self) -> str:
-        return self.multiworld.random.choice(filler_item_names)
+        return self.random.choice(filler_item_names)
 
 
     def set_rules(self) -> None:
@@ -543,25 +515,49 @@ class DarkSouls3World(World):
         self._add_early_item_rules(randomized_items)
 
         self._add_entrance_rule("Firelink Shrine Bell Tower", "Tower Key")
-        self._add_entrance_rule("Undead Settlement", "Small Lothric Banner")
+        self._add_entrance_rule("Undead Settlement", lambda state: (
+            state.has("Small Lothric Banner", self.player)
+            and self._can_get(state, "HWL: Soul of Boreal Valley Vordt")
+        ))
         self._add_entrance_rule("Road of Sacrifices", "US -> RS")
-        self._add_entrance_rule("Cathedral of the Deep", "RS -> CD")
-        self._add_entrance_rule("Farron Keep", "RS -> FK")
-        self._add_entrance_rule("Catacombs of Carthus", "FK -> CC")
-        self._add_entrance_rule("Irithyll Dungeon", "IBV -> ID")
-        self._add_entrance_rule("Lothric Castle", "Basin of Vows")
-        self._add_entrance_rule("Untended Graves", "CKG -> UG")
-        self._add_entrance_rule("Irithyll of the Boreal Valley", "Small Doll")
-        self._add_entrance_rule("Anor Londo", "IBV -> AL")
-        self._add_entrance_rule("Archdragon Peak", "Path of the Dragon")
-        self._add_entrance_rule("Grand Archives", "Grand Archives Key")
         self._add_entrance_rule(
-            "Kiln of the First Flame",
-            lambda state: state.has("Cinders of a Lord - Abyss Watcher", self.player) and
-                          state.has("Cinders of a Lord - Yhorm the Giant", self.player) and
-                          state.has("Cinders of a Lord - Aldrich", self.player) and
-                          state.has("Cinders of a Lord - Lothric Prince", self.player) and
-                          state.has("Transposing Kiln", self.player))
+            "Cathedral of the Deep",
+            lambda state: self._can_get(state, "RS: Soul of a Crystal Sage")
+        )
+        self._add_entrance_rule("Farron Keep", "RS -> FK")
+        self._add_entrance_rule(
+            "Catacombs of Carthus",
+            lambda state: self._can_get(state, "FK: Soul of the Blood of the Wolf")
+        )
+        self._add_entrance_rule("Irithyll Dungeon", "IBV -> ID")
+        self._add_entrance_rule(
+            "Lothric Castle",
+            lambda state: self._can_get(state, "HWL: Soul of the Dancer")
+        )
+        self._add_entrance_rule(
+            "Untended Graves",
+            lambda state: self._can_get(state, "CKG: Soul of Consumed Oceiros")
+        )
+        self._add_entrance_rule("Irithyll of the Boreal Valley", lambda state: (
+            state.has("Small Doll", self.player)
+            and self._can_get(state, "CC: Soul of High Lord Wolnir")
+        ))
+        self._add_entrance_rule(
+            "Anor Londo",
+            lambda state: self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
+        )
+        self._add_entrance_rule("Archdragon Peak", "Path of the Dragon")
+        self._add_entrance_rule("Grand Archives", lambda state: (
+            state.has("Grand Archives Key", self.player)
+            and self._can_get(state, "LC: Soul of Dragonslayer Armour")
+        ))
+        self._add_entrance_rule("Kiln of the First Flame", lambda state: (
+            state.has("Cinders of a Lord - Abyss Watcher", self.player)
+            and state.has("Cinders of a Lord - Yhorm the Giant", self.player)
+            and state.has("Cinders of a Lord - Aldrich", self.player)
+            and state.has("Cinders of a Lord - Lothric Prince", self.player)
+            and state.has("Transposing Kiln", self.player)
+        ))
 
         if self.options.late_basin_of_vows:
             self._add_entrance_rule("Lothric Castle", lambda state: (
@@ -584,13 +580,19 @@ class DarkSouls3World(World):
         if self.options.enable_dlc:
             self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "CD -> PW1")
             self._add_entrance_rule("Painted World of Ariandel (After Contraption)", "Contraption Key")
-            self._add_entrance_rule("Dreg Heap", "PW2 -> DH")
-            self._add_entrance_rule("Ringed City", "Small Envoy Banner")
+            self._add_entrance_rule(
+                "Dreg Heap",
+                lambda state: self._can_get(state, "PW2: Soul of Sister Friede")
+            )
+            self._add_entrance_rule("Ringed City", lambda state: (
+                state.has("Small Envoy Banner", self.player)
+                and self._can_get(state, "DH: Soul of the Demon Prince")
+            ))
 
             if self.options.late_dlc:
                 self._add_entrance_rule(
                     "Painted World of Ariandel (Before Contraption)",
-                    lambda state: state.has("Small Doll") and self._has_any_scroll(state))
+                    lambda state: state.has("Small Doll", self.player) and self._has_any_scroll(state))
 
         # Define the access rules to some specific locations
         if self._is_location_available("FS: Lift Chamber Key - Leonhard"):
@@ -698,8 +700,11 @@ class DarkSouls3World(World):
             )
         
         # Make sure the Storm Ruler is available BEFORE Yhorm the Giant
-        if self.yhorm_location.region:
-            self._add_entrance_rule(self.yhorm_location.region, "Storm Ruler")
+        if self.yhorm_location.name == "Ancient Wyvern":
+            # This is a white lie, you can get to a bunch of items in AP before you beat the Wyvern,
+            # but this saves us from having to split the entire region in two just to mark which
+            # specific items are before and after.
+            self._add_entrance_rule("Archdragon Peak", "Storm Ruler")
         for location in self.yhorm_location.locations:
             self._add_location_rule(location, "Storm Ruler")
 
@@ -934,7 +939,9 @@ class DarkSouls3World(World):
             "IBV: Mirrah Chain Gloves - bridge after killing Creighton",
             "IBV: Mirrah Chain Leggings - bridge after killing Creighton",
             "IBV: Mirrah Chain Mail - bridge after killing Creighton",
-            "IBV: Dragonslayer's Axe - Creighton drop"
+            "IBV: Dragonslayer's Axe - Creighton drop",
+            # Killing Pontiff without progressing Sirris's quest will break it.
+            "IBV: Soul of Pontiff Sulyvahn"
         ], lambda state: (
             self._can_get(state, "US: Soul of the Rotted Greatwood")
             and state.has("Dreamchaser's Ashes", self.player)
@@ -1049,7 +1056,6 @@ class DarkSouls3World(World):
             "UG: Wolf Knight Leggings - shop after killing FK boss",
         ], self._has_any_scroll)
 
-        self._add_entrance_rule("Catacombs of Carthus", self._has_any_scroll)
         # Not really necessary but ensures players can decide which way to go
         if self.options.enable_dlc:
             self._add_entrance_rule(
@@ -1442,7 +1448,7 @@ class DarkSouls3World(World):
     def _shuffle(self, seq: Sequence) -> List:
         """Returns a shuffled copy of a sequence."""
         copy = list(seq)
-        self.multiworld.random.shuffle(copy)
+        self.random.shuffle(copy)
         return copy
 
 
