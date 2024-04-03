@@ -22,7 +22,7 @@ version before using this version.
 ### One-Time Setup
 
 Before you first connect to a multiworld, you need to generate the local data files for your world's
-randomized items and (optionally) enemy locations. You only need to do this once per multiworld.
+randomized item and (optionally) enemy locations. You only need to do this once per multiworld.
 
 1. Before you first connect to a multiworld, run `randomizer\DS3Randomizer.exe`.
 
