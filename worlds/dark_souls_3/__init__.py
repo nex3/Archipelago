@@ -409,10 +409,10 @@ class DarkSouls3World(World):
             and not data.name == "Pyromancy Flame"
         ):
             # if the user made an error and set a min higher than the max we default to the max
-            max_5 = self.options.max_levels_in_5
-            min_5 = min(self.options.min_levels_in_5, max_5)
-            max_10 = self.options.max_levels_in_10
-            min_10 = min(self.options.min_levels_in_10, max_10)
+            max_5 = self.options.max_levels_in_5.value
+            min_5 = min(self.options.min_levels_in_5.value, max_5)
+            max_10 = self.options.max_levels_in_10.value
+            min_10 = min(self.options.min_levels_in_10.value, max_10)
             weapon_level_percentage = self.options.randomize_weapon_level_percentage
 
             if self.random.randint(0, 99) < weapon_level_percentage:
@@ -1447,7 +1447,7 @@ class DarkSouls3World(World):
                 ]
 
                 # Check the game, not the player, because we know how to sort within regions for DS3
-                offworld = self._shuffle(loc for loc in locations if loc.game != "Dark Souls III")
+                offworld = self._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
                 onworld = sorted((loc for loc in locations if loc.game == "Dark Souls III"),
                                  key=lambda loc: loc.data.region_value)
 
@@ -1527,7 +1527,7 @@ class DarkSouls3World(World):
 
         # A map from Archipelago's location IDs to the keys the offline
         # randomizer uses to identify locations.
-        location_ids_to_keys: Dict[str, str] = {}
+        location_ids_to_keys: Dict[int, str] = {}
         for location in self.multiworld.get_filled_locations(self.player):
             # Skip events and only look at this world's locations
             if (location.address is not None and location.item.code is not None
