@@ -33,7 +33,7 @@ region_order = [
     "Lothric Castle",
     "Consumed King's Garden",
     "Untended Graves",
-    # List this late becaues it contains a Titanite Slab in the base game
+    # List this late because it contains a Titanite Slab in the base game
     "Firelink Shrine Bell Tower",
     "Grand Archives",
     "Archdragon Peak",
@@ -294,7 +294,7 @@ location_tables = {
         DS3LocationData("FS: Soul of a Deserted Corpse - bell tower door",
                         "Soul of a Deserted Corpse"),
         DS3LocationData("FS: East-West Shield - tree by shrine entrance", "East-West Shield"),
-        DS3LocationData("FS: Homeward Bone - path above shrine entrace", "Homeward Bone"),
+        DS3LocationData("FS: Homeward Bone - path above shrine entrance", "Homeward Bone"),
         DS3LocationData("FS: Ember - above shrine entrance", "Ember"),
         DS3LocationData("FS: Wolf Ring+2 - left of boss room exit", "Wolf Ring+2", ngp = True),
         # Leonhard (quest)
@@ -710,7 +710,7 @@ location_tables = {
         # In enemy rando, the enemy may not burst through the wall and make this room obvious
         DS3LocationData("US: Whip - back alley, behind wooden wall", "Whip", hidden = True),
         DS3LocationData("US: Great Scythe - building by white tree, balcony", "Great Scythe"),
-        DS3LocationData("US: Homeward Bone - foot, drop overloop", "Homeward Bone",
+        DS3LocationData("US: Homeward Bone - foot, drop overlook", "Homeward Bone",
                         offline = '02,0:53100540::'),
         DS3LocationData("US: Large Soul of a Deserted Corpse - around corner by Cliff Underside",
                         "Large Soul of a Deserted Corpse", hidden = True), # Hidden corner
@@ -2186,7 +2186,7 @@ location_tables = {
         DS3LocationData("GA: Shriving Stone - 2F late, by ladder from 3F", "Shriving Stone"),
         DS3LocationData("GA: Large Soul of a Crestfallen Knight - 4F, back",
                         "Large Soul of a Crestfallen Knight"),
-        DS3LocationData("GA: Titanite Chunk - rooftopps, balcony", "Titanite Chunk"),
+        DS3LocationData("GA: Titanite Chunk - rooftops, balcony", "Titanite Chunk"),
         DS3LocationData("GA: Titanite Scale - rooftops lower, path to 2F", "Titanite Scale x3",
                         hidden = True), # Hidden fall
         DS3LocationData("GA: Titanite Chunk - rooftops lower, ledge by buttress", "Titanite Chunk",
@@ -2991,13 +2991,13 @@ location_tables = {
         DS3LocationData("FS: Black Fire Orb - Karla for Grave Warden Tome", "Black Fire Orb",
                         missable = True, shop = True, npc = True),
 
-        # Deep Braille Divine Tome. This can also be given to Irina but it'll fail her quest
+        # Deep Braille Divine Tome. This can also be given to Irina, but it'll fail her quest
         DS3LocationData("FS: Gnaw - Karla for Deep Braille Tome", "Gnaw", missable = True,
                         npc = True, shop = True),
         DS3LocationData("FS: Deep Protection - Karla for Deep Braille Tome", "Deep Protection",
                         missable = True, npc = True, shop = True),
 
-        # Londor Braille Divine Tome. This can also be given to Irina but it'll fail her quest
+        # Londor Braille Divine Tome. This can also be given to Irina, but it'll fail her quest
         DS3LocationData("FS: Vow of Silence - Karla for Londor Tome", "Vow of Silence",
                         missable = True, npc = True, shop = True),
         DS3LocationData("FS: Dark Blade - Karla for Londor Tome", "Dark Blade", missable = True,
