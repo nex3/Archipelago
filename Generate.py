@@ -21,7 +21,6 @@ from BaseClasses import seeddigits, get_seed, PlandoOptions
 from Main import main as ERmain
 from settings import get_settings
 from Utils import parse_yamls, version_tuple, __version__, tuplize_version
-from worlds.alttp import Options as LttPOptions
 from worlds.alttp.EntranceRandomizer import parse_arguments
 from worlds.alttp.Text import TextTable
 from worlds.AutoWorld import AutoWorldRegister
@@ -311,13 +310,6 @@ def handle_name(name: str, player: int, name_counter: Counter):
     return new_name
 
 
-def prefer_int(input_data: str) -> Union[str, int]:
-    try:
-        return int(input_data)
-    except:
-        return input_data
-
-
 def roll_percentage(percentage: Union[int, float]) -> bool:
     """Roll a percentage chance.
     percentage is expected to be in range [0, 100]"""
@@ -418,19 +410,19 @@ def roll_triggers(weights: dict, triggers: list) -> dict:
 
 
 def handle_option(ret: argparse.Namespace, game_weights: dict, option_key: str, option: type(Options.Option), plando_options: PlandoOptions):
-    if option_key in game_weights:
-        try:
+    try:
+        if option_key in game_weights:
             if not option.supports_weighting:
                 player_option = option.from_any(game_weights[option_key])
             else:
                 player_option = option.from_any(get_choice(option_key, game_weights))
-            setattr(ret, option_key, player_option)
-        except Exception as e:
-            raise Exception(f"Error generating option {option_key} in {ret.game}") from e
         else:
-            player_option.verify(AutoWorldRegister.world_types[ret.game], ret.name, plando_options)
+            player_option = option.from_any(option.default) # call the from_any here to support default "random"
+        setattr(ret, option_key, player_option)
+    except Exception as e:
+        raise Exception(f"Error generating option {option_key} in {ret.game}") from e
     else:
-        setattr(ret, option_key, option.from_any(option.default))  # call the from_any here to support default "random"
+        player_option.verify(AutoWorldRegister.world_types[ret.game], ret.name, plando_options)
 
 
 def roll_settings(weights: dict, plando_options: PlandoOptions = PlandoOptions.bosses):
