@@ -927,7 +927,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>CD: Crest Shield - path, drop down by Cathedral of the Deep bonfire</td><td>On a grave near the Cathedral of the Deep bonfire, accessed by dropping down to the right</td></tr>
 <tr><td>CD: Curse Ward Greatshield - by ladder from white tree to moat</td><td>Taking a right after the Infested Corpse graveyard, before the shortcut ladder down to the Ravenous Crystal Lizard area</td></tr>
 <tr><td>CD: Deep Braille Divine Tome - mimic by side chapel</td><td>Dropped by the Mimic before the room with the patrolling Cathedral Knight and Deep Accursed</td></tr>
-<tr><td>CD: Deep Gem - downstairs by first elevator</td><td>Coming from the room where you first see deacons, go down instead of continuing to the main cathedral room. Guarded by a pensive Cathedral Evangelist.</td></tr>
+<tr><td>CD: Deep Gem - down stairs by first elevator</td><td>Coming from the room where you first see deacons, go down instead of continuing to the main cathedral room. Guarded by a pensive Cathedral Evangelist.</td></tr>
 <tr><td>CD: Deep Ring - upper roofs, passive mob drop in first tower</td><td>Dropped by the passive Deacon on the way to Rosaria</td></tr>
 <tr><td>CD: Drang Armor - main hall, east</td><td>In the Giant Slave muck pit leading up to Deacons</td></tr>
 <tr><td>CD: Drang Gauntlets - main hall east</td><td>In the Giant Slave muck pit leading up to Deacons</td></tr>
@@ -970,7 +970,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>CD: Pale Tongue - main hall east</td><td>In the Giant Slave muck pit leading up to Deacons</td></tr>
 <tr><td>CD: Pale Tongue - upper roofs, outdoors far end</td><td>Before the rafters on the way to Rosaria, up a flying buttress and straight right, passing a halberd-wielding Large Hollow Soldier</td></tr>
 <tr><td>CD: Poisonbite Ring - moat, hall past miniboss</td><td>In the pit with the Infested Corpse, accessible from the Ravenous Crystal Lizard area or from dropping down near the second Cleansing Chapel shortcut</td></tr>
-<tr><td>CD: Red Bug Pellet - lower roofs, upstairs between buttresses</td><td>In the area after the cathedral roof against the wall of the cathedral, down the path from the Cathedral Evangelist.</td></tr>
+<tr><td>CD: Red Bug Pellet - lower roofs, up stairs between buttresses</td><td>In the area after the cathedral roof against the wall of the cathedral, down the path from the Cathedral Evangelist.</td></tr>
 <tr><td>CD: Red Bug Pellet - right of cathedral front doors</td><td>Up the stairs past the Infested Corpse graveyard and the left, toward the roof path to the right of the cathedral doors</td></tr>
 <tr><td>CD: Red Sign Soapstone - passive mob drop by Rosaria&#x27;s Bed Chamber</td><td>Dropped by passive Corpse-grub against the wall near the entrance to Rosaria&#x27;s Bed Chamber</td></tr>
 <tr><td>CD: Repair Powder - by white tree</td><td>In the graveyard with the White Birch and Infested Corpses</td></tr>
@@ -1036,7 +1036,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>CKG: Wood Grain Ring+1 - by first elevator bottom</td><td>Behind the first elevator going down into the garden, in the toxic pool</td></tr>
 <tr><td>DH: Aquamarine Dagger - castle, up stairs</td><td>Up the second flight of stairs to the left of the starting area with the murkmen, before the long drop</td></tr>
 <tr><td>DH: Black Firebomb - ruins, up windmill from bonfire</td><td>To the left of the Earthen Peak Ruins bonfire, past the ruined windmill, next to many Poisonhorn bugs.</td></tr>
-<tr><td>DH: Covetous Silver Serpent Ring+3 - pantry upstairs, drop down</td><td>After exiting the building with the Lothric Knights where the front crumbles, to the last room of the building to the right, upstairs past an illusory wall to the left, then dropping down after exiting the building from the last room.</td></tr>
+<tr><td>DH: Covetous Silver Serpent Ring+3 - pantry upstairs, drop down</td><td>After exiting the building with the Lothric Knights where the front crumbles, to the last room of the building to the right, up stairs past an illusory wall to the left, then dropping down after exiting the building from the last room.</td></tr>
 <tr><td>DH: Desert Pyromancer Garb - ruins, by shack near cliff</td><td>Behind a shack near the edge of the cliff of the area targeted by the second angel.</td></tr>
 <tr><td>DH: Desert Pyromancer Gloves - swamp, far right</td><td>After dropping down in the poison swamp area, against the wall straight to the right.</td></tr>
 <tr><td>DH: Desert Pyromancer Hood - swamp upper, tunnel end</td><td>At the end of the tunnel with Desert Pyromancy Zoey, to the right of the final branches.</td></tr>
@@ -1045,13 +1045,13 @@ offline _Dark Souls III_ randomizer].
 <tr><td>DH: Divine Blessing - shop</td><td>Sold by Stone-humped Hag, or in her ashes</td></tr>
 <tr><td>DH: Divine Blessing - swamp upper, building roof</td><td>On a rooftop of one of the buildings bordering the poison swamp. Can be reached by dropping down from the final tree branch and accessing the roof to the right.</td></tr>
 <tr><td>DH: Ember - castle, behind spire</td><td>At the start of the area, behind a spire to the right of first drop down</td></tr>
-<tr><td>DH: Ember - pantry, behind crates just before upstairs</td><td>After exiting the building with the Lothric Knights where the front crumbles, to the last room end of the building to the right, upstairs past an illusory wall to the left, in the second-to-last room of the sequence, behind some crates to the left.</td></tr>
+<tr><td>DH: Ember - pantry, behind crates just before upstairs</td><td>After exiting the building with the Lothric Knights where the front crumbles, to the last room end of the building to the right, up stairs past an illusory wall to the left, in the second-to-last room of the sequence, behind some crates to the left.</td></tr>
 <tr><td>DH: Ember - ruins, alcove before swamp</td><td>In an alcove providing cover from the second angel&#x27;s projectiles, before dropping down in the poison swamp area.</td></tr>
 <tr><td>DH: Ember - ruins, alcove on cliff</td><td>In the area with the pilgrim responsible for the second angel, below the Within Earthen Peak Ruins bonfire. Can be accessed by dropping down from a cliff edge, dropping down to the right of the bonfire.</td></tr>
 <tr><td>DH: Ember - shop</td><td>Sold by Stone-humped Hag, or in her ashes</td></tr>
 <tr><td>DH: Flame Fan - swamp upper, NPC drop</td><td>Dropped by Desert Pyromancer Zoey</td></tr>
 <tr><td>DH: Giant Door Shield - ruins, path below far shack</td><td>Descending down a path from the edge of the cliff of the area targeted by the second angel, to the very end of the cliff.</td></tr>
-<tr><td>DH: Great Soul Dregs - pantry upstairs</td><td>After exiting the building with the Lothric Knights where the front crumbles, to the last room of the building to the right, upstairs past an illusory wall to the left, then all the way to the end of the last room.</td></tr>
+<tr><td>DH: Great Soul Dregs - pantry upstairs</td><td>After exiting the building with the Lothric Knights where the front crumbles, to the last room of the building to the right, up stairs past an illusory wall to the left, then all the way to the end of the last room.</td></tr>
 <tr><td>DH: Harald Curved Greatsword - swamp left, under root</td><td>In the back leftmost area of the poison swamp, underneath the tree branch leading up and out, guarded by a stationary Harald Legion Knight.</td></tr>
 <tr><td>DH: Hidden Blessing - shop</td><td>Sold by Stone-humped Hag, or in her ashes</td></tr>
 <tr><td>DH: Homeward Bone - end of path from church</td><td>Immediately before dropping into the area with the Earthen Peak Ruins bonfire, next to Gael&#x27;s flag.</td></tr>
@@ -1077,7 +1077,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>DH: Soul of a Weary Warrior - castle overhang</td><td>The bait item at the start of the area which falls down with you into the ruined building below.</td></tr>
 <tr><td>DH: Soul of the Demon Prince</td><td>Dropped by Demon Prince</td></tr>
 <tr><td>DH: Splitleaf Greatsword - shop</td><td>Sold by Stone-humped Hag, or in her ashes</td></tr>
-<tr><td>DH: Titanite Chunk - castle, upstairs</td><td>Up first flight of stairs to the left of the starting area with the murkmen, before the long drop</td></tr>
+<tr><td>DH: Titanite Chunk - castle, up stairs</td><td>Up first flight of stairs to the left of the starting area with the murkmen, before the long drop</td></tr>
 <tr><td>DH: Titanite Chunk - pantry, first room</td><td>After exiting the building with the Lothric Knights where the front crumbles, on a ledge in the first room of the building to the right.</td></tr>
 <tr><td>DH: Titanite Chunk - path from church, by pillar</td><td>Before dropping into the area with the Earthen Peak Ruins bonfire, behind a pillar in front of a murkman pool.</td></tr>
 <tr><td>DH: Titanite Chunk - ruins, by far shack</td><td>In front of a shack at the far edge of the cliff of the area targeted by the second angel. There is a shortcut dropdown to the left of the building.</td></tr>
@@ -1502,7 +1502,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>GA: Outrider Knight Helm - 3F, behind illusory wall, miniboss drop</td><td>Dropped by an Outrider Knight past the Crystal Sage&#x27;s third floor location and an illusory wall</td></tr>
 <tr><td>GA: Outrider Knight Leggings - 3F, behind illusory wall, miniboss drop</td><td>Dropped by an Outrider Knight past the Crystal Sage&#x27;s third floor location and an illusory wall</td></tr>
 <tr><td>GA: Power Within - dark room, behind retractable bookshelf</td><td>Behind a bookshelf in the dark room with the Crystal Lizards, moved by a lever in the same room</td></tr>
-<tr><td>GA: Refined Gem - upstairs from 4F, lizard</td><td>Dropped by a Crystal Lizard found heading from the first elevator shortcut with the movable bookshelf, on the right side up the stairs before exiting to the roof</td></tr>
+<tr><td>GA: Refined Gem - up stairs from 4F, lizard</td><td>Dropped by a Crystal Lizard found heading from the first elevator shortcut with the movable bookshelf, on the right side up the stairs before exiting to the roof</td></tr>
 <tr><td>GA: Sage Ring+1 - rafters, second level down</td><td>On the rafters high above the Grand Archives, dropping down from the cage to the high rafters to the rafters below with the Corpse-grub</td></tr>
 <tr><td>GA: Sage&#x27;s Crystal Staff - outside 5F, NPC drop</td><td>Dropped by Daughter of Crystal Kriemhild before the stairs leading up to Twin Princes</td></tr>
 <tr><td>GA: Scholar Ring - 2F, between late and early</td><td>On the corpse of a sitting Archives Scholar between two bookshelves, accessible by activating a lever before crossing the bridge that is the Crystal Sage&#x27;s final location</td></tr>
@@ -1524,10 +1524,10 @@ offline _Dark Souls III_ randomizer].
 <tr><td>GA: Titanite Chunk - rooftops lower, ledge by buttress</td><td>Going onto the roof and down the first ladder, dropping down on either side from the ledge facing the ocean, on a roof ledge to the right</td></tr>
 <tr><td>GA: Titanite Chunk - rooftops, just before 5F</td><td>On the Archives roof, after a short dropdown, in the small area where the two Gargoyles attack you</td></tr>
 <tr><td>GA: Titanite Scale - 1F, drop from 2F late onto bookshelves, lizard</td><td>Dropped by a Crystal Lizard on first floor bookshelves. Can be accessed by dropping down to the left at the end of the bridge which is the Crystal Sage&#x27;s final location</td></tr>
-<tr><td>GA: Titanite Scale - 1F, upstairs on bookshelf</td><td>On the Archives first floor, up a movable set of stairs near the large wax pool, on top of a bookshelf</td></tr>
+<tr><td>GA: Titanite Scale - 1F, up stairs on bookshelf</td><td>On the Archives first floor, up a movable set of stairs near the large wax pool, on top of a bookshelf</td></tr>
 <tr><td>GA: Titanite Scale - 2F, titanite scale atop bookshelf</td><td>On top of a bookshelf on the Archive second floor, accessible by going halfway up the stairs to the third floor and dropping down near a Grand Archives Scholar</td></tr>
 <tr><td>GA: Titanite Scale - 3F, by ladder to 2F late</td><td>Going from the Crystal Sage&#x27;s location on the third floor to its location on the bridge, on the left side of the ladder you descend, behind a table</td></tr>
-<tr><td>GA: Titanite Scale - 3F, corner upstairs</td><td>From the Grand Archives third floor up past the thralls, in a corner with bookshelves to the left</td></tr>
+<tr><td>GA: Titanite Scale - 3F, corner up stairs</td><td>From the Grand Archives third floor up past the thralls, in a corner with bookshelves to the left</td></tr>
 <tr><td>GA: Titanite Scale - 5F, chest by exit</td><td>In a chest after the first elevator shortcut with the movable bookshelf, in the area with the Grand Archives Scholars, to the left of the stairwell leading up to the roof</td></tr>
 <tr><td>GA: Titanite Scale - dark room, upstairs</td><td>Right after going up the stairs to the Archives second floor, on the left guarded by a Grand Archives Scholar and a sequence of Clawed Curse bookshelves</td></tr>
 <tr><td>GA: Titanite Scale - rooftops lower, path to 2F</td><td>Going onto the roof and down the first ladder, dropping down on either side from the ledge facing the ocean, then going past the corvians all the way to the left and making a jump</td></tr>
@@ -1541,7 +1541,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>GA: Twinkling Titanite - rafters, down lower level ladder</td><td>In a chest reachable after dropping down from the Archives rafters and down a ladder near the Corpse-grub</td></tr>
 <tr><td>GA: Twinkling Titanite - rooftops, lizard #1</td><td>Dropped by one of the pair of Crystal Lizards, on the right side, found going up a slope past the gargoyle on the Archives roof</td></tr>
 <tr><td>GA: Twinkling Titanite - rooftops, lizard #2</td><td>Dropped by one of the pair of Crystal Lizards, on the left side, found going up a slope past the gargoyle on the Archives roof</td></tr>
-<tr><td>GA: Twinkling Titanite - upstairs from 4F, lizard</td><td>Dropped by a Crystal Lizard found heading from the first elevator shortcut with the movable bookshelf, on the right side up the stairs before exiting to the roof</td></tr>
+<tr><td>GA: Twinkling Titanite - up stairs from 4F, lizard</td><td>Dropped by a Crystal Lizard found heading from the first elevator shortcut with the movable bookshelf, on the right side up the stairs before exiting to the roof</td></tr>
 <tr><td>GA: Undead Bone Shard - 5F, by entrance</td><td>On the corpse of a sitting Archives Scholar on a balcony high in the Archives overlooking the area with the Grand Archives Scholars with a shortcut ladder, near the final wax pool</td></tr>
 <tr><td>GA: Witch&#x27;s Locks - dark room, behind retractable bookshelf</td><td>Behind a bookshelf in the dark room with the Crystal Lizards, moved by a lever in the same room</td></tr>
 <tr><td>HWL: Astora Straight Sword - fort walkway, drop down</td><td>In the building with the Pus of Man on the roof, past the Lothric Knight down a hallway obscured by a wooden wheel, dropping down past the edge</td></tr>
@@ -1772,7 +1772,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>LC: Titanite Chunk - ascent, turret before barricades</td><td>From the Lothric Castle bonfire, up the stairs, straight, and then down the stairs behind the barricade</td></tr>
 <tr><td>LC: Titanite Chunk - dark room mid, out door opposite wyvern</td><td>From the room with the firebomb-throwing hollows, past the Pus of Man Wyvern and back around the front, before the Crystal Lizard</td></tr>
 <tr><td>LC: Titanite Chunk - dark room mid, pus of man mob drop</td><td>Dropped by the first Pus of Man wyvern</td></tr>
-<tr><td>LC: Titanite Chunk - downstairs after boss</td><td>Down the stairs to the right after Dragonslayer Armour</td></tr>
+<tr><td>LC: Titanite Chunk - down stairs after boss</td><td>Down the stairs to the right after Dragonslayer Armour</td></tr>
 <tr><td>LC: Titanite Chunk - moat #1</td><td>In the center of the area where the Pus of Man hollows transform</td></tr>
 <tr><td>LC: Titanite Chunk - moat #2</td><td>In the center of the area where the Pus of Man hollows transform</td></tr>
 <tr><td>LC: Titanite Chunk - moat, near ledge</td><td>Dropping down from the bridge where the Pus of Man wyverns breathe fire on the near side to the bonfire</td></tr>
@@ -2152,7 +2152,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>UG: Ring of Steel Protection+1 - environs, behind bell tower</td><td>Behind Bell Tower to the right</td></tr>
 <tr><td>UG: Shriving Stone - swamp, by bonfire</td><td>At the very start of the area</td></tr>
 <tr><td>UG: Soul of Champion Gundyr</td><td>Dropped by Champion Gundyr</td></tr>
-<tr><td>UG: Soul of a Crestfallen Knight - environs, above shrine entrance</td><td>Above the Firelink Shrine entrance, upstairs/slope from either left or right of the entrance</td></tr>
+<tr><td>UG: Soul of a Crestfallen Knight - environs, above shrine entrance</td><td>Above the Firelink Shrine entrance, up stairs/slope from either left or right of the entrance</td></tr>
 <tr><td>UG: Soul of a Crestfallen Knight - swamp, center</td><td>Close to where Ashen Estus Flask was in Cemetery of Ash</td></tr>
 <tr><td>UG: Titanite Chunk - swamp, left path by fountain</td><td>In a path to the left of where Ashen Estus Flask was in Cemetery of Ash</td></tr>
 <tr><td>UG: Titanite Chunk - swamp, right path by fountain</td><td>In a path to the right of where Ashen Estus Flask was in Cemetery of Ash</td></tr>
