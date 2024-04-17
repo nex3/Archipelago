@@ -466,7 +466,7 @@ ladder which is part of Consumed King's Garden.
   * "Lower" is the bottom floor that you enter onto from the plaza.
   * "Upper" is the top floor with the door to the main hall.
   * "Mid" is the middle floor accessible by climbing a ladder from lower or
-    going downs tairs from upper.
+    going down stairs from upper.
 
 * **Main hall:** The central room of the barracks, behind the gate.
 
