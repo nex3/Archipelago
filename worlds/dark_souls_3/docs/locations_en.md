@@ -466,7 +466,7 @@ ladder which is part of Consumed King's Garden.
   * "Lower" is the bottom floor that you enter onto from the plaza.
   * "Upper" is the top floor with the door to the main hall.
   * "Mid" is the middle floor accessible by climbing a ladder from lower or
-    going downstairs from upper.
+    going downs tairs from upper.
 
 * **Main hall:** The central room of the barracks, behind the gate.
 
@@ -1817,7 +1817,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>PC: Poison Gem - swamp, below halls</td><td>In the inner cave of the Profaned Capital toxic pool</td></tr>
 <tr><td>PC: Purging Stone - chapel ground floor</td><td>At the back of the room with the three Monstrosities of Sin on the first floor</td></tr>
 <tr><td>PC: Purging Stone - swamp, by chapel ladder</td><td>In the middle of the Profaned Capital toxic pool, near the ladder to the Court Sorcerer</td></tr>
-<tr><td>PC: Rubbish - chapel, downstairs from second floor</td><td>Hanging corpse visible from Profaned Capital accessible from the second floor of the building with the Monstrosities of Sin, in the back right</td></tr>
+<tr><td>PC: Rubbish - chapel, down stairs from second floor</td><td>Hanging corpse visible from Profaned Capital accessible from the second floor of the building with the Monstrosities of Sin, in the back right</td></tr>
 <tr><td>PC: Rusted Coin - below bridge #1</td><td>Among the rubble before the steps leading up to the Profaned Flame</td></tr>
 <tr><td>PC: Rusted Coin - below bridge #2</td><td>Among the rubble before the steps leading up to the Profaned Flame</td></tr>
 <tr><td>PC: Rusted Coin - tower exterior</td><td>Treasure visible on a ledge in the Profaned Capital bonfire. Can be accessed by climbing a ladder outside the main structure.</td></tr>
