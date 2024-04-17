@@ -1550,7 +1550,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>HWL: Binoculars - corpse tower, upper platform</td><td>In the area with the dead wyvern, at the top of a set of stairs past a Hollow Soldier</td></tr>
 <tr><td>HWL: Black Firebomb - small roof over fountain</td><td>After roof with Pus of Man, on the edge of another rooftop to the left where you can drop down into Winged Knight area</td></tr>
 <tr><td>HWL: Broadsword - fort, room off walkway</td><td>In the building with the Pus of Man on the roof, past the Lothric Knight in an alcove to the left</td></tr>
-<tr><td>HWL: Cell Key - fort ground, downstairs</td><td>In the basement of the building with Pus of Man on the roof, down the stairs guarded by a dog</td></tr>
+<tr><td>HWL: Cell Key - fort ground, down stairs</td><td>In the basement of the building with Pus of Man on the roof, down the stairs guarded by a dog</td></tr>
 <tr><td>HWL: Claymore - flame plaza</td><td>In the area where the wyvern breathes fire, farthest away from the door</td></tr>
 <tr><td>HWL: Club - flame plaza</td><td>In the area where the wyvern breathes fire, in the open</td></tr>
 <tr><td>HWL: Ember - back tower, transforming hollow</td><td>Dropped by the Pus of Man on the tower to the right of the High Wall bonfire after transformation</td></tr>
