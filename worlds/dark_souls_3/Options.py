@@ -209,14 +209,12 @@ class AutoEquipOption(Toggle):
 
 
 class LockEquipOption(Toggle):
-    """Lock the equipment slots so you cannot change your armor or your left/right weapons.
-    Works great with the Auto-equip option."""
+    """Lock the equipment slots so you cannot change your armor or your left/right weapons. Works great with the Auto-equip option."""
     display_name = "Lock Equipment Slots"
 
 
 class NoWeaponRequirementsOption(Toggle):
-    """Disable the weapon requirements by removing any movement or damage penalties,
-    permitting you to use any weapon early."""
+    """Disable the weapon requirements by removing any movement or damage penalties, permitting you to use any weapon early."""
     display_name = "No Weapon Requirements"
 
 
