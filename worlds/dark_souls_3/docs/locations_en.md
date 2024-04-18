@@ -2152,7 +2152,7 @@ offline _Dark Souls III_ randomizer].
 <tr><td>UG: Ring of Steel Protection+1 - environs, behind bell tower</td><td>Behind Bell Tower to the right</td></tr>
 <tr><td>UG: Shriving Stone - swamp, by bonfire</td><td>At the very start of the area</td></tr>
 <tr><td>UG: Soul of Champion Gundyr</td><td>Dropped by Champion Gundyr</td></tr>
-<tr><td>UG: Soul of a Crestfallen Knight - environs, above shrine entrance</td><td>Above the Firelink Shrine entrance, up stairs/slope from either left or right of the entrance</td></tr>
+<tr><td>UG: Soul of a Crestfallen Knight - environs, above shrine entrance</td><td>Above the Firelink Shrine entrance, up the stairs/slope from either left or right of the entrance</td></tr>
 <tr><td>UG: Soul of a Crestfallen Knight - swamp, center</td><td>Close to where Ashen Estus Flask was in Cemetery of Ash</td></tr>
 <tr><td>UG: Titanite Chunk - swamp, left path by fountain</td><td>In a path to the left of where Ashen Estus Flask was in Cemetery of Ash</td></tr>
 <tr><td>UG: Titanite Chunk - swamp, right path by fountain</td><td>In a path to the right of where Ashen Estus Flask was in Cemetery of Ash</td></tr>
