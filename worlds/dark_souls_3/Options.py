@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import json
 import typing
 
-from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, ItemDict, NamedRange, Option, PerGameCommonOptions, Range, Toggle, VerifyKeys
+from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, ItemDict, NamedRange, Option, PerGameCommonOptions, Range, Removed, Toggle, VerifyKeys
 
 
 class ExcludedLocationsOption(Choice):
@@ -391,3 +391,17 @@ class DarkSouls3Options(PerGameCommonOptions):
     all_chests_are_mimics: AllChestsAreMimicsOption
     impatient_mimics: ImpatientMimicsOption
     exclude_locations: DS3ExcludeLocations
+
+    # Removed
+    pool_type: Removed
+    enable_weapon_locations: Removed
+    enable_shield_locations: Removed
+    enable_armor_locations: Removed
+    enable_ring_locations: Removed
+    enable_spell_locations: Removed
+    enable_key_locations: Removed
+    enable_boss_locations: Removed
+    enable_npc_locations: Removed
+    enable_misc_locations: Removed
+    enable_health_upgrade_locations: Removed
+    enable_progressive_locations: Removed
