@@ -348,7 +348,7 @@ class ImpatientMimicsOption(Toggle):
 
 
 class DS3ExcludeLocations(ExcludeLocations):
-    """Prevent these locations from having an important item"""
+    """Forces these locations to have certain types of items, exact behavior depends on the "Excluded Locations" option."""
     default = {"Hidden", "Small Crystal Lizards", "Upgrade", "Small Souls", "Miscellaneous"}
 
 
