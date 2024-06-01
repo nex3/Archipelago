@@ -718,11 +718,7 @@ class DarkSouls3World(World):
         for location in self.yhorm_location.locations:
             self._add_location_rule(location, "Storm Ruler")
 
-        self.multiworld.completion_condition[self.player] = lambda state: \
-            state.has("Cinders of a Lord - Abyss Watcher", self.player) and \
-            state.has("Cinders of a Lord - Yhorm the Giant", self.player) and \
-            state.has("Cinders of a Lord - Aldrich", self.player) and \
-            state.has("Cinders of a Lord - Lothric Prince", self.player)
+        self.multiworld.completion_condition[self.player] = lambda state: self._can_get(state, "KFF: Soul of the Lords")
 
 
     def _add_shop_rules(self) -> None:
