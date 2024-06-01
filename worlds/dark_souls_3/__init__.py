@@ -1250,8 +1250,8 @@ class DarkSouls3World(World):
         locations = location if type(location) is list else [location]
         for location in locations:
             data = location_dictionary[location]
-            if data.dlc and not self.options.enable_dlc: return False
-            if data.ngp and not self.options.enable_ngp: return False
+            if data.dlc and not self.options.enable_dlc: return
+            if data.ngp and not self.options.enable_ngp: return
 
             if not self._is_location_available(location): return
             if isinstance(rule, str):
