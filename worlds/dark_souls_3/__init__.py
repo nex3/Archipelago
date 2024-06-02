@@ -356,7 +356,7 @@ class DarkSouls3World(World):
                 self.multiworld.push_precollected(self.create_item(item))
                 warning(
                     f"Couldn't add \"{item.name}\" to the item pool for " + 
-                    f"{self.multiworld.get_player_name(self.player)}. Adding it to the starting " +
+                    f"{self.player_name}. Adding it to the starting " +
                     f"inventory instead."
                 )
 
@@ -468,7 +468,7 @@ class DarkSouls3World(World):
         self.local_itempool.remove(item)
 
         if not candidate_locations:
-            warning(f"Couldn't place \"{name}\" in a valid location for {self.multiworld.get_player_name(self.player)}. Adding it to starting inventory instead.")
+            warning(f"Couldn't place \"{name}\" in a valid location for {self.player_name}. Adding it to starting inventory instead.")
             location = next(
                 (location for location in self.multiworld.get_locations() if location.item == item),
                 None
@@ -1276,11 +1276,11 @@ class DarkSouls3World(World):
 
     def _can_go_to(self, state, region) -> None:
         """Returns whether state can access the given region name."""
-        return state.can_reach(f"Go To {region}", "Entrance", self.player)
+        return state.can_reach_entrance(f"Go To {region}", self.player)
 
     def _can_get(self, state, location) -> None:
         """Returns whether state can access the given location name."""
-        return state.can_reach(location, "Location", self.player)
+        return state.can_reach_location(location, self.player)
 
     def _is_location_available(
         self,
@@ -1312,10 +1312,10 @@ class DarkSouls3World(World):
         text = ""
 
         if self.yhorm_location != default_yhorm_location:
-            text += f"\nYhorm takes the place of {self.yhorm_location.name} in {self.multiworld.get_player_name(self.player)}'s world\n"
+            text += f"\nYhorm takes the place of {self.yhorm_location.name} in {self.player_name}'s world\n"
 
         if self.options.excluded_locations == "unnecessary":
-            text += f"\n{self.multiworld.get_player_name(self.player)}'s world excluded: {sorted(self.all_excluded_locations)}\n"
+            text += f"\n{self.player_name}'s world excluded: {sorted(self.all_excluded_locations)}\n"
 
         if text:
             text = "\n" + text + "\n"
@@ -1508,7 +1508,7 @@ class DarkSouls3World(World):
                 "impatient_mimics": self.options.impatient_mimics.value,
             },
             "seed": self.multiworld.seed_name,  # to verify the server's multiworld
-            "slot": self.multiworld.player_name[self.player],  # to connect to server
+            "slot": self.player_name,  # to connect to server
             # Reserializing here is silly, but it's easier for the static randomizer.
             "random_enemy_preset": json.dumps(self.options.random_enemy_preset.value),
             "yhorm": (
