@@ -239,15 +239,26 @@ class DarkSouls3World(World):
                 if (
                     location.missable and self.options.missable_locations == "unimportant"
                 ) or (
-                    # Mark Red Eye Orb as missable if Lift Chamber Key isn't randomized, because
-                    # the latter is missable by default.
+                    # Lift Chamber Key is missable. Exclude Lift-Chamber-Key-Locked locations if it isn't randomized
                     not self._is_location_available("FS: Lift Chamber Key - Leonhard")
                     and location.name == "HWL: Red Eye Orb - wall tower, miniboss"
+                ) or (
+                    # Chameleon is missable. Exclude Chameleon-locked locations if it isn't randomized
+                    not self._is_location_available("AL: Chameleon - tomb after marrying Anri")
+                    and location.name in {"RC: Dragonhead Shield - streets monument, across bridge",
+                                          "RC: Large Soul of a Crestfallen Knight - streets monument, across bridge",
+                                          "RC: Divine Blessing - streets monument, mob drop", "RC: Lapp's Helm - Lapp",
+                                          "RC: Lapp's Armor - Lapp",
+                                          "RC: Lapp's Gauntlets - Lapp",
+                                          "RC: Lapp's Leggings - Lapp"}
                 ):
                     new_location.progress_type = LocationProgressType.EXCLUDED
             else:
-                # Don't allow Siegward's Storm Ruler to mark Yhorm as defeatable.
-                if location.name == "PC: Storm Ruler - Siegward": continue
+                # Don't allow missable duplicates of progression items to be expected progression.
+                if location.name in {"PC: Storm Ruler - Siegward",
+                                     "US: Pyromancy Flame - Cornyx",
+                                     "US: Tower Key - kill Irina"}:
+                    continue
 
                 # Replace non-randomized items with events that give the default item
                 event_item = (
