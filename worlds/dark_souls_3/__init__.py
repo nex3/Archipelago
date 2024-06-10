@@ -106,11 +106,10 @@ class DarkSouls3World(World):
                     not self.options.late_basin_of_vows
                 )
             ):
-                self.multiworld.early_items[self.player]['Storm Ruler'] = 1
-                self.options.local_items.value.add('Storm Ruler')
+                self.multiworld.early_items[self.player]["Storm Ruler"] = 1
+                self.options.local_items.value.add("Storm Ruler")
         else:
             self.yhorm_location = default_yhorm_location
-
 
     def _allow_boss_for_yhorm(self, boss: DS3BossInfo) -> bool:
         """Returns whether boss is a valid location for Yhorm in this seed."""
@@ -140,7 +139,6 @@ class DarkSouls3World(World):
             and location.name != "CA: Coiled Sword - boss drop"
             for location in location_tables["Cemetery of Ash"]
         )
-
 
     def create_regions(self):
         # Create Vanilla Regions
@@ -228,7 +226,6 @@ class DarkSouls3World(World):
             create_connection("Painted World of Ariandel (After Contraption)", "Dreg Heap")
             create_connection("Dreg Heap", "Ringed City")
 
-
     # For each region, add the associated locations retrieved from the corresponding location_table
     def create_region(self, region_name, location_table) -> Region:
         new_region = Region(region_name, self.player, self.multiworld)
@@ -277,7 +274,6 @@ class DarkSouls3World(World):
         self.multiworld.regions.append(new_region)
         return new_region
 
-
     def create_items(self):
         # Just used to efficiently deduplicate items
         item_set: Set[str] = set()
@@ -314,7 +310,6 @@ class DarkSouls3World(World):
         self.multiworld.itempool += self.local_itempool
 
         self._fill_local_items()
-
 
     def _create_injectable_items(self, num_required_extra_items: int) -> List[Item]:
         """Returns a list of items to inject into the multiworld instead of skipped items.
@@ -369,7 +364,6 @@ class DarkSouls3World(World):
 
         return [self.create_item(item) for item in items]
 
-
     def create_item(self, item: Union[str, DS3ItemData]) -> Item:
         data = item if isinstance(item, DS3ItemData) else item_dictionary[item]
         classification = None
@@ -411,7 +405,6 @@ class DarkSouls3World(World):
 
         return DarkSouls3Item(self.player, data, classification=classification)
 
-
     def _fill_local_items(self) -> None:
         """Removes certain items from the item pool and manually places them in the local world.
 
@@ -420,7 +413,7 @@ class DarkSouls3World(World):
         # If Yhorm is at Iudex Gundyr, Storm Ruler must be randomized, so it can always be moved.
         # Fill this manually so that, if very few slots are available in Cemetery of Ash, this
         # doesn't get locked out by bad rolls on the next two fills.
-        if self.yhorm_location.name == 'Iudex Gundyr':
+        if self.yhorm_location.name == "Iudex Gundyr":
             self._fill_local_item("Storm Ruler", ["Cemetery of Ash"],
                                   lambda location: location.name != "CA: Coiled Sword - boss drop")
 
@@ -441,7 +434,6 @@ class DarkSouls3World(World):
                 "Firelink Shrine",
                 "High Wall of Lothric"
             ])
-
 
     def _fill_local_item(
         self, name: str,
@@ -501,10 +493,8 @@ class DarkSouls3World(World):
                 location.item = candidate
                 return
 
-
     def get_filler_item_name(self) -> str:
         return self.random.choice(filler_item_names)
-
 
     def set_rules(self) -> None:
         randomized_items = {item.name for item in self.local_itempool}
@@ -578,7 +568,7 @@ class DarkSouls3World(World):
                 and self._has_any_scroll(state)
             ))
 
-            if self.options.late_basin_of_vows > 1: # After Small Doll
+            if self.options.late_basin_of_vows > 1:  # After Small Doll
                 self._add_entrance_rule("Lothric Castle", "Small Doll")
 
         # DLC Access Rules Below
@@ -599,7 +589,7 @@ class DarkSouls3World(World):
                     "Painted World of Ariandel (Before Contraption)",
                     lambda state: state.has("Small Doll", self.player) and self._has_any_scroll(state))
 
-            if self.options.late_dlc > 1: # After Basin
+            if self.options.late_dlc > 1:  # After Basin
                 self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
 
         # Define the access rules to some specific locations
@@ -647,7 +637,7 @@ class DarkSouls3World(World):
                 and self._has_any_scroll(state)
             ))
 
-            if self.options.late_basin_of_vows > 1: # After Small Doll
+            if self.options.late_basin_of_vows > 1:  # After Small Doll
                 self._add_location_rule("HWL: Soul of the Dancer", "Small Doll")
 
         self._add_location_rule([
@@ -724,7 +714,6 @@ class DarkSouls3World(World):
             state.has("Cinders of a Lord - Yhorm the Giant", self.player) and \
             state.has("Cinders of a Lord - Aldrich", self.player) and \
             state.has("Cinders of a Lord - Lothric Prince", self.player)
-
 
     def _add_shop_rules(self) -> None:
         """Adds rules for items unlocked in shops."""
@@ -808,7 +797,6 @@ class DarkSouls3World(World):
                 self._add_location_rule(
                     [f"FS: {item} - {shop} for {key_name}" for item in items], key)
 
-
     def _add_npc_rules(self) -> None:
         """Adds rules for items accessible via NPC quests.
 
@@ -822,7 +810,7 @@ class DarkSouls3World(World):
         quest.
         """
 
-        ## Greirat
+        # Greirat
 
         self._add_location_rule([
             "FS: Divine Blessing - Greirat from US",
@@ -851,7 +839,7 @@ class DarkSouls3World(World):
             and self._can_get(state, "FS: Divine Blessing - Greirat from IBV")
         ))
 
-        ## Patches
+        # Patches
 
         # Patches will only set up shop in Firelink once he's tricked you in the bell tower. He'll
         # only do _that_ once you've spoken to Siegward after killing the Fire Demon and lit the
@@ -887,7 +875,7 @@ class DarkSouls3World(World):
             and self._can_get(state, "FS: Rusted Gold Coin - don't forgive Patches")
         ))
 
-        ## Leonhard
+        # Leonhard
 
         self._add_location_rule([
             # Talk to Leonhard in Firelink with a Pale Tongue after lighting Cliff Underside or
@@ -918,7 +906,7 @@ class DarkSouls3World(World):
             for item in ["Leonhard's Garb", "Leonhard's Gauntlets", "Leonhard's Trousers"]
         ], "Black Eye Orb")
 
-        ## Hawkwood
+        # Hawkwood
         
         # After Hawkwood leaves and once you have the Torso Stone, you can fight him for dragon
         # stones. Andre will give Swordgrass as a hint as well
@@ -930,7 +918,7 @@ class DarkSouls3World(World):
             and state.has("Twinkling Dragon Torso Stone", self.player)
         ))
 
-        ## Siegward
+        # Siegward
 
         # Unlock Siegward's cell after progressing his quest
         self._add_location_rule([
@@ -951,7 +939,7 @@ class DarkSouls3World(World):
             and self._can_get(state, "PC: Soul of Yhorm the Giant")
         ))
 
-        ## Sirris
+        # Sirris
 
         # Kill Greatwood and turn in Dreamchaser's Ashes to trigger this opportunity for invasion
         self._add_location_rule([
@@ -997,7 +985,7 @@ class DarkSouls3World(World):
             and state.has("Dreamchaser's Ashes", self.player)
         ))
 
-        ## Cornyx
+        # Cornyx
 
         self._add_location_rule([
             "US: Old Sage's Blindfold - kill Cornyx",
@@ -1019,7 +1007,7 @@ class DarkSouls3World(World):
             and state.has("Izalith Pyromancy Tome", self.player)
         ))
 
-        ## Irina
+        # Irina
 
         self._add_location_rule([
             "US: Tower Key - kill Irina",
@@ -1028,7 +1016,7 @@ class DarkSouls3World(World):
             and state.has("Braille Divine Tome of Lothric", self.player)
         ))
 
-        ## Karla
+        # Karla
 
         self._add_location_rule([
             "FS: Karla's Pointed Hat - kill Karla",
@@ -1042,11 +1030,11 @@ class DarkSouls3World(World):
             and state.has("Londor Braille Divine Tome", self.player)
         ))
 
-        ## Emma
+        # Emma
 
         self._add_location_rule("HWL: Basin of Vows - Emma", "Small Doll")
 
-        ## Orbeck
+        # Orbeck
 
         self._add_location_rule([
             "FS: Morion Blade - Yuria for Orbeck's Ashes",
@@ -1085,7 +1073,7 @@ class DarkSouls3World(World):
                 self._has_any_scroll
             )
 
-        ## Anri
+        # Anri
 
         # Anri only leaves Road of Sacrifices once Deacons is defeated
         self._add_location_rule([
@@ -1105,7 +1093,6 @@ class DarkSouls3World(World):
             self._can_get(state, "IBV: Ring of the Evil Eye - Anri") and
             self._can_get(state, "AL: Soul of Aldrich")
         ))
-
 
     def _add_transposition_rules(self) -> None:
         """Adds rules for items obtainable from Ludleth by soul transposition."""
@@ -1170,7 +1157,6 @@ class DarkSouls3World(World):
                 state.has(s, self.player) and state.has("Transposing Kiln", self.player)
             ))
 
-
     def _add_crow_rules(self) -> None:
         """Adds rules for items obtainable by trading items to the crow on Firelink roof."""
 
@@ -1203,7 +1189,6 @@ class DarkSouls3World(World):
                 and not item.data.is_upgraded
             ))
 
-
     def _add_unnecessary_location_rules(self) -> None:
         """Adds rules for locations that can contain useful but not necessary items.
 
@@ -1234,27 +1219,25 @@ class DarkSouls3World(World):
         if self.options.excluded_locations == "unnecessary":
             self.options.exclude_locations.value.clear()
 
-
     def _add_early_item_rules(self, randomized_items: Set[str]) -> None:
         """Adds rules to make sure specific items are available early."""
 
-        if 'Pyromancy Flame' in randomized_items:
+        if "Pyromancy Flame" in randomized_items:
             # Make this available early because so many items are useless without it.
             self._add_entrance_rule("Road of Sacrifices", "Pyromancy Flame")
             self._add_entrance_rule("Consumed King's Garden", "Pyromancy Flame")
             self._add_entrance_rule("Grand Archives", "Pyromancy Flame")
-        if 'Transposing Kiln' in randomized_items:
+        if "Transposing Kiln" in randomized_items:
             # Make this available early so players can make use of their boss souls.
             self._add_entrance_rule("Road of Sacrifices", "Transposing Kiln")
             self._add_entrance_rule("Consumed King's Garden", "Transposing Kiln")
             self._add_entrance_rule("Grand Archives", "Transposing Kiln")
         # Make this available pretty early 
-        if 'Small Lothric Banner' in randomized_items:
+        if "Small Lothric Banner" in randomized_items:
             if self.options.early_banner == "early_global":
-                self.multiworld.early_items[self.player]['Small Lothric Banner'] = 1
+                self.multiworld.early_items[self.player]["Small Lothric Banner"] = 1
             elif self.options.early_banner == "early_local":
-                self.multiworld.local_early_items[self.player]['Small Lothric Banner'] = 1
-
+                self.multiworld.local_early_items[self.player]["Small Lothric Banner"] = 1
 
     def _has_any_scroll(self, state: CollectionState) -> bool:
         """Returns whether the given state has any scroll item."""
@@ -1264,7 +1247,6 @@ class DarkSouls3World(World):
             or state.has("Logan's Scroll", self.player)
             or state.has("Crystal Scroll", self.player)
         )
-
 
     def _add_location_rule(self, location: Union[str, List[str]], rule: Union[CollectionRule, str]) -> None:
         """Sets a rule for the given location if it that location is randomized.
@@ -1283,7 +1265,6 @@ class DarkSouls3World(World):
                 rule = lambda state, item=rule: state.has(item, self.player)
             add_rule(self.multiworld.get_location(location, self.player), rule)
 
-
     def _add_entrance_rule(self, region: str, rule: Union[CollectionRule, str]) -> None:
         """Sets a rule for the entrance to the given region."""
         assert region in location_tables
@@ -1294,22 +1275,18 @@ class DarkSouls3World(World):
             rule = lambda state, item=rule: state.has(item, self.player)
         add_rule(self.multiworld.get_entrance("Go To " + region, self.player), rule)
 
-
     def _add_item_rule(self, location: str, rule: ItemRule) -> None:
         """Sets a rule for what items are allowed in a given location."""
         if not self._is_location_available(location): return
         add_item_rule(self.multiworld.get_location(location, self.player), rule)
 
-
     def _can_go_to(self, state, region) -> None:
         """Returns whether state can access the given region name."""
         return state.can_reach(f"Go To {region}", "Entrance", self.player)
 
-
     def _can_get(self, state, location) -> None:
         """Returns whether state can access the given location name."""
         return state.can_reach(location, "Location", self.player)
-
 
     def _is_location_available(
         self,
@@ -1337,13 +1314,11 @@ class DarkSouls3World(World):
             )
         )
 
-
     def write_spoiler(self, spoiler_handle: TextIO) -> None:
         if self.yhorm_location != default_yhorm_location:
             spoiler_handle.write(
                 f"Yhorm takes the place of {self.yhorm_location.name} in " +
                 f"{self.multiworld.get_player_name(self.player)}'s world\n")
-
 
     def post_fill(self):
         """If item smoothing is enabled, rearrange items so they scale up smoothly through the run.
@@ -1459,13 +1434,11 @@ class DarkSouls3World(World):
             upgraded_weapons.sort(key=lambda item: item.level)
             smooth_items(upgraded_weapons)
 
-
     def _shuffle(self, seq: Sequence) -> List:
         """Returns a shuffled copy of a sequence."""
         copy = list(seq)
         self.random.shuffle(copy)
         return copy
-
 
     def _pop_item(
         self,
@@ -1484,7 +1457,6 @@ class DarkSouls3World(World):
 
         # If we can't find a suitable item, give up and assign an unsuitable one.
         return items.pop(0)
-
 
     def fill_slot_data(self) -> Dict[str, object]:
         slot_data: Dict[str, object] = {}
