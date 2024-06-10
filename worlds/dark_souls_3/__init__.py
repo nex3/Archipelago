@@ -40,6 +40,8 @@ class DarkSouls3Web(WebWorld):
     tutorials = [setup_en, setup_fr]
     option_groups = option_groups
 
+    item_descriptions = item_descriptions
+
 
 class DarkSouls3World(World):
     """
@@ -366,7 +368,7 @@ class DarkSouls3World(World):
                 if item in items: continue
                 self.multiworld.push_precollected(self.create_item(item))
                 warning(
-                    f"Couldn't add \"{item.name}\" to the item pool for " + 
+                    f"Couldn't add \"{item.name}\" to the item pool for " +
                     f"{self.player_name}. Adding it to the starting " +
                     f"inventory instead."
                 )
@@ -450,7 +452,7 @@ class DarkSouls3World(World):
         additional_condition: Optional[Callable[[DarkSouls3Location], bool]] = None,
     ) -> None:
         """Chooses a valid location for the item with the given name and places it there.
-        
+
         This always chooses a local location among the given regions. If additional_condition is
         passed, only locations meeting that condition will be considered.
 
@@ -708,7 +710,7 @@ class DarkSouls3World(World):
                 "US: Young White Branch - by white tree #2",
                 lambda item: item.player == self.player and not item.data.unique
             )
-        
+
         # Make sure the Storm Ruler is available BEFORE Yhorm the Giant
         if self.yhorm_location.name == "Ancient Wyvern":
             # This is a white lie, you can get to a bunch of items in AP before you beat the Wyvern,
@@ -912,7 +914,7 @@ class DarkSouls3World(World):
         ], "Black Eye Orb")
 
         # Hawkwood
-        
+
         # After Hawkwood leaves and once you have the Torso Stone, you can fight him for dragon
         # stones. Andre will give Swordgrass as a hint as well
         self._add_location_rule([
@@ -1237,7 +1239,7 @@ class DarkSouls3World(World):
             self._add_entrance_rule("Road of Sacrifices", "Transposing Kiln")
             self._add_entrance_rule("Consumed King's Garden", "Transposing Kiln")
             self._add_entrance_rule("Grand Archives", "Transposing Kiln")
-        # Make this available pretty early 
+        # Make this available pretty early
         if 'Small Lothric Banner' in randomized_items:
             if self.options.early_banner == "early_global":
                 self.multiworld.early_items[self.player]['Small Lothric Banner'] = 1

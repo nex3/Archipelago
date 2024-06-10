@@ -1672,11 +1672,7 @@ item_name_groups = {
 
 item_descriptions = {
     "Progression": "Items which unlock locations.",
-    "Cinders": """
-      All four Cinders of a Lord.
-
-      Once you have these four, you can fight Soul of Cinder and win the game.
-    """,
+    "Cinders": "All four Cinders of a Lord.\n\nOnce you have these four, you can fight Soul of Cinder and win the game.",
     "Miscellaneous": "Generic stackable items, such as arrows, firebombs, buffs, and so on.",
     "Unique": """
       Items that are unique per NG cycle, such as scrolls, keys, ashes, and so on. Doesn't include
