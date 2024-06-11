@@ -1,5 +1,10 @@
 # Dark Souls III
 
+Game Page | [Items] | [Locations]
+
+[Items]: /tutorial/Dark%20Souls%20III/items/en
+[Locations]: /tutorial/Dark%20Souls%20III/locations/en
+
 ## What do I need to do to randomize DS3?
 
 See full instructions on [the setup page].
@@ -28,7 +33,7 @@ need to configure and export a config file.
 4. By setting the "Randomize Weapon Level" or "Randomize Infusion" options, you
    can randomize whether the weapons you find will be upgraded or infused.
 
-There are also other settings that can make playing the game more convenient or
+There are also options that can make playing the game more convenient or
 bring a new experience, like removing equip loads or auto-equipping weapons as
 you pick them up. Check out [the options page][options] for more!
 
@@ -68,7 +73,7 @@ groups] you want to omit. For example, this is the default setting but without
 
 [location groups]: /tutorial/Dark%20Souls%20III/locations/en#location-groups
 
-```json
+```yaml
 Dark Souls III:
   exclude_locations:
   - Small Crystal Lizards
@@ -80,7 +85,7 @@ Dark Souls III:
 This allows _all_ non-missable locations to have progression items, if you're in
 for the long haul:
 
-```json
+```yaml
 Dark Souls III:
   exclude_locations: []
 ```
@@ -93,13 +98,14 @@ still be included in the randomization pool, but none of them will be mandatory.
 For example, the following configuration just requires you to play the game
 through Irithyll of the Boreal Valley:
 
-```json
+```yaml
 Dark Souls III:
   # Enable the DLC so it's included in the randomization pool
   enable_dlc: true
 
   exclude_locations:
     # Exclude late-game and DLC regions
+    - Anor Londo
     - Lothric Castle
     - Consumed King's Garden
     - Untended Graves
@@ -131,3 +137,65 @@ individual location.
 Check out the [item guide], which explains the named groups available for items.
 
 [item guide]: /tutorial/Dark%20Souls%20III/items/en
+
+## What's new from 2.x.x?
+
+Version 3.0.0 of the Dark Souls III Archipelago client has a number of
+substantial differences with the older 2.x.x versions. Improvements include:
+
+* Support for randomizing all item locations, not just unique items.
+
+* Support for randomizing items in shops, starting loadouts, Path of the Dragon,
+  and more.
+
+* Built-in integration with the enemy randomizer, including consistent seeding
+  for races.
+
+* Support for the latest patch for Dark Souls III, 1.15.2. Older patches are
+  *not* supported.
+
+* Optional smooth distribution for upgrade items, upgraded weapons, and soul
+  items so you're more likely to see weaker items earlier and more powerful
+  items later.
+
+* More detailed location names that indicate where a location is, not just what
+  it replaces.
+
+* Other players' item names are visible in DS3.
+
+* If you pick up items while static, they'll still send once you reconnect.
+ 
+However, 2.x.x YAMLs are not compatible with 3.0.0. You'll need to [generate a
+new YAML configuration] for use with 3.x.x.
+
+[generating a new YAML configuration]: /games/Dark%20Souls%20III/player-options
+
+The following options have been removed:
+
+* `enable_boss_locations` is now controlled by the `soul_locations` option.
+
+* `enable_progressive_locations` was removed because all locations are now
+  individually randomized rather than replaced with a progressive list.
+
+* `pool_type` has been removed. Since there are no longer any non-randomized
+  items in randomized categories, there's not a meaningful distinction between
+  "shuffle" and "various" mode.
+
+* `enable_*_locations` options have all been removed. Instead, you can now add
+  [location group names] to the `exclude_locations` option to prevent them from
+  containing important items.
+
+  [location group names]: /tutorial/Dark%20Souls%20III/locations/en#location-groups
+
+  By default, the Hidden, Small Crystal Lizards, Upgrade, Small Souls, and
+  Miscellaneous groups are in `exclude_locations`. Once you've chosen your
+  excluded locations, you can set `excluded_locations: unrandomized` to preserve
+  the default vanilla item placements for all excluded locations.
+
+* `guaranteed_items`: In almost all cases, all items from the base game are now
+  included somewhere in the multiworld.
+
+In addition, the following options have changed:
+
+* The location names used in options like `exclude_locations` have changed. See
+  the [location guide] for a full description.
