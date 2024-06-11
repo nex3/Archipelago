@@ -810,7 +810,7 @@ class DarkSouls3World(World):
         quest.
         """
 
-        # Greirat
+        ## Greirat
 
         self._add_location_rule([
             "FS: Divine Blessing - Greirat from US",
@@ -839,7 +839,7 @@ class DarkSouls3World(World):
             and self._can_get(state, "FS: Divine Blessing - Greirat from IBV")
         ))
 
-        # Patches
+        ## Patches
 
         # Patches will only set up shop in Firelink once he's tricked you in the bell tower. He'll
         # only do _that_ once you've spoken to Siegward after killing the Fire Demon and lit the
@@ -875,7 +875,7 @@ class DarkSouls3World(World):
             and self._can_get(state, "FS: Rusted Gold Coin - don't forgive Patches")
         ))
 
-        # Leonhard
+        ## Leonhard
 
         self._add_location_rule([
             # Talk to Leonhard in Firelink with a Pale Tongue after lighting Cliff Underside or
@@ -906,7 +906,7 @@ class DarkSouls3World(World):
             for item in ["Leonhard's Garb", "Leonhard's Gauntlets", "Leonhard's Trousers"]
         ], "Black Eye Orb")
 
-        # Hawkwood
+        ## Hawkwood
         
         # After Hawkwood leaves and once you have the Torso Stone, you can fight him for dragon
         # stones. Andre will give Swordgrass as a hint as well
@@ -918,7 +918,7 @@ class DarkSouls3World(World):
             and state.has("Twinkling Dragon Torso Stone", self.player)
         ))
 
-        # Siegward
+        ## Siegward
 
         # Unlock Siegward's cell after progressing his quest
         self._add_location_rule([
@@ -939,7 +939,7 @@ class DarkSouls3World(World):
             and self._can_get(state, "PC: Soul of Yhorm the Giant")
         ))
 
-        # Sirris
+        ## Sirris
 
         # Kill Greatwood and turn in Dreamchaser's Ashes to trigger this opportunity for invasion
         self._add_location_rule([
@@ -985,7 +985,7 @@ class DarkSouls3World(World):
             and state.has("Dreamchaser's Ashes", self.player)
         ))
 
-        # Cornyx
+        ## Cornyx
 
         self._add_location_rule([
             "US: Old Sage's Blindfold - kill Cornyx",
@@ -1007,7 +1007,7 @@ class DarkSouls3World(World):
             and state.has("Izalith Pyromancy Tome", self.player)
         ))
 
-        # Irina
+        ## Irina
 
         self._add_location_rule([
             "US: Tower Key - kill Irina",
@@ -1016,7 +1016,7 @@ class DarkSouls3World(World):
             and state.has("Braille Divine Tome of Lothric", self.player)
         ))
 
-        # Karla
+        ## Karla
 
         self._add_location_rule([
             "FS: Karla's Pointed Hat - kill Karla",
@@ -1030,11 +1030,11 @@ class DarkSouls3World(World):
             and state.has("Londor Braille Divine Tome", self.player)
         ))
 
-        # Emma
+        ## Emma
 
         self._add_location_rule("HWL: Basin of Vows - Emma", "Small Doll")
 
-        # Orbeck
+        ## Orbeck
 
         self._add_location_rule([
             "FS: Morion Blade - Yuria for Orbeck's Ashes",
@@ -1073,7 +1073,7 @@ class DarkSouls3World(World):
                 self._has_any_scroll
             )
 
-        # Anri
+        ## Anri
 
         # Anri only leaves Road of Sacrifices once Deacons is defeated
         self._add_location_rule([
