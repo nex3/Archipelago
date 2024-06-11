@@ -310,6 +310,7 @@ class ExcludedLocationBehaviorOption(Choice):
     - Unnecessary: Excluded locations can't have progression items, but they can have useful items.
     - Unimportant: Neither progression items nor useful items can be placed in excluded locations.
     - Unrandomized: Excluded locations always contain the same item as in vanilla Dark Souls III.
+    - Unrandomized Shuffle: Excluded locations shuffle their items amongst themselves.
 
     A "progression item" is anything that's required to unlock another location in some game. A "useful item" is something each game defines individually, usually items that are quite desirable but not strictly necessary.
     """
@@ -317,6 +318,7 @@ class ExcludedLocationBehaviorOption(Choice):
     option_unnecessary = 1
     option_unimportant = 2
     option_unrandomized = 3
+    option_unrandomized_shuffle = 4
     default = 2
 
 

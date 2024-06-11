@@ -6,6 +6,7 @@ from logging import warning
 from typing import Any, Callable, Dict, Set, List, Optional, TextIO, Union
 
 from BaseClasses import CollectionState, MultiWorld, Region, Item, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
+from Fill import fill_restrictive
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
@@ -89,6 +90,8 @@ class DarkSouls3World(World):
         self.main_path_locations = []
         self.enabled_location_categories = set()
         self.all_excluded_locations = set()
+        self.nonrandom_items = []
+        self.nonrandom_locations = []
 
     def generate_early(self):
         self.all_excluded_locations.update(self.options.exclude_locations.value)
@@ -265,6 +268,15 @@ class DarkSouls3World(World):
                                           "RC: Lapp's Leggings - Lapp"}
                 ):
                     new_location.progress_type = LocationProgressType.EXCLUDED
+
+                # Build item/location lists for nonrandom shuffle
+                if self.options.excluded_locations == "unrandomized_shuffle" and location.name in excluded:
+                    new_location = DarkSouls3Location(self.player, location, new_region)
+                    excluded.remove(location.name)
+                    if location.default_item_name:
+                        self.nonrandom_items.append(self.create_item(location.default_item_name))
+                        self.nonrandom_locations.append(new_location)
+
             else:
                 # Don't allow missable duplicates of progression items to be expected progression.
                 if location.name in {"PC: Storm Ruler - Siegward",
@@ -305,6 +317,9 @@ class DarkSouls3World(World):
         for location in self.multiworld.get_unfilled_locations(self.player):
             if not self._is_location_available(location.name):
                 raise Exception("DS3 generation bug: Added an unavailable location.")
+            # Don't create nonrandom items/locations
+            if location in self.nonrandom_locations:
+                continue
 
             item = item_dictionary[location.data.default_item_name]
             if item.skip:
@@ -727,6 +742,13 @@ class DarkSouls3World(World):
             self._add_location_rule(location, "Storm Ruler")
 
         self.multiworld.completion_condition[self.player] = lambda state: self._can_get(state, "KFF: Soul of the Lords")
+
+        # Shuffle nonrandom items/locations after all rules are added
+        if self.options.excluded_locations == "unrandomized_shuffle":
+            self.random.shuffle(self.nonrandom_locations)
+            self.random.shuffle(self.nonrandom_items)
+            fill_restrictive(self.multiworld, self.multiworld.get_all_state(False), self.nonrandom_locations,
+                             self.nonrandom_items, single_player_placement=True, lock=True, name="DS3 Unrandomized")
 
     def _add_shop_rules(self) -> None:
         """Adds rules for items unlocked in shops."""
@@ -1229,7 +1251,7 @@ class DarkSouls3World(World):
                 lambda item: not item.advancement
             )
 
-        if self.options.excluded_locations == "unnecessary":
+        if self.options.excluded_locations == "unnecessary" or self.options.excluded_locations == "unrandomized_shuffle":
             self.options.exclude_locations.value.clear()
 
     def _add_early_item_rules(self, randomized_items: Set[str]) -> None:
@@ -1333,7 +1355,7 @@ class DarkSouls3World(World):
         if self.yhorm_location != default_yhorm_location:
             text += f"\nYhorm takes the place of {self.yhorm_location.name} in {self.player_name}'s world\n"
 
-        if self.options.excluded_locations == "unnecessary":
+        if self.options.excluded_locations == "unnecessary" or self.options.excluded_locations == "unrandomized_shuffle":
             text += f"\n{self.player_name}'s world excluded: {sorted(self.all_excluded_locations)}\n"
 
         if text:
