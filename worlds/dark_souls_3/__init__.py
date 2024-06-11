@@ -90,8 +90,8 @@ class DarkSouls3World(World):
         self.main_path_locations = []
         self.enabled_location_categories = set()
         self.all_excluded_locations = set()
-        self.nonrandom_items = []
-        self.nonrandom_locations = []
+        self.nonrandom_shuffle_items = []
+        self.nonrandom_shuffle_locations = []
 
     def generate_early(self):
         self.all_excluded_locations.update(self.options.exclude_locations.value)
@@ -274,8 +274,8 @@ class DarkSouls3World(World):
                     new_location = DarkSouls3Location(self.player, location, new_region)
                     excluded.remove(location.name)
                     if location.default_item_name:
-                        self.nonrandom_items.append(self.create_item(location.default_item_name))
-                        self.nonrandom_locations.append(new_location)
+                        self.nonrandom_shuffle_items.append(self.create_item(location.default_item_name))
+                        self.nonrandom_shuffle_locations.append(new_location)
 
             else:
                 # Don't allow missable duplicates of progression items to be expected progression.
@@ -317,8 +317,8 @@ class DarkSouls3World(World):
         for location in self.multiworld.get_unfilled_locations(self.player):
             if not self._is_location_available(location.name):
                 raise Exception("DS3 generation bug: Added an unavailable location.")
-            # Don't create nonrandom items/locations
-            if location in self.nonrandom_locations:
+            # Don't create nonrandom shuffle items/locations
+            if location in self.nonrandom_shuffle_locations:
                 continue
 
             item = item_dictionary[location.data.default_item_name]
@@ -745,10 +745,10 @@ class DarkSouls3World(World):
 
         # Shuffle nonrandom items/locations after all rules are added
         if self.options.excluded_locations == "unrandomized_shuffle":
-            self.random.shuffle(self.nonrandom_locations)
-            self.random.shuffle(self.nonrandom_items)
-            fill_restrictive(self.multiworld, self.multiworld.get_all_state(False), self.nonrandom_locations,
-                             self.nonrandom_items, single_player_placement=True, lock=True, name="DS3 Unrandomized")
+            self.random.shuffle(self.nonrandom_shuffle_locations)
+            self.random.shuffle(self.nonrandom_shuffle_items)
+            fill_restrictive(self.multiworld, self.multiworld.get_all_state(False), self.nonrandom_shuffle_locations,
+                             self.nonrandom_shuffle_items, single_player_placement=True, lock=True, name="DS3 Unrandomized")
 
     def _add_shop_rules(self) -> None:
         """Adds rules for items unlocked in shops."""
