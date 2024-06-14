@@ -149,7 +149,7 @@ class DarkSouls3World(World):
         # allow Yhorm as Iudex Gundyr if there's at least one available location.
         return any(
             self._is_location_available(location)
-            and location.name not in self.options.exclude_locations.value
+            and location.name not in self.all_excluded_locations
             and location.name != "CA: Coiled Sword - boss drop"
             for location in location_tables["Cemetery of Ash"]
         )
@@ -1233,7 +1233,7 @@ class DarkSouls3World(World):
         """
 
         unnecessary_locations = (
-            self.options.exclude_locations.value
+            self.all_excluded_locations
             if self.options.excluded_locations == "unnecessary"
             else set()
         ).union(
@@ -1380,14 +1380,14 @@ class DarkSouls3World(World):
             for region in region_order
             # Shuffle locations within each region.
             for location in self._shuffle(location_tables[region])
-            if self._is_location_available(location)
+            if self._is_location_available(location) and location not in self.nonrandom_shuffle_locations
         ]
 
         # All DarkSouls3Items for this world that have been assigned anywhere, grouped by name
         full_items_by_name = defaultdict(list)
         for location in self.multiworld.get_filled_locations():
             if location.item.player == self.player and (
-                location.player != self.player or self._is_location_available(location)
+                location.player != self.player or self._is_location_available(location) and location not in self.nonrandom_shuffle_locations
             ):
                 full_items_by_name[location.item.name].append(location.item)
 
