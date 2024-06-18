@@ -146,7 +146,7 @@ class DarkSouls3World(World):
         # allow Yhorm as Iudex Gundyr if there's at least one available location.
         return any(
             self._is_location_available(location)
-            and location.name not in self.options.exclude_locations.value
+            and location.name not in self.all_excluded_locations
             and location.name != "CA: Coiled Sword - boss drop"
             for location in location_tables["Cemetery of Ash"]
         )
@@ -1211,7 +1211,7 @@ class DarkSouls3World(World):
         """
 
         unnecessary_locations = (
-            self.options.exclude_locations.value
+            self.all_excluded_locations
             if self.options.excluded_locations == "unnecessary"
             else set()
         ).union(
