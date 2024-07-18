@@ -41,6 +41,7 @@ class DarkSouls3Web(WebWorld):
     tutorials = [setup_en, setup_fr]
     option_groups = option_groups
     item_descriptions = item_descriptions
+    rich_text_options_doc = True
 
 
 class DarkSouls3World(World):
@@ -75,7 +76,7 @@ class DarkSouls3World(World):
 
     all_excluded_locations: Set[str] = set()
     """This is the same value as `self.options.exclude_locations.value` initially, but if
-    `options.exclude_locations` gets cleared due to `excluded_locations: unnecessary` this still
+    `options.exclude_locations` gets cleared due to `excluded_locations: allow_useful` this still
     holds the old locations so we can ensure they don't get necessary items.
     """
 
@@ -113,8 +114,8 @@ class DarkSouls3World(World):
                 [boss for boss in all_bosses if self._allow_boss_for_yhorm(boss)])
 
             # If Yhorm is early, make sure the Storm Ruler is easily available to avoid BK
+            # Iudex Gundyr is handled separately in _fill_local_items
             if (
-                self.yhorm_location.name == "Iudex Gundyr" or
                 self.yhorm_location.name == "Vordt of the Boreal Valley" or (
                     self.yhorm_location.name == "Dancer of the Boreal Valley" and
                     not self.options.late_basin_of_vows
@@ -252,7 +253,13 @@ class DarkSouls3World(World):
             if self._is_location_available(location):
                 new_location = DarkSouls3Location(self.player, location, new_region)
                 if (
-                    location.missable and self.options.missable_locations == "unimportant"
+                    # Exclude missable locations that don't allow useful items
+                    location.missable and self.options.missable_location_behavior == "forbid_useful"
+                    and not (
+                        # Unless they are excluded to a higher degree already
+                        location.name in self.all_excluded_locations
+                        and self.options.missable_location_behavior < self.options.excluded_location_behavior
+                    )
                 ) or (
                     # Lift Chamber Key is missable. Exclude Lift-Chamber-Key-Locked locations if it isn't randomized
                     not self._is_location_available("FS: Lift Chamber Key - Leonhard")
@@ -270,7 +277,7 @@ class DarkSouls3World(World):
                     new_location.progress_type = LocationProgressType.EXCLUDED
 
                 # Build item/location lists for nonrandom shuffle
-                if self.options.excluded_locations == "unrandomized_shuffle" and location.name in excluded:
+                if self.options.excluded_location_behavior == "shuffle_separately" and location.name in excluded:
                     new_location = DarkSouls3Location(self.player, location, new_region)
                     excluded.remove(location.name)
                     if location.default_item_name:
@@ -300,7 +307,9 @@ class DarkSouls3World(World):
                 new_location.place_locked_item(event_item)
                 if location.name in excluded:
                     excluded.remove(location.name)
-                    self.all_excluded_locations.remove(location.name)
+                    # Only remove from all_excluded if excluded does not have priority over missable
+                    if not (self.options.missable_location_behavior < self.options.excluded_location_behavior):
+                        self.all_excluded_locations.remove(location.name)
 
             new_region.locations.append(new_location)
 
@@ -504,7 +513,7 @@ class DarkSouls3World(World):
         if not candidate_locations:
             warning(f"Couldn't place \"{name}\" in a valid location for {self.player_name}. Adding it to starting inventory instead.")
             location = next(
-                (location for location in self.multiworld.get_locations() if location.item == item),
+                (location for location in self.multiworld.get_locations(self.player) if location.data.default_item_name == item.name),
                 None
             )
             if location: self._replace_with_filler(location)
@@ -535,7 +544,7 @@ class DarkSouls3World(World):
         self._add_npc_rules()
         self._add_transposition_rules()
         self._add_crow_rules()
-        self._add_unnecessary_location_rules()
+        self._add_allow_useful_location_rules()
         self._add_early_item_rules(randomized_items)
 
         self._add_entrance_rule("Firelink Shrine Bell Tower", "Tower Key")
@@ -744,7 +753,7 @@ class DarkSouls3World(World):
         self.multiworld.completion_condition[self.player] = lambda state: self._can_get(state, "KFF: Soul of the Lords")
 
         # Shuffle nonrandom items/locations after all rules are added
-        if self.options.excluded_locations == "unrandomized_shuffle":
+        if self.options.excluded_location_behavior == "shuffle_separately":
             self.random.shuffle(self.nonrandom_shuffle_locations)
             self.random.shuffle(self.nonrandom_shuffle_items)
             fill_restrictive(self.multiworld, self.multiworld.get_all_state(False), self.nonrandom_shuffle_locations,
@@ -1224,7 +1233,7 @@ class DarkSouls3World(World):
                 and not item.data.is_upgraded
             ))
 
-    def _add_unnecessary_location_rules(self) -> None:
+    def _add_allow_useful_location_rules(self) -> None:
         """Adds rules for locations that can contain useful but not necessary items.
 
         If we allow useful items in the excluded locations, we don't want Archipelago's fill
@@ -1232,26 +1241,42 @@ class DarkSouls3World(World):
         manually add item rules to exclude important items.
         """
 
-        unnecessary_locations = (
-            self.all_excluded_locations
-            if self.options.excluded_locations == "unnecessary"
+        all_locations = self.multiworld.get_locations(self.player)
+
+        allow_useful_locations = (
+            (
+                {
+                    location.name
+                    for location in all_locations
+                    if location.name in self.all_excluded_locations
+                    and not location.data.missable
+                }
+                if self.options.excluded_location_behavior < self.options.missable_location_behavior
+                else self.all_excluded_locations
+            )
+            if self.options.excluded_location_behavior == "allow_useful"
             else set()
         ).union(
             {
                 location.name
-                for location in self.multiworld.get_locations()
-                if location.player == self.player and location.data.missable
+                for location in all_locations
+                if location.data.missable
+                and not (
+                    location.name in self.all_excluded_locations
+                    and self.options.missable_location_behavior <
+                        self.options.excluded_location_behavior
+                )
             }
-            if self.options.missable_locations == "unnecessary"
+            if self.options.missable_location_behavior == "allow_useful"
             else set()
         )
-        for location in unnecessary_locations:
+        for location in allow_useful_locations:
             self._add_item_rule(
                 location,
                 lambda item: not item.advancement
             )
 
-        if self.options.excluded_locations == "unnecessary" or self.options.excluded_locations == "unrandomized_shuffle":
+        if self.options.excluded_location_behavior == "allow_useful" or self.options.excluded_location_behavior == "shuffle_separately":
             self.options.exclude_locations.value.clear()
 
     def _add_early_item_rules(self, randomized_items: Set[str]) -> None:
@@ -1288,7 +1313,7 @@ class DarkSouls3World(World):
 
         The rule can just be a single item/event name as well as an explicit rule lambda.
         """
-        locations = location if type(location) is list else [location]
+        locations = location if isinstance(location, list) else [location]
         for location in locations:
             data = location_dictionary[location]
             if data.dlc and not self.options.enable_dlc: return
@@ -1303,7 +1328,7 @@ class DarkSouls3World(World):
     def _add_entrance_rule(self, region: str, rule: Union[CollectionRule, str]) -> None:
         """Sets a rule for the entrance to the given region."""
         assert region in location_tables
-        if not any(region == reg.name for reg in self.multiworld.regions): return
+        if not any(region == reg for reg in self.multiworld.regions.region_cache[self.player]): return
         if isinstance(rule, str):
             if " -> " not in rule:
                 assert item_dictionary[rule].classification == ItemClassification.progression
@@ -1340,11 +1365,11 @@ class DarkSouls3World(World):
             and (not data.dlc or self.options.enable_dlc)
             and (not data.ngp or self.options.enable_ngp)
             and not (
-                self.options.excluded_locations == "unrandomized"
+                self.options.excluded_location_behavior == "do_not_randomize"
                 and data.name in self.all_excluded_locations
             )
             and not (
-                self.options.missable_locations == "unrandomized"
+                self.options.missable_location_behavior == "do_not_randomize"
                 and data.missable
             )
         )
@@ -1355,7 +1380,7 @@ class DarkSouls3World(World):
         if self.yhorm_location != default_yhorm_location:
             text += f"\nYhorm takes the place of {self.yhorm_location.name} in {self.player_name}'s world\n"
 
-        if self.options.excluded_locations == "unnecessary" or self.options.excluded_locations == "unrandomized_shuffle":
+        if self.options.excluded_location_behavior == "allow_useful" or self.options.excluded_location_behavior == "shuffle_separately":
             text += f"\n{self.player_name}'s world excluded: {sorted(self.all_excluded_locations)}\n"
 
         if text:
