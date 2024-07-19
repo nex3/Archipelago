@@ -86,10 +86,6 @@ class DarkSouls3World(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.locked_items = []
-        self.locked_locations = []
-        self.main_path_locations = []
-        self.enabled_location_categories = set()
         self.all_excluded_locations = set()
         self.nonrandom_shuffle_items = []
         self.nonrandom_shuffle_locations = []
