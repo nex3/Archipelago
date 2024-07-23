@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from collections import defaultdict
 import json
 from logging import warning
-from typing import Any, Callable, Dict, Set, List, Optional, TextIO, Union
+from typing import Any, Callable, cast, Dict, Set, List, Optional, TextIO, Union
 
 from BaseClasses import CollectionState, MultiWorld, Region, Item, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
 
@@ -56,9 +56,9 @@ class DarkSouls3World(World):
     web = DarkSouls3Web()
     base_id = 100000
     required_client_version = (0, 4, 2)
-    item_name_to_id = {data.name: data.ap_code for data in item_dictionary.values()}
+    item_name_to_id = {data.name: cast(int, data.ap_code) for data in item_dictionary.values()}
     location_name_to_id = {
-        location.name: location.ap_code
+        location.name: cast(int, location.ap_code)
         for locations in location_tables.values()
         for location in locations
     }
@@ -85,10 +85,6 @@ class DarkSouls3World(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.locked_items = []
-        self.locked_locations = []
-        self.main_path_locations = []
-        self.enabled_location_categories = set()
         self.all_excluded_locations = set()
 
     def generate_early(self):
@@ -152,7 +148,7 @@ class DarkSouls3World(World):
             for location in location_tables["Cemetery of Ash"]
         )
 
-    def create_regions(self):
+    def create_regions(self) -> None:
         # Create Vanilla Regions
         regions: Dict[str, Region] = {"Menu": self.create_region("Menu", {})}
         regions.update({region_name: self.create_region(region_name, location_tables[region_name]) for region_name in [
@@ -304,7 +300,7 @@ class DarkSouls3World(World):
         self.multiworld.regions.append(new_region)
         return new_region
 
-    def create_items(self):
+    def create_items(self) -> None:
         # Just used to efficiently deduplicate items
         item_set: Set[str] = set()
 

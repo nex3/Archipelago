@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Dict, List, Set
+from typing import cast, ClassVar, Optional, Dict, List, Set, Union
 from dataclasses import dataclass
 
 from BaseClasses import ItemClassification, Location, Region
@@ -61,7 +61,7 @@ class DS3LocationData:
     that progression balancing and item smoothing is more accurate for DS3.
     """
 
-    ap_code: int = None
+    ap_code: Union[int, None] = None
     """Archipelago's internal ID for this location (also known as its "address")."""
 
     region_value: int = 0
@@ -188,7 +188,7 @@ class DS3LocationData:
 
         This is computed from the properties assigned to this location."""
         # Events aren't part of any location groups.
-        if self.is_event: return
+        if self.is_event: return []
 
         names = []
         if self.prominent: names.append("Prominent")
@@ -201,7 +201,7 @@ class DS3LocationData:
         if self.lizard: names.append("Small Crystal Lizards")
         if self.hidden: names.append("Hidden")
 
-        default_item = item_dictionary[self.default_item_name]
+        default_item = item_dictionary[cast(str, self.default_item_name)]
         names.append({
                          DS3ItemCategory.WEAPON_UPGRADE_5: "Weapons",
                          DS3ItemCategory.WEAPON_UPGRADE_10: "Weapons",
@@ -3103,7 +3103,7 @@ for location_name, location_table in location_tables.items():
 
     # Allow entire locations to be added to location sets.
     if not location_name.endswith(" Shop"):
-        location_name_groups[location_name] = frozenset([
+        location_name_groups[location_name] = set([
             location_data.name for location_data in location_table
             if not location_data.is_event
         ])
