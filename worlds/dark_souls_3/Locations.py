@@ -188,7 +188,8 @@ class DS3LocationData:
 
         This is computed from the properties assigned to this location."""
         # Events aren't part of any location groups.
-        if self.is_event: return []
+        if self.is_event:
+            return []
 
         names = []
         if self.prominent: names.append("Prominent")

@@ -87,7 +87,7 @@ class DarkSouls3World(World):
         super().__init__(multiworld, player)
         self.all_excluded_locations = set()
 
-    def generate_early(self):
+    def generate_early(self) -> None:
         self.all_excluded_locations.update(self.options.exclude_locations.value)
 
         # Inform Universal Tracker where Yhorm is being randomized to.
