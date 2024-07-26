@@ -1375,7 +1375,7 @@ class DarkSouls3World(World):
         region order, and then the best items in a sphere go into the multiworld.
         """
 
-        locations_by_sphere = list(self.multiworld.get_spheres())
+        locations_by_sphere = [sorted(loc for loc in sphere if loc.item.player == self.player and not loc.locked) for sphere in self.multiworld.get_spheres()]
 
         # All items in the base game in approximately the order they appear
         all_item_order = [
@@ -1421,9 +1421,7 @@ class DarkSouls3World(World):
                 loc
                 for locations in locations_by_sphere
                 for loc in locations
-                if loc.item.player == self.player
-                and not loc.locked
-                and loc.item.name in names
+                if loc.item.name in names
             ]
 
             # It's expected that there may be more total items than there are matching locations if
@@ -1435,13 +1433,8 @@ class DarkSouls3World(World):
                     f"contain smoothed items, but only {len(item_order)} items to smooth."
                 )
 
-            for i, all_locations in enumerate(locations_by_sphere):
-                locations = [
-                    loc for loc in all_locations
-                    if loc.item.player == self.player
-                    and not loc.locked
-                    and loc.item.name in names
-                ]
+            for all_locations in locations_by_sphere:
+                locations = [loc for loc in all_locations if loc.item.name in names]
 
                 # Check the game, not the player, because we know how to sort within regions for DS3
                 offworld = self._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
