@@ -1484,13 +1484,8 @@ class DarkSouls3World(World):
         items: List[Union[DS3ItemData, DarkSouls3Item]]
     ) -> Union[DS3ItemData, DarkSouls3Item]:
         """Returns the next item in items that can be assigned to location."""
-        # Non-excluded locations can take any item we throw at them. (More specifically, if they can
-        # take one item in a group, they can take any other).
-        if location.progress_type != LocationProgressType.EXCLUDED: return items.pop(0)
-
-        # Excluded locations require filler items.
         for i, item in enumerate(items):
-            if item.classification == ItemClassification.filler:
+            if location.can_fill(self.multiworld.state, item, False):
                 return items.pop(i)
 
         # If we can't find a suitable item, give up and assign an unsuitable one.
