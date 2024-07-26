@@ -1419,8 +1419,8 @@ class DarkSouls3World(World):
 
             all_matching_locations = [
                 loc
-                for locations in locations_by_sphere
-                for loc in locations
+                for sphere in locations_by_sphere
+                for loc in sphere
                 if loc.item.name in names
             ]
 
@@ -1433,8 +1433,8 @@ class DarkSouls3World(World):
                     f"contain smoothed items, but only {len(item_order)} items to smooth."
                 )
 
-            for all_locations in locations_by_sphere:
-                locations = [loc for loc in all_locations if loc.item.name in names]
+            for sphere in locations_by_sphere:
+                locations = [loc for loc in sphere if loc.item.name in names]
 
                 # Check the game, not the player, because we know how to sort within regions for DS3
                 offworld = self._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
