@@ -309,7 +309,8 @@ class RandomEnemyPresetOption(Option[Dict[str, Any]], VerifyKeys):
     def __init__(self, value: Dict[str, Any]):
         self.value = deepcopy(value)
 
-    def get_option_name(self, value: Dict[str, Any]) -> str:
+    @classmethod
+    def get_option_name(cls, value: Dict[str, Any]) -> str:
         return json.dumps(value)
 
     @classmethod
