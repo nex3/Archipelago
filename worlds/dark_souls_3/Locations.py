@@ -258,7 +258,7 @@ class DarkSouls3Location(Location):
 #   as part of their normal quest, "kill [name]" for items that require killing
 #   them even when they aren't hostile, and just "[name]" for items that are
 #   naturally available as part of their quest.
-location_tables: dict[str, list[DS3LocationData]] = {
+location_tables: Dict[str, List[DS3LocationData]] = {
     "Cemetery of Ash": [
         DS3LocationData("CA: Soul of a Deserted Corpse - right of spawn",
                         "Soul of a Deserted Corpse"),
