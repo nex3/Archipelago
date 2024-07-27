@@ -198,7 +198,7 @@ class DS3LocationData:
         if self.lizard: names.append("Small Crystal Lizards")
         if self.hidden: names.append("Hidden")
 
-        default_item = item_dictionary[self.default_item_name] #ignore (never None)
+        default_item = item_dictionary[cast(str, self.default_item_name)]
         names.append({
                          DS3ItemCategory.WEAPON_UPGRADE_5: "Weapons",
                          DS3ItemCategory.WEAPON_UPGRADE_10: "Weapons",
