@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import dataclasses
 from enum import IntEnum
-from typing import cast, ClassVar, Dict, Generator, List, Optional, Set, Union
+from typing import cast, ClassVar, Dict, Generator, List, Optional, Set
 
 from BaseClasses import Item, ItemClassification
 
@@ -96,10 +96,10 @@ class DS3ItemData:
     """The next item ID to use when creating item data."""
 
     name: str
-    ds3_code: Union[int, None]
+    ds3_code: Optional[int]
     category: DS3ItemCategory
 
-    base_ds3_code: Union[int, None] = None
+    base_ds3_code: Optional[int] = None
     """If this is an upgradable weapon, the base ID of the weapon it upgrades from.
 
     Otherwise, or if the weapon isn't upgraded, this is the same as ds3_code.
@@ -111,7 +111,7 @@ class DS3ItemData:
     classification: ItemClassification = ItemClassification.filler
     """How important this item is to the game progression."""
 
-    ap_code: Union[int, None] = None
+    ap_code: Optional[int] = None
     """The Archipelago ID for this item."""
 
     is_dlc: bool = False
@@ -129,7 +129,7 @@ class DS3ItemData:
     difference.
     """
 
-    souls: Union[int, None] = None
+    souls: Optional[int] = None
     """If this is a consumable item that gives souls, the number of souls it gives."""
 
     useful_if: UsefulIf = UsefulIf.DEFAULT
@@ -245,7 +245,7 @@ class DarkSouls3Item(Item):
     data: DS3ItemData
 
     @property
-    def level(self) -> Union[int, None]:
+    def level(self) -> Optional[int]:
         """This item's upgrade level, if it's a weapon."""
         return cast(int, self.data.ds3_code) % 100 if self.data.category.upgrade_level else None
 
