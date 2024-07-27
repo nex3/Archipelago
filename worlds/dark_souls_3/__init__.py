@@ -1314,11 +1314,11 @@ class DarkSouls3World(World):
         if not self._is_location_available(location): return
         add_item_rule(self.multiworld.get_location(location, self.player), rule)
 
-    def _can_go_to(self, state, region) -> None:
+    def _can_go_to(self, state, region) -> bool:
         """Returns whether state can access the given region name."""
         return state.can_reach_entrance(f"Go To {region}", self.player)
 
-    def _can_get(self, state, location) -> None:
+    def _can_get(self, state, location) -> bool:
         """Returns whether state can access the given location name."""
         return state.can_reach_location(location, self.player)
 
