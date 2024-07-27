@@ -1,4 +1,4 @@
-from typing import cast, ClassVar, Optional, Dict, List, Set, Union
+from typing import cast, ClassVar, Optional, Dict, List, Set
 from dataclasses import dataclass
 
 from BaseClasses import ItemClassification, Location, Region
@@ -61,7 +61,7 @@ class DS3LocationData:
     that progression balancing and item smoothing is more accurate for DS3.
     """
 
-    ap_code: Union[int, None] = None
+    ap_code: Optional[int] = None
     """Archipelago's internal ID for this location (also known as its "address")."""
 
     region_value: int = 0
