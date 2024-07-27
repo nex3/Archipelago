@@ -187,10 +187,6 @@ class DS3LocationData:
         """The names of location groups this location should appear in.
 
         This is computed from the properties assigned to this location."""
-        # Events aren't part of any location groups.
-        if self.is_event:
-            return []
-
         names = []
         if self.prominent: names.append("Prominent")
         if self.progression: names.append("Progression")
@@ -202,7 +198,7 @@ class DS3LocationData:
         if self.lizard: names.append("Small Crystal Lizards")
         if self.hidden: names.append("Hidden")
 
-        default_item = item_dictionary[cast(str, self.default_item_name)]
+        default_item = item_dictionary[self.default_item_name] #ignore (never None)
         names.append({
                          DS3ItemCategory.WEAPON_UPGRADE_5: "Weapons",
                          DS3ItemCategory.WEAPON_UPGRADE_10: "Weapons",
