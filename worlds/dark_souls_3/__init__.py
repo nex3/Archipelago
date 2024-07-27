@@ -114,8 +114,7 @@ class DarkSouls3World(World):
                     not self.options.late_basin_of_vows
                 )
             ):
-                self.multiworld.early_items[self.player]["Storm Ruler"] = 1
-                self.options.local_items.value.add("Storm Ruler")
+                self.multiworld.local_early_items[self.player]["Storm Ruler"] = 1
         else:
             self.yhorm_location = default_yhorm_location
 
@@ -332,10 +331,11 @@ class DarkSouls3World(World):
         # Extra filler items for locations containing skip items
         self.local_itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
 
+        # Potentially fill some items locally and remove them from the itempool
+        self._fill_local_items()
+
         # Add items to itempool
         self.multiworld.itempool += self.local_itempool
-
-        self._fill_local_items()
 
     def _create_injectable_items(self, num_required_extra_items: int) -> List[DarkSouls3Item]:
         """Returns a list of items to inject into the multiworld instead of skipped items.
@@ -488,7 +488,6 @@ class DarkSouls3World(World):
             and location.item_rule(item)
         ]
 
-        self.multiworld.itempool.remove(item)
         self.local_itempool.remove(item)
 
         if not candidate_locations:
@@ -1371,7 +1370,10 @@ class DarkSouls3World(World):
         region order, and then the best items in a sphere go into the multiworld.
         """
 
-        locations_by_sphere = list(self.multiworld.get_spheres())
+        locations_by_sphere = [
+            sorted(loc for loc in sphere if loc.item.player == self.player and not loc.locked)
+            for sphere in self.multiworld.get_spheres()
+        ]
 
         # All items in the base game in approximately the order they appear
         all_item_order = [
@@ -1415,11 +1417,9 @@ class DarkSouls3World(World):
 
             all_matching_locations = [
                 loc
-                for locations in locations_by_sphere
-                for loc in locations
-                if loc.item.player == self.player
-                and not loc.locked
-                and loc.item.name in names
+                for sphere in locations_by_sphere
+                for loc in sphere
+                if loc.item.name in names
             ]
 
             # It's expected that there may be more total items than there are matching locations if
@@ -1431,13 +1431,8 @@ class DarkSouls3World(World):
                     f"contain smoothed items, but only {len(item_order)} items to smooth."
                 )
 
-            for i, all_locations in enumerate(locations_by_sphere):
-                locations = [
-                    loc for loc in all_locations
-                    if loc.item.player == self.player
-                    and not loc.locked
-                    and loc.item.name in names
-                ]
+            for sphere in locations_by_sphere:
+                locations = [loc for loc in sphere if loc.item.name in names]
 
                 # Check the game, not the player, because we know how to sort within regions for DS3
                 offworld = self._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
@@ -1487,13 +1482,8 @@ class DarkSouls3World(World):
         items: List[Union[DS3ItemData, DarkSouls3Item]]
     ) -> Union[DS3ItemData, DarkSouls3Item]:
         """Returns the next item in items that can be assigned to location."""
-        # Non-excluded locations can take any item we throw at them. (More specifically, if they can
-        # take one item in a group, they can take any other).
-        if location.progress_type != LocationProgressType.EXCLUDED: return items.pop(0)
-
-        # Excluded locations require filler items.
         for i, item in enumerate(items):
-            if item.classification == ItemClassification.filler:
+            if location.can_fill(self.multiworld.state, item, False):
                 return items.pop(i)
 
         # If we can't find a suitable item, give up and assign an unsuitable one.
