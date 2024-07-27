@@ -79,7 +79,7 @@ class DarkSouls3World(World):
     holds the old locations so we can ensure they don't get necessary items.
     """
 
-    local_itempool: Optional[List[DarkSouls3Item]]
+    local_itempool: List[DarkSouls3Item] = []
     """The pool of all items within this particular world. This is a subset of
     `self.multiworld.itempool`."""
 
@@ -337,7 +337,7 @@ class DarkSouls3World(World):
 
         self._fill_local_items()
 
-    def _create_injectable_items(self, num_required_extra_items: int) -> List[Item]:
+    def _create_injectable_items(self, num_required_extra_items: int) -> List[DarkSouls3Item]:
         """Returns a list of items to inject into the multiworld instead of skipped items.
 
         If there isn't enough room to inject all the necessary progression items
@@ -386,7 +386,7 @@ class DarkSouls3World(World):
 
         return [self.create_item(item) for item in items]
 
-    def create_item(self, item: Union[str, DS3ItemData]) -> Item:
+    def create_item(self, item: Union[str, DS3ItemData]) -> DarkSouls3Item:
         data = item if isinstance(item, DS3ItemData) else item_dictionary[item]
         classification = None
         if self.multiworld and data.useful_if != UsefulIf.DEFAULT and (
