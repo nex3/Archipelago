@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import dataclasses
 from enum import IntEnum
-import types
 from typing import cast, ClassVar, Dict, Generator, List, Optional, Set, Union
 
 from BaseClasses import Item, ItemClassification
