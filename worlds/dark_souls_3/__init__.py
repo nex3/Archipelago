@@ -6,6 +6,7 @@ from logging import warning
 from typing import cast, Any, Callable, Dict, Set, List, Optional, TextIO, Union
 
 from BaseClasses import CollectionState, MultiWorld, Region, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
+from Fill import remaining_fill
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
@@ -1401,7 +1402,7 @@ class DarkSouls3World(World):
             """
 
             # Convert items to full DarkSouls3Items.
-            item_order = [
+            converted_item_order = [
                 item for item in (
                     (
                         # full_items_by_name won't contain DLC items if the DLC is disabled.
@@ -1414,7 +1415,7 @@ class DarkSouls3World(World):
                 if item and item.code is not None
             ]
 
-            names = {item.name for item in item_order}
+            names = {item.name for item in converted_item_order}
 
             all_matching_locations = [
                 loc
@@ -1426,11 +1427,13 @@ class DarkSouls3World(World):
             # It's expected that there may be more total items than there are matching locations if
             # the player has chosen a more limited accessibility option, since the matching
             # locations *only* include items in the spheres of accessibility.
-            if len(item_order) < len(all_matching_locations):
+            if len(converted_item_order) < len(all_matching_locations):
                 raise Exception(
                     f"DS3 bug: there are {len(all_matching_locations)} locations that can " +
-                    f"contain smoothed items, but only {len(item_order)} items to smooth."
+                    f"contain smoothed items, but only {len(converted_item_order)} items to smooth."
                 )
+
+            sorted_spheres = []
 
             for sphere in locations_by_sphere:
                 locations = [loc for loc in sphere if loc.item.name in names]
@@ -1440,11 +1443,10 @@ class DarkSouls3World(World):
                 onworld = sorted((loc for loc in locations if loc.game == "Dark Souls III"),
                                  key=lambda loc: loc.data.region_value)
 
-                # Give offworld regions the last (best) items within a given sphere
-                for location in onworld + offworld:
-                    new_item = self._pop_item(location, item_order)
-                    location.item = new_item
-                    new_item.location = location
+                sorted_spheres.extend(onworld + offworld)
+
+            converted_item_order.reverse()
+            remaining_fill(self.multiworld, sorted_spheres, converted_item_order, name="DS3 Smoothing")  # , check_location_can_fill=True)
 
         if self.options.smooth_upgrade_items:
             base_names = {
@@ -1476,19 +1478,6 @@ class DarkSouls3World(World):
         copy = list(seq)
         self.random.shuffle(copy)
         return copy
-
-    def _pop_item(
-        self,
-        location: Location,
-        items: List[Union[DS3ItemData, DarkSouls3Item]]
-    ) -> Union[DS3ItemData, DarkSouls3Item]:
-        """Returns the next item in items that can be assigned to location."""
-        for i, item in enumerate(items):
-            if location.can_fill(self.multiworld.state, item, False):
-                return items.pop(i)
-
-        # If we can't find a suitable item, give up and assign an unsuitable one.
-        return items.pop(0)
 
     def fill_slot_data(self) -> Dict[str, object]:
         slot_data: Dict[str, object] = {}
