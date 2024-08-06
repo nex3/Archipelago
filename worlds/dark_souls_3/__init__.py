@@ -1455,10 +1455,12 @@ class DarkSouls3World(World):
             smooth_items([item for item in all_item_order if item.base_name in base_names])
 
         if self.options.smooth_soul_items:
-            smooth_items([
+            souls = [
                 item for item in all_item_order
                 if item.souls and item.classification != ItemClassification.progression
-            ])
+            ]
+            souls.sort(key=lambda item: item.souls)
+            smooth_items(souls)
 
         if self.options.smooth_upgraded_weapons:
             upgraded_weapons = [
