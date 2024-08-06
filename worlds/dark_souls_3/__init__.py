@@ -1466,7 +1466,7 @@ class DarkSouls3World(World):
         if self.options.smooth_upgraded_weapons:
             upgraded_weapons = [
                 location.item
-                for location in cast(List[DarkSouls3Location], self.multiworld.get_filled_locations())
+                for location in self.multiworld.get_filled_locations()
                 if location.item.player == self.player
                 and location.item.level and location.item.level > 0
                 and location.item.classification != ItemClassification.progression
