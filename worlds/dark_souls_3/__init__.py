@@ -3,18 +3,18 @@ from collections.abc import Sequence
 from collections import defaultdict
 import json
 from logging import warning
-from typing import Any, Callable, Dict, Set, List, Optional, TextIO, Union
+from typing import cast, Any, Callable, Dict, Set, List, Optional, TextIO, Union
 
-from BaseClasses import CollectionState, MultiWorld, Region, Item, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
+from BaseClasses import CollectionState, MultiWorld, Region, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
 from Fill import fill_restrictive
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
 
 from .Bosses import DS3BossInfo, all_bosses, default_yhorm_location
-from .Items import DarkSouls3Item, DS3ItemCategory, DS3ItemData, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
+from .Items import DarkSouls3Item, DS3ItemData, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
 from .Locations import DarkSouls3Location, DS3LocationData, location_tables, location_descriptions, location_dictionary, location_name_groups, region_order
-from .Options import DarkSouls3Options, EarlySmallLothricBanner, option_groups
+from .Options import DarkSouls3Options, option_groups
 
 
 class DarkSouls3Web(WebWorld):
@@ -68,7 +68,7 @@ class DarkSouls3World(World):
     location_descriptions = location_descriptions
     item_descriptions = item_descriptions
 
-    yhorm_location: Optional[DS3BossInfo]
+    yhorm_location: DS3BossInfo = default_yhorm_location
     """If enemy randomization is enabled, this is the boss who Yhorm the Giant should replace.
     
     This is used to determine where the Storm Ruler can be placed.
@@ -80,7 +80,7 @@ class DarkSouls3World(World):
     holds the old locations so we can ensure they don't get necessary items.
     """
 
-    local_itempool: Optional[List[DarkSouls3Item]]
+    local_itempool: List[DarkSouls3Item] = []
     """The pool of all items within this particular world. This is a subset of
     `self.multiworld.itempool`."""
 
@@ -90,7 +90,7 @@ class DarkSouls3World(World):
         self.nonrandom_shuffle_items = []
         self.nonrandom_shuffle_locations = []
 
-    def generate_early(self):
+    def generate_early(self) -> None:
         self.all_excluded_locations.update(self.options.exclude_locations.value)
 
         # Inform Universal Tracker where Yhorm is being randomized to.
@@ -101,8 +101,6 @@ class DarkSouls3World(World):
                     for boss in all_bosses:
                         if yhorm_data.startswith(boss.name):
                             self.yhorm_location = boss
-                else:
-                    self.yhorm_location = default_yhorm_location
 
         # Randomize Yhorm manually so that we know where to place the Storm Ruler.
         elif self.options.randomize_enemies:
@@ -117,10 +115,7 @@ class DarkSouls3World(World):
                     not self.options.late_basin_of_vows
                 )
             ):
-                self.multiworld.early_items[self.player]["Storm Ruler"] = 1
-                self.options.local_items.value.add("Storm Ruler")
-        else:
-            self.yhorm_location = default_yhorm_location
+                self.multiworld.local_early_items[self.player]["Storm Ruler"] = 1
 
     def _allow_boss_for_yhorm(self, boss: DS3BossInfo) -> bool:
         """Returns whether boss is a valid location for Yhorm in this seed."""
@@ -151,7 +146,7 @@ class DarkSouls3World(World):
             for location in location_tables["Cemetery of Ash"]
         )
 
-    def create_regions(self):
+    def create_regions(self) -> None:
         # Create Vanilla Regions
         regions: Dict[str, Region] = {"Menu": self.create_region("Menu", {})}
         regions.update({region_name: self.create_region(region_name, location_tables[region_name]) for region_name in [
@@ -312,7 +307,7 @@ class DarkSouls3World(World):
         self.multiworld.regions.append(new_region)
         return new_region
 
-    def create_items(self):
+    def create_items(self) -> None:
         # Just used to efficiently deduplicate items
         item_set: Set[str] = set()
 
@@ -347,12 +342,13 @@ class DarkSouls3World(World):
         # Extra filler items for locations containing skip items
         self.local_itempool.extend(self.create_filler() for _ in range(num_required_extra_items))
 
+        # Potentially fill some items locally and remove them from the itempool
+        self._fill_local_items()
+
         # Add items to itempool
         self.multiworld.itempool += self.local_itempool
 
-        self._fill_local_items()
-
-    def _create_injectable_items(self, num_required_extra_items: int) -> List[Item]:
+    def _create_injectable_items(self, num_required_extra_items: int) -> List[DarkSouls3Item]:
         """Returns a list of items to inject into the multiworld instead of skipped items.
 
         If there isn't enough room to inject all the necessary progression items
@@ -401,7 +397,7 @@ class DarkSouls3World(World):
 
         return [self.create_item(item) for item in items]
 
-    def create_item(self, item: Union[str, DS3ItemData]) -> Item:
+    def create_item(self, item: Union[str, DS3ItemData]) -> DarkSouls3Item:
         data = item if isinstance(item, DS3ItemData) else item_dictionary[item]
         classification = None
         if self.multiworld and data.useful_if != UsefulIf.DEFAULT and (
@@ -420,7 +416,7 @@ class DarkSouls3World(World):
             and data.category.upgrade_level
             # Because we require the Pyromancy Flame to be available early, don't upgrade it so it
             # doesn't get shuffled around by weapon smoothing.
-            and not data.name == "Pyromancy Flame"
+            and data.name != "Pyromancy Flame"
         ):
             # if the user made an error and set a min higher than the max we default to the max
             max_5 = self.options.max_levels_in_5.value
@@ -503,7 +499,6 @@ class DarkSouls3World(World):
             and location.item_rule(item)
         ]
 
-        self.multiworld.itempool.remove(item)
         self.local_itempool.remove(item)
 
         if not candidate_locations:
@@ -996,6 +991,11 @@ class DarkSouls3World(World):
             self._can_get(state, "US: Soul of the Rotted Greatwood")
             and state.has("Dreamchaser's Ashes", self.player)
         ))
+        # Add indirect condition since reaching AL requires deafeating Pontiff which requires defeating Greatwood in US
+        self.multiworld.register_indirect_condition(
+            self.get_region("Undead Settlement"),
+            self.get_entrance("Go To Anor Londo")
+        )
 
         # Kill Creighton and Aldrich to trigger this opportunity for invasion
         self._add_location_rule([
@@ -1336,11 +1336,11 @@ class DarkSouls3World(World):
         if not self._is_location_available(location): return
         add_item_rule(self.multiworld.get_location(location, self.player), rule)
 
-    def _can_go_to(self, state, region) -> None:
+    def _can_go_to(self, state, region) -> bool:
         """Returns whether state can access the given region name."""
         return state.can_reach_entrance(f"Go To {region}", self.player)
 
-    def _can_get(self, state, location) -> None:
+    def _can_get(self, state, location) -> bool:
         """Returns whether state can access the given location name."""
         return state.can_reach_location(location, self.player)
 
@@ -1393,7 +1393,10 @@ class DarkSouls3World(World):
         region order, and then the best items in a sphere go into the multiworld.
         """
 
-        locations_by_sphere = list(self.multiworld.get_spheres())
+        locations_by_sphere = [
+            sorted(loc for loc in sphere if loc.item.player == self.player and not loc.locked)
+            for sphere in self.multiworld.get_spheres()
+        ]
 
         # All items in the base game in approximately the order they appear
         all_item_order = [
@@ -1437,11 +1440,9 @@ class DarkSouls3World(World):
 
             all_matching_locations = [
                 loc
-                for locations in locations_by_sphere
-                for loc in locations
-                if loc.item.player == self.player
-                and not loc.locked
-                and loc.item.name in names
+                for sphere in locations_by_sphere
+                for loc in sphere
+                if loc.item.name in names
             ]
 
             # It's expected that there may be more total items than there are matching locations if
@@ -1453,13 +1454,8 @@ class DarkSouls3World(World):
                     f"contain smoothed items, but only {len(item_order)} items to smooth."
                 )
 
-            for i, all_locations in enumerate(locations_by_sphere):
-                locations = [
-                    loc for loc in all_locations
-                    if loc.item.player == self.player
-                    and not loc.locked
-                    and loc.item.name in names
-                ]
+            for sphere in locations_by_sphere:
+                locations = [loc for loc in sphere if loc.item.name in names]
 
                 # Check the game, not the player, because we know how to sort within regions for DS3
                 offworld = self._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
@@ -1509,13 +1505,8 @@ class DarkSouls3World(World):
         items: List[Union[DS3ItemData, DarkSouls3Item]]
     ) -> Union[DS3ItemData, DarkSouls3Item]:
         """Returns the next item in items that can be assigned to location."""
-        # Non-excluded locations can take any item we throw at them. (More specifically, if they can
-        # take one item in a group, they can take any other).
-        if location.progress_type != LocationProgressType.EXCLUDED: return items.pop(0)
-
-        # Excluded locations require filler items.
         for i, item in enumerate(items):
-            if item.classification == ItemClassification.filler:
+            if location.can_fill(self.multiworld.state, item, False):
                 return items.pop(i)
 
         # If we can't find a suitable item, give up and assign an unsuitable one.
@@ -1524,18 +1515,25 @@ class DarkSouls3World(World):
     def fill_slot_data(self) -> Dict[str, object]:
         slot_data: Dict[str, object] = {}
 
-        our_items = {
-            location.item
+        # Once all clients support overlapping item IDs, adjust the DS3 AP item IDs to encode the
+        # in-game ID as well as the count so that we don't need to send this information at all.
+        #
+        # We include all the items the game knows about so that users can manually request items
+        # that aren't randomized, and then we _also_ include all the items that are placed in
+        # practice `item_dictionary.values()` doesn't include upgraded or infused weapons.
+        all_items = {
+            cast(DarkSouls3Item, location.item).data
             for location in self.multiworld.get_filled_locations()
             # item.code None is used for events, which we want to skip
             if location.item.code is not None and location.item.player == self.player
-        }
+        }.union(item_dictionary.values())
 
         ap_ids_to_ds3_ids: Dict[str, int] = {}
         item_counts: Dict[str, int] = {}
-        for item in our_items:
-            if item.data.ds3_code: ap_ids_to_ds3_ids[str(item.code)] = item.data.ds3_code
-            if item.data.count != 1: item_counts[str(item.code)] = item.data.count
+        for item in all_items:
+            if item.ap_code is None: continue
+            if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
+            if item.count != 1: item_counts[str(item.ap_code)] = item.count
 
         # A map from Archipelago's location IDs to the keys the static randomizer uses to identify
         # locations.
