@@ -327,7 +327,7 @@ class DarkSouls3World(World):
         self.local_itempool.extend(injectables)
 
         # Extra filler items for locations containing skip items
-        self.local_itempool.extend(cast(DarkSouls3Item, self.create_filler()) for _ in range(num_required_extra_items))
+        self.local_itempool.extend(self.create_item(self.get_filler_item_name()) for _ in range(num_required_extra_items))
 
         # Potentially fill some items locally and remove them from the itempool
         self._fill_local_items()
@@ -491,11 +491,10 @@ class DarkSouls3World(World):
         if not candidate_locations:
             warning(f"Couldn't place \"{name}\" in a valid location for {self.player_name}. Adding it to starting inventory instead.")
             location = next(
-                (location for location in cast(List[DarkSouls3Location], self.multiworld.get_locations(self.player)) if location.data.default_item_name == item.name),
+                (location for location in self._get_our_locations() if location.data.default_item_name == item.name),
                 None
             )
-            if location:
-                self._replace_with_filler(location)
+            if location: self._replace_with_filler(location)
             self.multiworld.push_precollected(self.create_item(name))
             return
 
@@ -1218,7 +1217,7 @@ class DarkSouls3World(World):
         manually add item rules to exclude important items.
         """
 
-        all_locations = cast(List[DarkSouls3Location], self.multiworld.get_locations(self.player))
+        all_locations = self._get_our_locations()
 
         allow_useful_locations = (
             (
@@ -1492,6 +1491,9 @@ class DarkSouls3World(World):
 
         # If we can't find a suitable item, give up and assign an unsuitable one.
         return items.pop(0)
+
+    def _get_our_locations(self) -> List[DarkSouls3Location]:
+        return cast(List[DarkSouls3Location], self.multiworld.get_locations(self.player))
 
     def fill_slot_data(self) -> Dict[str, object]:
         slot_data: Dict[str, object] = {}
