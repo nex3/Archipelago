@@ -1,4 +1,3 @@
-from copy import deepcopy
 from dataclasses import dataclass
 import json
 from typing import Any, Dict
@@ -305,9 +304,6 @@ class RandomEnemyPresetOption(Option[Dict[str, Any]], VerifyKeys):
     valid_keys = ["Description", "RecommendFullRandomization", "RecommendNoEnemyProgression",
                   "OopsAll", "Boss", "Miniboss", "Basic", "BuffBasicEnemiesAsBosses",
                   "DontRandomize", "RemoveSource", "Enemies"]
-
-    def __init__(self, value: Dict[str, Any]):
-        self.value = deepcopy(value)
 
     @classmethod
     def get_option_name(cls, value: Dict[str, Any]) -> str:
