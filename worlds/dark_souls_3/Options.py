@@ -333,6 +333,7 @@ class ExcludedLocationBehaviorOption(Choice):
       locations.
     - **Do Not Randomize:** Excluded locations always contain the same item as in vanilla Dark Souls
       III.
+    - **Shuffle Separately:** Excluded locations shuffle their items amongst each other.
 
     A "progression item" is anything that's required to unlock another location in some game. A
     "useful item" is something each game defines individually, usually items that are quite
@@ -342,6 +343,7 @@ class ExcludedLocationBehaviorOption(Choice):
     option_allow_useful = 1
     option_forbid_useful = 2
     option_do_not_randomize = 3
+    option_shuffle_separately = 4
     default = 2
 
 
