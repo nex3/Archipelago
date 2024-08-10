@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass
 import json
 from typing import Any, Dict
