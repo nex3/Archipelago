@@ -50,6 +50,14 @@ class LateDLCOption(Choice):
     option_after_basin = 2
 
 
+class UnmissableQuestsOption(DefaultOnToggle):
+    """Tweak the way quest progression works to make NPC quests impossible to fail.
+
+    See the DS3 Locations page for detailed information on how the quests differ from vanilla.
+    """
+    display_name = "Unmissable Quests"
+
+
 class EnableDLCOption(Toggle):
     """Include DLC locations, items, and enemies in the randomized pools.
 
@@ -373,7 +381,8 @@ class DarkSouls3Options(PerGameCommonOptions):
     late_basin_of_vows: LateBasinOfVowsOption
     late_dlc: LateDLCOption
     death_link: DeathLink
-    enable_dlc: EnableDLCOption
+    unmissable_quests: UnmissableQuestsOption
+    enable_ngp: EnableNGPOption
     enable_ngp: EnableNGPOption
 
     # Equipment

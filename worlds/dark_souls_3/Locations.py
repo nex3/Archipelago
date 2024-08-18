@@ -2943,30 +2943,23 @@ location_tables: Dict[str, List[DS3LocationData]] = {
 
         # Undead Settlement rewards
         DS3LocationData("FS: Divine Blessing - Greirat from US", "Divine Blessing",
-                        static='99,0:-1:110000,120000,70000150,70000175:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000150,70000175:', shop=True, npc=True),
         DS3LocationData("FS: Ember - Greirat from US", "Ember",
-                        static='99,0:-1:110000,120000,70000150,70000175:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000150,70000175:', shop=True, npc=True),
 
         # Irityhll rewards
         DS3LocationData("FS: Divine Blessing - Greirat from IBV", "Divine Blessing",
-                        static='99,0:-1:110000,120000,70000151,70000176:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
         DS3LocationData("FS: Hidden Blessing - Greirat from IBV", "Hidden Blessing",
-                        static='99,0:-1:110000,120000,70000151,70000176:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
         DS3LocationData("FS: Titanite Scale - Greirat from IBV", "Titanite Scale",
-                        static='99,0:-1:110000,120000,70000151,70000176:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
         DS3LocationData("FS: Twinkling Titanite - Greirat from IBV", "Twinkling Titanite",
-                        static='99,0:-1:110000,120000,70000151,70000176:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
 
         # Lothric rewards (from Shrine Handmaid)
         DS3LocationData("FS: Ember - shop for Greirat's Ashes", "Twinkling Titanite",
-                        static='99,0:-1:110000,120000,70000152,70000177:', missable=True,
-                        shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000152,70000177:', shop=True, npc=True),
     ],
     "Karla's Shop": [
         DS3LocationData("FS: Affinity - Karla", "Affinity", shop=True, npc=True),

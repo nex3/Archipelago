@@ -8,6 +8,7 @@
 ## Table of Contents
 
 * [Location Groups](#location-groups)
+* [Unmissable Mode](#unmissable-mode)
 * [Understanding Location Names](#understanding-location-names)
   * [HWL: High Wall of Lothric](#high-wall-of-lothric)
   * [US: Undead Settlement](#undead-settlement)
@@ -94,6 +95,23 @@ at once:
 * **Rings:** Locations that contain rings in vanilla.
 
 * **Spells:** Locations that contain spells in vanilla.
+
+## Unmissable Mode
+
+By default, this mod changes some details of how _Dark Souls III_ works to
+minimize the number of locations that are possible to miss permanently. This
+means that Archipelago can place progression items in these locations. You can
+turn this off by setting `unmissable_quests: False`.
+
+**Note:** Unmissable mode is a work in progress, and more unmissable locations
+will be added in future releases.
+
+* **Greirat** will always survive pillaging Irithyll, regardless of what you do
+  with Siegward or Patches. Instead of returning from his trips after you beat
+  a boss, he'll return from Undead Settlement after you beat either the Road of
+  Sacrifices or Farron Keep boss, and he'll return from Irithyll after you beat
+  either the Irithyll or Profaned Capital boss. (If you've already killed one
+  of these bosses, he'll be back next time you return to Firelink.)
 
 ## Understanding Location Names
 
