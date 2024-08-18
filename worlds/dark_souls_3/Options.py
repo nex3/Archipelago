@@ -53,9 +53,18 @@ class LateDLCOption(Choice):
 class UnmissableQuestsOption(DefaultOnToggle):
     """Tweak the way quest progression works to make NPC quests impossible to fail.
 
-    See the DS3 Locations page for detailed information on how the quests differ from vanilla.
+    This allows progression items to be obtained in all NPC quest locations. See the DS3 Locations
+    page for detailed information on how the quests differ from vanilla.
     """
     display_name = "Unmissable Quests"
+
+
+class UnmissableTranspositionsOption(DefaultOnToggle):
+    """Ludleth sells copies of any boss souls you've received.
+
+    This allows progression items to be obtained through soul transposition.
+    """
+    display_name = "Unmissable Transpositions"
 
 
 class EnableDLCOption(Toggle):
@@ -382,7 +391,8 @@ class DarkSouls3Options(PerGameCommonOptions):
     late_dlc: LateDLCOption
     death_link: DeathLink
     unmissable_quests: UnmissableQuestsOption
-    enable_ngp: EnableNGPOption
+    unmissable_transpositions: UnmissableTranspositionsOption
+    enable_dlc: EnableDLCOption
     enable_ngp: EnableNGPOption
 
     # Equipment

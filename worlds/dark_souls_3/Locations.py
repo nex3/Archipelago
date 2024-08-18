@@ -1,7 +1,8 @@
-from typing import cast, ClassVar, Optional, Dict, List, Set
+from typing import cast, Callable, ClassVar, Optional, Dict, List, Set, Union
 from dataclasses import dataclass
 
 from BaseClasses import ItemClassification, Location, Region
+from Options import PerGameCommonOptions
 from .Items import DS3ItemCategory, item_dictionary
 
 # Regions in approximate order of reward, mostly measured by how high-quality the upgrade items are
@@ -83,7 +84,7 @@ class DS3LocationData:
     association instead.
     """
 
-    missable: bool = False
+    missable: Union[bool, Callable[[PerGameCommonOptions], bool]] = False
     """Whether this item is possible to permanently lose access to.
 
     This is also used for items that are *technically* possible to get at any time, but are
@@ -183,6 +184,10 @@ class DS3LocationData:
             DS3LocationData.__location_id += 1
         if self.miniboss or self.mimic or self.lizard or self.hostile_npc: self.drop = True
 
+    def is_missable(self, options: PerGameCommonOptions) -> bool:
+        """Whether this location is missable given a set of options."""
+        return self.missable if isinstance(self.missable, bool) else self.missable(options)
+
     def location_groups(self) -> List[str]:
         """The names of location groups this location should appear in.
 
@@ -233,6 +238,18 @@ class DarkSouls3Location(Location):
             event: bool = False):
         super().__init__(player, data.name, None if event else data.ap_code, parent)
         self.data = data
+
+
+def missable_quest(options: PerGameCommonOptions) -> bool:
+    """A utility function for items that are only missable when unmissable_quests is False."""
+    return not options.unmissable_quests
+
+
+def missable_transposition(options: PerGameCommonOptions) -> bool:
+    """A utility function for items that are only missable when unmissable_transpositions is
+    False.
+    """
+    return not options.unmissable_transpositions
 
 
 # Naming conventions:
@@ -366,101 +383,108 @@ location_tables: Dict[str, List[DS3LocationData]] = {
 
         # Ludleth Shop
         DS3LocationData("FS: Vordt's Great Hammer - Ludleth for Vordt", "Vordt's Great Hammer",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Pontiff's Left Eye - Ludleth for Vordt", "Pontiff's Left Eye",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Bountiful Sunlight - Ludleth for Rosaria", "Bountiful Sunlight",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Darkmoon Longbow - Ludleth for Aldrich", "Darkmoon Longbow",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Lifehunt Scythe - Ludleth for Aldrich", "Lifehunt Scythe",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Hollowslayer Greatsword - Ludleth for Greatwood",
-                        "Hollowslayer Greatsword", missable=True, boss=True, shop=True),
+                        "Hollowslayer Greatsword", missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Arstor's Spear - Ludleth for Greatwood", "Arstor's Spear",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Crystal Sage's Rapier - Ludleth for Sage", "Crystal Sage's Rapier",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Crystal Hail - Ludleth for Sage", "Crystal Hail", missable=True,
-                        boss=True, shop=True),
+                        boss=missable_transposition, shop=True),
         DS3LocationData("FS: Cleric's Candlestick - Ludleth for Deacons", "Cleric's Candlestick",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Deep Soul - Ludleth for Deacons", "Deep Soul", missable=True,
-                        boss=True, shop=True),
+                        boss=missable_transposition, shop=True),
         DS3LocationData("FS: Havel's Ring - Ludleth for Stray Demon", "Havel's Ring",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Boulder Heave - Ludleth for Stray Demon", "Boulder Heave",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Farron Greatsword - Ludleth for Abyss Watchers", "Farron Greatsword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Wolf Knight's Greatsword - Ludleth for Abyss Watchers",
-                        "Wolf Knight's Greatsword", missable=True, boss=True, shop=True),
+                        "Wolf Knight's Greatsword", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Wolnir's Holy Sword - Ludleth for Wolnir", "Wolnir's Holy Sword",
-                        missable=True, boss=True, shop=True),
-        DS3LocationData("FS: Black Serpent - Ludleth for Wolnir", "Black Serpent", missable=True,
-                        boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
+        DS3LocationData("FS: Black Serpent - Ludleth for Wolnir", "Black Serpent",
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Demon's Greataxe - Ludleth for Fire Demon", "Demon's Greataxe",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Demon's Fist - Ludleth for Fire Demon", "Demon's Fist",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Old King's Great Hammer - Ludleth for Old Demon King",
-                        "Old King's Great Hammer", missable=True, boss=True, shop=True),
+                        "Old King's Great Hammer", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Chaos Bed Vestiges - Ludleth for Old Demon King", "Chaos Bed Vestiges",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Greatsword of Judgment - Ludleth for Pontiff",
-                        "Greatsword of Judgment", missable=True, boss=True, shop=True),
+                        "Greatsword of Judgment", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Profaned Greatsword - Ludleth for Pontiff", "Profaned Greatsword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Yhorm's Great Machete - Ludleth for Yhorm", "Yhorm's Great Machete",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Yhorm's Greatshield - Ludleth for Yhorm", "Yhorm's Greatshield",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Dancer's Enchanted Swords - Ludleth for Dancer",
-                        "Dancer's Enchanted Swords", missable=True, boss=True, shop=True),
+                        "Dancer's Enchanted Swords", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Soothing Sunlight - Ludleth for Dancer", "Soothing Sunlight",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Dragonslayer Greataxe - Ludleth for Dragonslayer",
-                        "Dragonslayer Greataxe", missable=True, boss=True, shop=True),
+                        "Dragonslayer Greataxe", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Dragonslayer Greatshield - Ludleth for Dragonslayer",
-                        "Dragonslayer Greatshield", missable=True, boss=True, shop=True),
+                        "Dragonslayer Greatshield", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Moonlight Greatsword - Ludleth for Oceiros", "Moonlight Greatsword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: White Dragon Breath - Ludleth for Oceiros", "White Dragon Breath",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Lorian's Greatsword - Ludleth for Princes", "Lorian's Greatsword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Lothric's Holy Sword - Ludleth for Princes", "Lothric's Holy Sword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Gundyr's Halberd - Ludleth for Champion", "Gundyr's Halberd",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Prisoner's Chain - Ludleth for Champion", "Prisoner's Chain",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Storm Curved Sword - Ludleth for Nameless", "Storm Curved Sword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Dragonslayer Swordspear - Ludleth for Nameless",
-                        "Dragonslayer Swordspear", missable=True, boss=True, shop=True),
+                        "Dragonslayer Swordspear", missable=missable_transposition, boss=True,
+                        shop=True),
         DS3LocationData("FS: Lightning Storm - Ludleth for Nameless", "Lightning Storm",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Firelink Greatsword - Ludleth for Cinder", "Firelink Greatsword",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Sunlight Spear - Ludleth for Cinder", "Sunlight Spear",
-                        missable=True, boss=True, shop=True),
+                        missable=missable_transposition, boss=True, shop=True),
         DS3LocationData("FS: Friede's Great Scythe - Ludleth for Friede", "Friede's Great Scythe",
-                        missable=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
         DS3LocationData("FS: Rose of Ariandel - Ludleth for Friede", "Rose of Ariandel",
-                        missable=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
         DS3LocationData("FS: Demon's Scar - Ludleth for Demon Prince", "Demon's Scar",
-                        missable=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
         DS3LocationData("FS: Seething Chaos - Ludleth for Demon Prince", "Seething Chaos",
-                        missable=True, dlc=True, boss=True, shop=True),
-        DS3LocationData("FS: Frayed Blade - Ludleth for Midir", "Frayed Blade", missable=True,
-                        dlc=True, boss=True, shop=True),
-        DS3LocationData("FS: Old Moonlight - Ludleth for Midir", "Old Moonlight", missable=True,
-                        dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
+        DS3LocationData("FS: Frayed Blade - Ludleth for Midir", "Frayed Blade",
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
+        DS3LocationData("FS: Old Moonlight - Ludleth for Midir", "Old Moonlight",
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
         DS3LocationData("FS: Gael's Greatsword - Ludleth for Gael", "Gael's Greatsword",
-                        missable=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
         DS3LocationData("FS: Repeating Crossbow - Ludleth for Gael", "Repeating Crossbow",
-                        missable=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, dlc=True, boss=True, shop=True),
     ],
     "Firelink Shrine Bell Tower": [
         # Guarded by Tower Key
@@ -2943,23 +2967,30 @@ location_tables: Dict[str, List[DS3LocationData]] = {
 
         # Undead Settlement rewards
         DS3LocationData("FS: Divine Blessing - Greirat from US", "Divine Blessing",
-                        static='99,0:-1:110000,120000,70000150,70000175:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000150,70000175:',
+                        missable=missable_quest, shop=True, npc=True),
         DS3LocationData("FS: Ember - Greirat from US", "Ember",
-                        static='99,0:-1:110000,120000,70000150,70000175:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000150,70000175:',
+                        missable=missable_quest,  shop=True, npc=True),
 
         # Irityhll rewards
         DS3LocationData("FS: Divine Blessing - Greirat from IBV", "Divine Blessing",
-                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:',
+                        missable=missable_quest,  shop=True, npc=True),
         DS3LocationData("FS: Hidden Blessing - Greirat from IBV", "Hidden Blessing",
-                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:',
+                        missable=missable_quest,  shop=True, npc=True),
         DS3LocationData("FS: Titanite Scale - Greirat from IBV", "Titanite Scale",
-                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:',
+                        missable=missable_quest,  shop=True, npc=True),
         DS3LocationData("FS: Twinkling Titanite - Greirat from IBV", "Twinkling Titanite",
-                        static='99,0:-1:110000,120000,70000151,70000176:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000151,70000176:',
+                        missable=missable_quest,  shop=True, npc=True),
 
         # Lothric rewards (from Shrine Handmaid)
         DS3LocationData("FS: Ember - shop for Greirat's Ashes", "Twinkling Titanite",
-                        static='99,0:-1:110000,120000,70000152,70000177:', shop=True, npc=True),
+                        static='99,0:-1:110000,120000,70000152,70000177:',
+                        missable=missable_quest,  shop=True, npc=True),
     ],
     "Karla's Shop": [
         DS3LocationData("FS: Affinity - Karla", "Affinity", shop=True, npc=True),
