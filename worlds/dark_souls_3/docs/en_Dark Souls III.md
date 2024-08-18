@@ -138,7 +138,22 @@ Check out the [item guide], which explains the named groups available for items.
 
 [item guide]: /tutorial/Dark%20Souls%20III/items/en
 
-## What's new from 2.x.x?
+## What's new?
+
+### 3.1.0
+
+* NPC quest behavior is now tweaked to avoid missable locations by default.
+  This can be disabled by setting `unmissable_quests: false`. For more details,
+  see [the location guide][unmissable_quests].
+
+* Ludleth now sells copies of any boss souls you've received, so boss soul
+  locations are no longer missable by default. These can be disabled by setting
+  `unmissable_transpositions: false`. For more details, see
+  [the location guide][unmissable_transpositions].
+
+[unmissable_transpositions]: /tutorial/Dark%20Souls%20III/locations/en#unmissable_transpositions
+
+### 3.0.0
 
 Version 3.0.0 of the Dark Souls III Archipelago client has a number of
 substantial differences with the older 2.x.x versions. Improvements include:

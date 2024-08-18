@@ -9,6 +9,8 @@
 
 * [Location Groups](#location-groups)
 * [Unmissable Mode](#unmissable-mode)
+  * [`unmissable_quests`](#unmissable_quests)
+  * [`unmissable_transpositions`](#unmissable_transpositions)
 * [Understanding Location Names](#understanding-location-names)
   * [HWL: High Wall of Lothric](#high-wall-of-lothric)
   * [US: Undead Settlement](#undead-settlement)
@@ -101,10 +103,16 @@ at once:
 By default, this mod changes some details of how _Dark Souls III_ works to
 minimize the number of locations that are possible to miss permanently. This
 means that Archipelago can place progression items in these locations. You can
-turn this off by setting `unmissable_quests: False`.
+turn this off by setting various `unmissable_*` options to `false`.
 
 **Note:** Unmissable mode is a work in progress, and more unmissable locations
 will be added in future releases.
+
+### `unmissable_quests`
+
+This option makes quest-related NPCs immortal and updates their quests to
+remove places where they can be missed or failed entirely. Currently the
+following NPCs' quests are supported:
 
 * **Greirat** will always survive pillaging Irithyll, regardless of what you do
   with Siegward or Patches. Instead of returning from his trips after you beat
@@ -112,6 +120,14 @@ will be added in future releases.
   Sacrifices or Farron Keep boss, and he'll return from Irithyll after you beat
   either the Irithyll or Profaned Capital boss. (If you've already killed one
   of these bosses, he'll be back next time you return to Firelink.)
+
+### `unmissable_transpositions`
+
+This option makes Ludleth sell any boss souls you've received. This means that
+you'll always be able to buy all the transposition items for a given boss soul
+if you really need to, so those locations can contain progression items. Note
+that Ludleth *does* add a hefty surcharge for replacement souls, so you'll
+still have to think carefully before cracking a boss soul for levels.
 
 ## Understanding Location Names
 

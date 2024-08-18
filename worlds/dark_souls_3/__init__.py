@@ -243,7 +243,8 @@ class DarkSouls3World(World):
                 new_location = DarkSouls3Location(self.player, location, new_region)
                 if (
                     # Exclude missable locations that don't allow useful items
-                    location.missable and self.options.missable_location_behavior == "forbid_useful"
+                    location.is_missable(self.options)
+                    and self.options.missable_location_behavior == "forbid_useful"
                     and not (
                         # Unless they are excluded to a higher degree already
                         location.name in self.all_excluded_locations
@@ -476,7 +477,7 @@ class DarkSouls3World(World):
                 for region in regions
                 for location in location_tables[region]
                 if self._is_location_available(location)
-                and not location.missable
+                and not location.is_missable(self.options)
                 and not location.conditional
                 and (not additional_condition or additional_condition(location))
             )
@@ -1237,7 +1238,7 @@ class DarkSouls3World(World):
                     location.name
                     for location in all_locations
                     if location.name in self.all_excluded_locations
-                    and not location.data.missable
+                    and not location.data.is_missable(self.options)
                 }
                 if self.options.excluded_location_behavior < self.options.missable_location_behavior
                 else self.all_excluded_locations
@@ -1248,7 +1249,7 @@ class DarkSouls3World(World):
             {
                 location.name
                 for location in all_locations
-                if location.data.missable
+                if location.data.is_missable(self.options)
                 and not (
                     location.name in self.all_excluded_locations
                     and self.options.missable_location_behavior <
@@ -1358,7 +1359,7 @@ class DarkSouls3World(World):
             )
             and not (
                 self.options.missable_location_behavior == "do_not_randomize"
-                and data.missable
+                and data.is_missable(self.options)
             )
         )
 
