@@ -833,6 +833,10 @@ class DarkSouls3World(World):
         ], lambda state: (
             self._can_go_to(state, "Undead Settlement")
             and state.has("Loretta's Bone", self.player)
+            and (
+                self._can_get(state, "RS: Soul of a Crystal Sage")
+                or self._can_get(state, "FK: Soul of the Blood of the Wolf")
+            )
         ))
         self._add_location_rule([
             "FS: Divine Blessing - Greirat from IBV",
@@ -843,9 +847,17 @@ class DarkSouls3World(World):
         ], lambda state: (
             self._can_go_to(state, "Irithyll of the Boreal Valley")
             and self._can_get(state, "FS: Divine Blessing - Greirat from US")
-            # Either Patches or Siegward can save Greirat, but we assume the player will want to use
-            # Patches because it's harder to screw up
-            and self._can_get(state, "CD: Shotel - Patches")
+            and (
+                # In unmissable mode, Greirat can't die in Irithyll.
+                (
+                    self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
+                    or self._can_get(state, "PC: Soul of Yhorm the Giant")
+                )
+                if self.options.unmissable_quests
+                # Either Patches or Siegward can save Greirat, but we assume the player will want
+                # to use Patches because it's harder to screw up
+                else self._can_get(state, "CD: Shotel - Patches")
+            )
         ))
         self._add_location_rule([
             "FS: Ember - shop for Greirat's Ashes",
@@ -1529,6 +1541,7 @@ class DarkSouls3World(World):
 
         slot_data = {
             "options": {
+                "unmissable_quests": self.options.unmissable_quests.value,
                 "random_starting_loadout": self.options.random_starting_loadout.value,
                 "require_one_handed_starting_weapons": self.options.require_one_handed_starting_weapons.value,
                 "auto_equip": self.options.auto_equip.value,
