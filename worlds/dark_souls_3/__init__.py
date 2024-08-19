@@ -1543,6 +1543,7 @@ class DarkSouls3World(World):
         slot_data = {
             "options": {
                 "unmissable_quests": self.options.unmissable_quests.value,
+                "unmissable_transpositions": self.options.unmissable_transpositions.value,
                 "random_starting_loadout": self.options.random_starting_loadout.value,
                 "require_one_handed_starting_weapons": self.options.require_one_handed_starting_weapons.value,
                 "auto_equip": self.options.auto_equip.value,
