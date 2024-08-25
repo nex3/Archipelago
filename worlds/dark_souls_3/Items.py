@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 import dataclasses
 from enum import IntEnum
-from typing import Any, cast, ClassVar, Dict, Generator, List, Optional, Set
+from typing import Any, cast, Callable, ClassVar, Dict, Generator, List, Optional, Set, Union
 
 from BaseClasses import Item, ItemClassification
+from Options import PerGameCommonOptions
 
 
 class DS3ItemCategory(IntEnum):
@@ -120,13 +121,16 @@ class DS3ItemData:
     count: int = 1
     """The number of copies of this item included in each drop."""
 
-    inject: bool = False
+    inject: Union[bool, Callable[[PerGameCommonOptions], bool]] = False
     """If this is set, the randomizer will try to inject this item into the game.
 
     This is used for items such as covenant rewards that aren't realistically reachable in a
     randomizer run, but are still fun to have available to the player. If there are more locations
     available than there are items in the item pool, these items will be used to help make up the
     difference.
+
+    This is also used for a few progression items that don't have locations in-game for whatever
+    reason. These are required to have room to inject them, or generation will fail.
     """
 
     souls: Optional[int] = None
@@ -239,6 +243,10 @@ class DS3ItemData:
             filler = False,
         )
     
+    def should_inject(self, options: PerGameCommonOptions) -> bool:
+        """Whether this location should be injected given a set of options."""
+        return self.inject if isinstance(self.inject, bool) else self.inject(options)
+
     def __hash__(self) -> int:
         return (self.name, self.ds3_code).__hash__()
     
@@ -1409,6 +1417,11 @@ _vanilla_items = [
     DS3ItemData("Blessed Weapon",                      0x40395F80, DS3ItemCategory.SPELL),
     DS3ItemData("Deep Protection",                     0x40398690, DS3ItemCategory.SPELL),
     DS3ItemData("Atonement",                           0x4039ADA0, DS3ItemCategory.SPELL),
+
+    ## Custom Items
+    DS3ItemData("Phantom Hunters",                     0x20002774, DS3ItemCategory.UNIQUE,
+                inject = lambda options: options.unmissable_invasions,
+                classification = ItemClassification.progression),
 ]
 
 _dlc_items = [

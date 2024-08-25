@@ -60,6 +60,16 @@ class UnmissableQuestsOption(DefaultOnToggle):
     display_name = "Unmissable Quests"
 
 
+class UnmissableInvasionsOption(DefaultOnToggle):
+    """Scripted invasions are triggered by a new covenant.
+
+    Scripted invasions are no longer dependent on having enough Embers, on not having beaten the
+    area boss, or on particular quest progression. Instead, the new Phantom Hunters covenant will
+    trigger all scripted invasions when equipped.
+    """
+    display_name = "Unmissable Invasions"
+
+
 class UnmissableTranspositionsOption(DefaultOnToggle):
     """Ludleth sells copies of any boss souls you've received.
 
@@ -396,6 +406,7 @@ class DarkSouls3Options(PerGameCommonOptions):
     late_dlc: LateDLCOption
     death_link: DeathLink
     unmissable_quests: UnmissableQuestsOption
+    unmissable_invasions: UnmissableInvasionsOption
     unmissable_transpositions: UnmissableTranspositionsOption
     enable_dlc: EnableDLCOption
     enable_ngp: EnableNGPOption

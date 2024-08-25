@@ -241,15 +241,22 @@ class DarkSouls3Location(Location):
 
 
 def missable_quest(options: PerGameCommonOptions) -> bool:
-    """A utility function for items that are only missable when unmissable_quests is False."""
+    """A utility function for locations that are only missable when unmissable_quests is False."""
     return not options.unmissable_quests
 
 
 def missable_transposition(options: PerGameCommonOptions) -> bool:
-    """A utility function for items that are only missable when unmissable_transpositions is
+    """A utility function for locations that are only missable when unmissable_transpositions is
     False.
     """
     return not options.unmissable_transpositions
+
+
+def missable_invasion(options: PerGameCommonOptions) -> bool:
+    """A utility function for locations that are only missable when unmissable_invasions is
+    False.
+    """
+    return not options.unmissable_invasions
 
 
 # Naming conventions:
@@ -783,6 +790,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("US: Sharp Gem - lizard by Dilapidated Bridge", "Sharp Gem", lizard=True),
         DS3LocationData("US: Heavy Gem - chasm, lizard", "Heavy Gem", lizard=True),
         DS3LocationData("US: Siegbräu - Siegward", "Siegbräu", missable=True, npc=True),
+        DS3LocationData("US: Vertebra Shackle - Hodrick drop", "Vertebra Shackle",
+                        conditional=True, missable=missable_invasion, hostile_npc=True),
         DS3LocationData("US: Heavy Gem - Hawkwood", "Heavy Gem", static='00,0:50006070::',
                         missable=True, npc=True),  # Hawkwood (quest, after Greatwood or Sage)
         DS3LocationData("US -> RS", None),

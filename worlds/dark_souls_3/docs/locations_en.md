@@ -10,6 +10,7 @@
 * [Location Groups](#location-groups)
 * [Unmissable Mode](#unmissable-mode)
   * [`unmissable_quests`](#unmissable_quests)
+  * [`unmissable_invasions`](#unmissable_invasions)
   * [`unmissable_transpositions`](#unmissable_transpositions)
 * [Understanding Location Names](#understanding-location-names)
   * [HWL: High Wall of Lothric](#high-wall-of-lothric)
@@ -121,13 +122,22 @@ following NPCs' quests are supported:
   either the Irithyll or Profaned Capital boss. (If you've already killed one
   of these bosses, he'll be back next time you return to Firelink.)
 
+### `unmissable_invasions`
+
+This option changes how scripted invasions work so that their rewards are
+impossible to miss. Instead of invading you when you're embered, which can fail
+if you don't find enough Embers at the right time or if you use them up, the mod
+adds a new covenant item called "Phantom Hunters". Invasions will only trigger
+when you have this covenant equipped, and they will _always_ trigger until you
+defeat them, regardless of whether or not you've beaten the area boss.
+
 ### `unmissable_transpositions`
 
 This option makes Ludleth sell any boss souls you've received. This means that
 you'll always be able to buy all the transposition items for a given boss soul
 if you really need to, so those locations can contain progression items. Note
-that Ludleth *does* add a hefty surcharge for replacement souls, so you'll
-still have to think carefully before cracking a boss soul for levels.
+that Ludleth *does* add a hefty surcharge for replacement souls, so you'll still
+have to think carefully before cracking a boss soul for levels.
 
 ## Understanding Location Names
 
