@@ -347,7 +347,8 @@ class DarkSouls3World(World):
         all_injectable_items = [
             item for item
             in item_dictionary.values()
-            if item.inject and (not item.is_dlc or self.options.enable_dlc)
+            if item.should_inject(self.options)
+            and (not item.is_dlc or self.options.enable_dlc)
         ]
         injectable_mandatory = [
             item for item in all_injectable_items
@@ -590,6 +591,11 @@ class DarkSouls3World(World):
 
             if self.options.late_basin_of_vows > 1:  # After Small Doll
                 self._add_entrance_rule("Lothric Castle", "Small Doll")
+
+        if self.options.unmissable_invasions:
+            self._add_location_rule([
+                "US: Vertebra Shackle - Hodrick drop"
+            ], "Phantom Hunters")
 
         # DLC Access Rules Below
         if self.options.enable_dlc:
@@ -1127,6 +1133,7 @@ class DarkSouls3World(World):
             self._can_get(state, "AL: Soul of Aldrich")
         ))
 
+
     def _add_transposition_rules(self) -> None:
         """Adds rules for items obtainable from Ludleth by soul transposition."""
 
@@ -1543,6 +1550,7 @@ class DarkSouls3World(World):
         slot_data = {
             "options": {
                 "unmissable_quests": self.options.unmissable_quests.value,
+                "unmissable_invasions": self.options.unmissable_invasions.value,
                 "unmissable_transpositions": self.options.unmissable_transpositions.value,
                 "random_starting_loadout": self.options.random_starting_loadout.value,
                 "require_one_handed_starting_weapons": self.options.require_one_handed_starting_weapons.value,
