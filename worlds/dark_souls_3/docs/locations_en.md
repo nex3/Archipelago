@@ -122,6 +122,10 @@ following NPCs' quests are supported:
   either the Irithyll or Profaned Capital boss. (If you've already killed one
   of these bosses, he'll be back next time you return to Firelink.)
 
+* **Irina** will not accept dark tomes at all. She can't be killed for her drop
+  until you've given her both the Braille Divine Tome of Carim and the Braille
+  Divine Tome of Lothric.
+
 ### `unmissable_invasions`
 
 This option changes how scripted invasions work so that their rewards are
