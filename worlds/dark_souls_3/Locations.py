@@ -659,7 +659,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         static='02,0:50006141::', npc=True),
         DS3LocationData("US: Cornyx's Skirt - kill Cornyx", "Cornyx's Skirt",
                         static='02,0:50006141::', npc=True),
-        DS3LocationData("US: Tower Key - kill Irina", "Tower Key", missable=True, npc=True),
+        DS3LocationData("US: Tower Key - kill Irina", "Tower Key", missable=missable_quest,
+                        npc=True),
         DS3LocationData("US: Flynn's Ring - tower village, rooftop", "Flynn's Ring"),
         DS3LocationData("US: Undead Bone Shard - by white tree", "Undead Bone Shard"),
         DS3LocationData("US: Alluring Skull - foot, behind carriage", "Alluring Skull x2"),
@@ -857,18 +858,18 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: Replenishment - Irina", "Replenishment", npc=True, shop=True),
         DS3LocationData("FS: Caressing Tears - Irina", "Caressing Tears", npc=True, shop=True),
         DS3LocationData("FS: Homeward - Irina", "Homeward", npc=True, shop=True),
-        DS3LocationData("FS: Med Heal - Irina for Tome of Carim", "Med Heal", missable=True,
-                        npc=True, shop=True),
+        DS3LocationData("FS: Med Heal - Irina for Tome of Carim", "Med Heal",
+                        missable=missable_quest, npc=True, shop=True),
         DS3LocationData("FS: Tears of Denial - Irina for Tome of Carim", "Tears of Denial",
-                        missable=True, npc=True, shop=True),
-        DS3LocationData("FS: Force - Irina for Tome of Carim", "Force", missable=True, npc=True,
-                        shop=True),
+                        missable=missable_quest, npc=True, shop=True),
+        DS3LocationData("FS: Force - Irina for Tome of Carim", "Force", missable=missable_quest,
+                        npc=True, shop=True),
         DS3LocationData("FS: Bountiful Light - Irina for Tome of Lothric", "Bountiful Light",
-                        missable=True, npc=True, shop=True),
+                        missable=missable_quest, npc=True, shop=True),
         DS3LocationData("FS: Magic Barrier - Irina for Tome of Lothric", "Magic Barrier",
-                        missable=True, npc=True, shop=True),
+                        missable=missable_quest, npc=True, shop=True),
         DS3LocationData("FS: Blessed Weapon - Irina for Tome of Lothric", "Blessed Weapon",
-                        missable=True, npc=True, shop=True),
+                        missable=missable_quest, npc=True, shop=True),
     ],
     "Road of Sacrifices": [
         DS3LocationData("RS: Soul of a Crystal Sage", "Soul of a Crystal Sage", prominent=True,
@@ -3019,13 +3020,15 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: Black Fire Orb - Karla for Grave Warden Tome", "Black Fire Orb",
                         missable=True, shop=True, npc=True),
 
-        # Deep Braille Divine Tome. This can also be given to Irina, but it'll fail her quest
+        # Deep Braille Divine Tome. This can also be given to Irina in missable quest mode, but
+        # it'll fail her quest
         DS3LocationData("FS: Gnaw - Karla for Deep Braille Tome", "Gnaw", missable=True,
                         npc=True, shop=True),
         DS3LocationData("FS: Deep Protection - Karla for Deep Braille Tome", "Deep Protection",
                         missable=True, npc=True, shop=True),
 
-        # Londor Braille Divine Tome. This can also be given to Irina, but it'll fail her quest
+        # Londor Braille Divine Tome. This can also be given to Irina in missable quest mode, but
+        # it'll fail her quest
         DS3LocationData("FS: Vow of Silence - Karla for Londor Tome", "Vow of Silence",
                         missable=True, npc=True, shop=True),
         DS3LocationData("FS: Dark Blade - Karla for Londor Tome", "Dark Blade", missable=True,
