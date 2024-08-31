@@ -126,6 +126,10 @@ following NPCs' quests are supported:
   until you've given her both the Braille Divine Tome of Carim and the Braille
   Divine Tome of Lothric.
 
+* **Cornyx** will always give a Pyromancy Flame replacement regardless of your
+  starting class. He can't be killed for his drops until you've given him all
+  three Pyromancy Tomes that he accepts.
+
 ### `unmissable_invasions`
 
 This option changes how scripted invasions work so that their rewards are
