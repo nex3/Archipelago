@@ -3,7 +3,7 @@
 ## Required Software
 
 - [Dark Souls III](https://store.steampowered.com/app/374320/DARK_SOULS_III/)
-- [Dark Souls III AP Client](https://github.com/nex3/Dark-Souls-III-Archipelago-client/releases)
+- [Dark Souls III AP Client](https://github.com/nex3/Dark-Souls-III-Archipelago-client/releases/latest)
 
 ## Optional Software
 
@@ -57,22 +57,16 @@ The [Player Options](/games/Dark%20Souls%20III/player-options) page on the websi
 configure your personal options and export them into a config file. The [AP client archive] also
 includes an options template.
 
-[AP client archive]: https://github.com/Marechal-L/Dark-Souls-III-Archipelago-client/releases
+[AP client archive]: https://github.com/nex3/Dark-Souls-III-Archipelago-client/releases/latest
 
 ### Does this work with Proton?
 
 The *Dark Souls III* Archipelago randomizer supports running on Linux under Proton. There are a few
 things to keep in mind:
 
-* Because `DS3Randomizer.exe` relies on the .NET runtime, you'll need to do one of two things:
-
-  * Use the `DS3.Archipelago.*-self-contained.zip` [AP client archive], which includes the .NET
-    runtime. This is a much larger download, but it will allow you to run `DS3Randomizer.exe`
-    directly from Proton without any issues.
-
-  * Install the [.NET Runtime] under **plain [WINE]**, then run `DS3Randomizer.exe` under plain
-    WINE as well. This is more complicated up front, but it'll allow you to run multiple versions
-    of the randomizer with the same .NET installation.
+* Because `DS3Randomizer.exe` relies on the .NET runtime, you'll need to install
+  the [.NET Runtime] under **plain [WINE]**, then run `DS3Randomizer.exe` under
+  plain WINE as well. It won't work as a Proton app!
 
 * To run the game itself, just run `launchmod_darksouls3.bat` under Proton.
 
