@@ -739,7 +739,15 @@ class DarkSouls3World(World):
                 "FS: Force - Irina for Tome of Carim",
                 "FS: Bountiful Light - Irina for Tome of Lothric",
                 "FS: Magic Barrier - Irina for Tome of Lothric",
-                "FS: Blessed Weapon - Irina for Tome of Lothric"
+                "FS: Blessed Weapon - Irina for Tome of Lothric",
+                "US: Soul of an Unknown Traveler - chasm crypt",
+                "US: Red Hilted Halberd - chasm crypt", "Red Hilted Halberd",
+                "US: Saint's Talisman - chasm, by ladder", "Saint's Talisman",
+                "US: Titanite Shard - chasm #1", "Titanite Shard",
+                "US: Titanite Shard - chasm #2", "Titanite Shard",
+                "US: Red and White Shield - chasm, hanging corpse",
+                "US: Heavy Gem - chasm, lizard",
+                "US: Loincloth - by Velka statue",
             ], "Grave Key")
 
         self.multiworld.completion_condition[self.player] = lambda state: self._can_get(state, "KFF: Soul of the Lords")
