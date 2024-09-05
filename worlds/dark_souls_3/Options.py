@@ -90,6 +90,16 @@ class EnableNGPOption(Toggle):
     display_name = "Enable NG+"
 
 
+class AnriGenderOption(Choice):
+    """Which gender to make Anri of Astora."""
+    display_name = "Anri's Gender"
+    option_opposite = "opposite"
+    option_same = "same"
+    option_female = "female"
+    option_male = "male"
+    default = option_opposite
+
+
 ## Equipment
 
 class RandomizeStartingLoadout(DefaultOnToggle):
@@ -405,6 +415,7 @@ class DarkSouls3Options(PerGameCommonOptions):
     unmissable_transpositions: UnmissableTranspositionsOption
     enable_dlc: EnableDLCOption
     enable_ngp: EnableNGPOption
+    anri_gender: AnriGenderOption
 
     # Equipment
     random_starting_loadout: RandomizeStartingLoadout

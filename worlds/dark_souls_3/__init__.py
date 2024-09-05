@@ -1650,6 +1650,7 @@ class DarkSouls3World(World):
                 "scale_enemies": self.options.scale_enemies.value,
                 "all_chests_are_mimics": self.options.all_chests_are_mimics.value,
                 "impatient_mimics": self.options.impatient_mimics.value,
+                "anri_gender": self.options.anri_gender.value,
             },
             "seed": self.multiworld.seed_name,  # to verify the server's multiworld
             "slot": self.multiworld.player_name[self.player],  # to connect to server
