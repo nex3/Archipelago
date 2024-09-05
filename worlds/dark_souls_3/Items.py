@@ -142,7 +142,7 @@ class DS3ItemData:
     filler: bool = False
     """Whether this is a candidate for a filler item to be added to fill out extra locations."""
 
-    skip: bool = False
+    skip: Union[bool, Callable[[PerGameCommonOptions], bool]] = False
     """Whether to omit this item from randomization and replace it with filler or unique items."""
 
     @property
@@ -246,6 +246,10 @@ class DS3ItemData:
     def should_inject(self, options: PerGameCommonOptions) -> bool:
         """Whether this location should be injected given a set of options."""
         return self.inject if isinstance(self.inject, bool) else self.inject(options)
+
+    def should_skip(self, options: PerGameCommonOptions) -> bool:
+        """Whether this location should be skipped given a set of options."""
+        return self.skip if isinstance(self.skip, bool) else self.skip(options)
 
 
 class DarkSouls3Item(Item):
@@ -1079,7 +1083,9 @@ _vanilla_items = [
     DS3ItemData("Twinkling Dragon Head Stone",         0x40000183, DS3ItemCategory.UNIQUE),
     DS3ItemData("Twinkling Dragon Torso Stone",        0x40000184, DS3ItemCategory.UNIQUE,
                 classification = ItemClassification.progression),
-    DS3ItemData("Fire Keeper Soul",                    0x40000186, DS3ItemCategory.UNIQUE),
+    DS3ItemData("Fire Keeper Soul",                    0x40000186, DS3ItemCategory.UNIQUE,
+                # Remove this item in unmissable mode so players can't break Yoel and Yuria's quest
+                skip=lambda options: options.unmissable_quests),
     # Allow souls up to 2k in value to be used as filler
     DS3ItemData("Fading Soul",                         0x40000190, DS3ItemCategory.SOUL, souls = 50),
     DS3ItemData("Soul of a Deserted Corpse",           0x40000191, DS3ItemCategory.SOUL, souls = 200),
@@ -1266,7 +1272,7 @@ _vanilla_items = [
     DS3ItemData("Eyes of a Fire Keeper",               0x4000085A, DS3ItemCategory.UNIQUE,
                 classification = ItemClassification.useful), # Allow players to do any ending
     DS3ItemData("Sword of Avowal",                     0x4000085B, DS3ItemCategory.UNIQUE,
-                classification = ItemClassification.useful),
+                classification = ItemClassification.progression),
     DS3ItemData("Golden Scroll",                       0x4000085C, DS3ItemCategory.UNIQUE,
                 classification = ItemClassification.progression),
     DS3ItemData("Estus Shard",                         0x4000085D, DS3ItemCategory.HEALING,

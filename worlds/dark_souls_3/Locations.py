@@ -84,8 +84,8 @@ class DS3LocationData:
     association instead.
     """
 
-    missable: Union[bool, Callable[[PerGameCommonOptions], bool]] = False
-    """Whether this item is possible to permanently lose access to.
+    missable: Union[bool, Callable[['DS3LocationData', PerGameCommonOptions], bool]] = False
+    """Whether this location is possible to permanently lose access to.
 
     This is also used for items that are *technically* possible to get at any time, but are
     prohibitively difficult without blocking off other checks (items dropped by NPCs on death
@@ -95,14 +95,8 @@ class DS3LocationData:
     progression or useful items.
     """
 
-    dlc: bool = False
-    """Whether this location is only accessible if the DLC is enabled."""
-
-    ngp: bool = False
-    """Whether this location only contains an item in NG+ and later.
-
-    By default, these items aren't randomized or included in the randomization pool, but an option
-    can be set to enable them even for NG runs."""
+    omit: Union[bool, Callable[['DS3LocationData', PerGameCommonOptions], bool]] = False
+    """Whether to not include this location in the multiworld at all."""
 
     npc: bool = False
     """Whether this item is contingent on killing an NPC or following their quest."""
@@ -186,7 +180,11 @@ class DS3LocationData:
 
     def is_missable(self, options: PerGameCommonOptions) -> bool:
         """Whether this location is missable given a set of options."""
-        return self.missable if isinstance(self.missable, bool) else self.missable(options)
+        return self.missable if isinstance(self.missable, bool) else self.missable(self, options)
+
+    def should_omit(self, options: PerGameCommonOptions) -> bool:
+        """Whether this location should be omitted given a set of options."""
+        return self.omit if isinstance(self.omit, bool) else self.omit(self, options)
 
     def location_groups(self) -> List[str]:
         """The names of location groups this location should appear in.
@@ -240,19 +238,39 @@ class DarkSouls3Location(Location):
         self.data = data
 
 
-def missable_quest(options: PerGameCommonOptions) -> bool:
+def disable_dlc(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
+    """A utility function for locations that are omitted when DLC is disabled."""
+    return not options.enable_dlc
+
+
+def disable_ngp(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
+    """A utility function for locations that are omitted when NG+ locations are disabled."""
+    return not options.enable_ngp
+
+
+def is_unrandomized_and_missable(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
+    """A utility function for locations that are omitted when they're unrandomized and missable."""
+    if not self.is_missable(options): return False
+    
+    return options.missable_location_behavior == "do_not_randomize" or (
+        options.excluded_location_behavior == "do_not_randomize"
+        and self.name in options.exclude_locations.value
+    )
+
+
+def missable_quest(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
     """A utility function for locations that are only missable when unmissable_quests is False."""
     return not options.unmissable_quests
 
 
-def missable_transposition(options: PerGameCommonOptions) -> bool:
+def missable_transposition(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
     """A utility function for locations that are only missable when unmissable_transpositions is
     False.
     """
     return not options.unmissable_transpositions
 
 
-def missable_invasion(options: PerGameCommonOptions) -> bool:
+def missable_invasion(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
     """A utility function for locations that are only missable when unmissable_invasions is
     False.
     """
@@ -291,7 +309,7 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("CA: Soul of an Unknown Traveler - by miniboss",
                         "Soul of an Unknown Traveler"),
         DS3LocationData("CA: Speckled Stoneplate Ring+1 - by miniboss",
-                        "Speckled Stoneplate Ring+1", ngp=True),
+                        "Speckled Stoneplate Ring+1", omit=disable_ngp),
         DS3LocationData("CA: Titanite Scale - miniboss drop", "Titanite Scale", miniboss=True),
         DS3LocationData("CA: Coiled Sword - boss drop", "Coiled Sword", prominent=True,
                         progression=True, boss=True),
@@ -315,7 +333,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: East-West Shield - tree by shrine entrance", "East-West Shield"),
         DS3LocationData("FS: Homeward Bone - path above shrine entrance", "Homeward Bone"),
         DS3LocationData("FS: Ember - above shrine entrance", "Ember"),
-        DS3LocationData("FS: Wolf Ring+2 - left of boss room exit", "Wolf Ring+2", ngp=True),
+        DS3LocationData("FS: Wolf Ring+2 - left of boss room exit", "Wolf Ring+2",
+                        omit=disable_ngp),
         # Leonhard (quest)
         DS3LocationData("FS: Cracked Red Eye Orb - Leonhard", "Cracked Red Eye Orb x5",
                         missable=True, npc=True),
@@ -378,15 +397,15 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: Wood Grain Ring - Easterner's Ashes", "Wood Grain Ring", shop=True,
                         conditional=True),
         DS3LocationData("FS: Millwood Knight Helm - Captain's Ashes", "Millwood Knight Helm",
-                        dlc=True, shop=True, conditional=True),
+                        omit=disable_dlc, shop=True, conditional=True),
         DS3LocationData("FS: Millwood Knight Armor - Captain's Ashes", "Millwood Knight Armor",
-                        dlc=True, shop=True, conditional=True),
+                        omit=disable_dlc, shop=True, conditional=True),
         DS3LocationData("FS: Millwood Knight Gauntlets - Captain's Ashes",
-                        "Millwood Knight Gauntlets", dlc=True, shop=True, conditional=True),
+                        "Millwood Knight Gauntlets", omit=disable_dlc, shop=True, conditional=True),
         DS3LocationData("FS: Millwood Knight Leggings - Captain's Ashes",
-                        "Millwood Knight Leggings", dlc=True, shop=True, conditional=True),
-        DS3LocationData("FS: Refined Gem - Captain's Ashes", "Refined Gem", dlc=True, shop=True,
-                        conditional=True),
+                        "Millwood Knight Leggings", omit=disable_dlc, shop=True, conditional=True),
+        DS3LocationData("FS: Refined Gem - Captain's Ashes", "Refined Gem", omit=disable_dlc,
+                        shop=True, conditional=True),
 
         # Ludleth Shop
         DS3LocationData("FS: Vordt's Great Hammer - Ludleth for Vordt", "Vordt's Great Hammer",
@@ -477,21 +496,29 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: Sunlight Spear - Ludleth for Cinder", "Sunlight Spear",
                         missable=missable_transposition, conditional=True, boss=True, shop=True),
         DS3LocationData("FS: Friede's Great Scythe - Ludleth for Friede", "Friede's Great Scythe",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Rose of Ariandel - Ludleth for Friede", "Rose of Ariandel",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Demon's Scar - Ludleth for Demon Prince", "Demon's Scar",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Seething Chaos - Ludleth for Demon Prince", "Seething Chaos",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Frayed Blade - Ludleth for Midir", "Frayed Blade",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Old Moonlight - Ludleth for Midir", "Old Moonlight",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Gael's Greatsword - Ludleth for Gael", "Gael's Greatsword",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
         DS3LocationData("FS: Repeating Crossbow - Ludleth for Gael", "Repeating Crossbow",
-                        missable=missable_transposition, conditional=True, dlc=True, boss=True, shop=True),
+                        missable=missable_transposition, conditional=True, omit=disable_dlc,
+                        boss=True, shop=True),
     ],
     "Firelink Shrine Bell Tower": [
         # Guarded by Tower Key
@@ -618,9 +645,9 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Soul of a Deserted Corpse"),
         DS3LocationData("HWL: Estus Shard - fort ground, on anvil", "Estus Shard"),
         DS3LocationData("HWL: Fleshbite Ring+1 - fort roof, jump to other roof",
-                        "Fleshbite Ring+1", ngp=True, hidden=True),  # Hidden jump
+                        "Fleshbite Ring+1", omit=disable_ngp, hidden=True),  # Hidden jump
         DS3LocationData("HWL: Ring of the Evil Eye+2 - fort ground, far wall",
-                        "Ring of the Evil Eye+2", ngp=True, hidden=True),  # In barrels
+                        "Ring of the Evil Eye+2", omit=disable_ngp, hidden=True),  # In barrels
         DS3LocationData("HWL: Silver Eagle Kite Shield - fort mezzanine",
                         "Silver Eagle Kite Shield"),
         DS3LocationData("HWL: Astora Straight Sword - fort walkway, drop down",
@@ -649,8 +676,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         prominent=True, boss=True),
         DS3LocationData("US: Transposing Kiln - boss drop", "Transposing Kiln", boss=True),
         # Missable because it's unavailable if you start as a Pyromancer
-        DS3LocationData("US: Pyromancy Flame - Cornyx", "Pyromancy Flame", missable=missable_quest,
-                        npc=True),
+        DS3LocationData("US: Pyromancy Flame - Cornyx", "Pyromancy Flame",
+                        omit=is_unrandomized_and_missable, missable=missable_quest, npc=True),
         DS3LocationData("US: Old Sage's Blindfold - kill Cornyx", "Old Sage's Blindfold",
                         npc=True),
         DS3LocationData("US: Cornyx's Garb - kill Cornyx", "Cornyx's Garb",
@@ -659,8 +686,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         static='02,0:50006141::', npc=True),
         DS3LocationData("US: Cornyx's Skirt - kill Cornyx", "Cornyx's Skirt",
                         static='02,0:50006141::', npc=True),
-        DS3LocationData("US: Tower Key - kill Irina", "Tower Key", missable=missable_quest,
-                        npc=True),
+        DS3LocationData("US: Tower Key - kill Irina", "Tower Key",
+                        omit=is_unrandomized_and_missable, missable=missable_quest, npc=True),
         DS3LocationData("US: Flynn's Ring - tower village, rooftop", "Flynn's Ring"),
         DS3LocationData("US: Undead Bone Shard - by white tree", "Undead Bone Shard"),
         DS3LocationData("US: Alluring Skull - foot, behind carriage", "Alluring Skull x2"),
@@ -773,11 +800,13 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Large Soul of a Deserted Corpse"),
         DS3LocationData("US: Kukri - hanging corpse above burning tree", "Kukri x9",
                         missable=True),  # requires projectile
-        DS3LocationData("US: Life Ring+1 - tower on the way to village", "Life Ring+1", ngp=True),
+        DS3LocationData("US: Life Ring+1 - tower on the way to village", "Life Ring+1",
+                        omit=disable_ngp),
         DS3LocationData("US: Poisonbite Ring+1 - graveyard by white tree, near well",
-                        "Poisonbite Ring+1", ngp=True),
+                        "Poisonbite Ring+1", omit=disable_ngp),
         DS3LocationData("US: Covetous Silver Serpent Ring+2 - tower village, drop down from roof",
-                        "Covetous Silver Serpent Ring+2", ngp=True, hidden=True),  # Hidden fall
+                        "Covetous Silver Serpent Ring+2", omit=disable_ngp,
+                        hidden=True),  # Hidden fall
         DS3LocationData("US: Human Pine Resin - tower village building, chest upstairs",
                         "Human Pine Resin x4"),
         DS3LocationData("US: Homeward Bone - tower village, right at start", "Homeward Bone",
@@ -798,30 +827,33 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("US -> RS", None),
 
         # Yoel/Yuria of Londor
-        DS3LocationData("FS: Soul Arrow - Yoel/Yuria", "Soul Arrow",
-                        static='99,0:-1:50000,110000,70000116:', missable=True, npc=True,
-                        shop=True),
-        DS3LocationData("FS: Heavy Soul Arrow - Yoel/Yuria", "Heavy Soul Arrow",
+        DS3LocationData("FS: Soul Arrow - Yoel/Yuria shop", "Soul Arrow",
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest, npc=True,
+                        conditional=True, shop=True),
+        DS3LocationData("FS: Heavy Soul Arrow - Yoel/Yuria shop", "Heavy Soul Arrow",
                         static='99,0:-1:50000,110000,70000116:',
-                        missable=True, npc=True, shop=True),
-        DS3LocationData("FS: Magic Weapon - Yoel/Yuria", "Magic Weapon",
-                        static='99,0:-1:50000,110000,70000116:', missable=True, npc=True,
-                        shop=True),
-        DS3LocationData("FS: Magic Shield - Yoel/Yuria", "Magic Shield",
-                        static='99,0:-1:50000,110000,70000116:', missable=True, npc=True,
-                        shop=True),
-        DS3LocationData("FS: Soul Greatsword - Yoel/Yuria", "Soul Greatsword",
-                        static='99,0:-1:50000,110000,70000450,70000475:', missable=True,
-                        npc=True, shop=True),
-        DS3LocationData("FS: Dark Hand - Yoel/Yuria", "Dark Hand", missable=True, npc=True),
-        DS3LocationData("FS: Untrue White Ring - Yoel/Yuria", "Untrue White Ring", missable=True,
-                        npc=True),
-        DS3LocationData("FS: Untrue Dark Ring - Yoel/Yuria", "Untrue Dark Ring", missable=True,
-                        npc=True),
-        DS3LocationData("FS: Londor Braille Divine Tome - Yoel/Yuria", "Londor Braille Divine Tome",
-                        static='99,0:-1:40000,110000,70000116:', missable=True, npc=True),
-        DS3LocationData("FS: Darkdrift - Yoel/Yuria", "Darkdrift", missable=True, drop=True,
-                        npc=True),  # kill her or kill Soul of Cinder
+                        missable=missable_quest, conditional=True, npc=True, shop=True),
+        DS3LocationData("FS: Magic Weapon - Yoel/Yuria shop", "Magic Weapon",
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        conditional=True, npc=True, shop=True),
+        DS3LocationData("FS: Magic Shield - Yoel/Yuria shop", "Magic Shield",
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        conditional=True, npc=True, shop=True),
+        DS3LocationData("FS: Soul Greatsword - Yoel/Yuria shop", "Soul Greatsword",
+                        static='99,0:-1:50000,110000,70000450,70000475:', missable=missable_quest,
+                        conditional=True, npc=True, shop=True),
+        DS3LocationData("FS: Dark Hand - Yuria shop", "Dark Hand", missable=missable_quest,
+                        conditional=True, npc=True),
+        DS3LocationData("FS: Untrue White Ring - Yuria shop", "Untrue White Ring",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("FS: Untrue Dark Ring - Yuria shop", "Untrue Dark Ring",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("FS: Londor Braille Divine Tome - Yuria shop", "Londor Braille Divine Tome",
+                        static='99,0:-1:40000,110000,70000116:', missable=missable_quest,
+                        conditional=True, npc=True),
+        DS3LocationData("FS: Darkdrift - kill Yuria", "Darkdrift", missable=missable_quest,
+                        conditional=True, drop=True,
+                        npc=True),  # kill her or kill Soul of Cinder with her aid
 
         # Cornyx of the Great Swamp
         # These aren't missable because the Shrine Handmaid will carry them if you kill Cornyx.
@@ -957,13 +989,13 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("RS: Sellsword Trousers - keep perimeter balcony", "Sellsword Trousers"),
         DS3LocationData("RS: Farron Coal - keep perimeter", "Farron Coal"),
         DS3LocationData("RS: Chloranthy Ring+2 - road, drop across from carriage",
-                        "Chloranthy Ring+2", hidden=True, ngp=True),  # Hidden fall
+                        "Chloranthy Ring+2", hidden=True, omit=disable_ngp),  # Hidden fall
         DS3LocationData("RS: Lingering Dragoncrest Ring+1 - water", "Lingering Dragoncrest Ring+1",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("RS: Great Swamp Ring - miniboss drop, by Farron Keep",
                         "Great Swamp Ring", miniboss=True),  # Giant Crab drop
         DS3LocationData("RS: Blue Sentinels - Horace", "Blue Sentinels",
-                        missable=True, npc=True),  # Horace quest
+                        missable=missable_quest, npc=True),  # Horace quest
         DS3LocationData("RS: Crystal Gem - stronghold, lizard", "Crystal Gem"),
         DS3LocationData("RS: Fading Soul - woods by Crucifixion Woods bonfire", "Fading Soul",
                         static='03,0:53300210::'),
@@ -1140,9 +1172,9 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Large Soul of an Unknown Traveler"),
         # Before the stairs leading down into the Deacons fight
         DS3LocationData("CD: Ring of the Evil Eye+1 - by stairs to boss", "Ring of the Evil Eye+1",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("CD: Ring of Favor+2 - upper roofs, on buttress", "Ring of Favor+2",
-                        hidden=True, ngp=True),  # Hidden fall
+                        hidden=True, omit=disable_ngp),  # Hidden fall
         DS3LocationData("CD: Crest Shield - path, drop down by Cathedral of the Deep bonfire",
                         "Crest Shield", hidden=True),  # Hidden fall
         DS3LocationData("CD: Young White Branch - by white tree #1", "Young White Branch"),
@@ -1291,11 +1323,11 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FK: Ember - upper keep, by miniboss #1", "Ember"),
         DS3LocationData("FK: Ember - upper keep, by miniboss #2", "Ember"),
         DS3LocationData("FK: Dark Stoneplate Ring+2 - keep ruins ritual island, behind wall",
-                        "Dark Stoneplate Ring+2", ngp=True, hidden=True),
+                        "Dark Stoneplate Ring+2", omit=disable_ngp, hidden=True),
         DS3LocationData("FK: Magic Stoneplate Ring+1 - between right island and wall",
-                        "Magic Stoneplate Ring+1", ngp=True),
+                        "Magic Stoneplate Ring+1", omit=disable_ngp),
         DS3LocationData("FK: Wolf Ring+1 - keep ruins bonfire island, outside building",
-                        "Wolf Ring+1", ngp=True),
+                        "Wolf Ring+1", omit=disable_ngp),
         DS3LocationData("FK: Antiquated Dress - hidden cave", "Antiquated Dress", hidden=True),
         DS3LocationData("FK: Antiquated Gloves - hidden cave", "Antiquated Gloves", hidden=True),
         DS3LocationData("FK: Antiquated Skirt - hidden cave", "Antiquated Skirt", hidden=True),
@@ -1398,9 +1430,9 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("CC: Large Soul of an Unknown Traveler - crypt upper, hall middle",
                         "Large Soul of an Unknown Traveler"),
         DS3LocationData("CC: Ring of Steel Protection+2 - atrium upper, drop onto pillar",
-                        "Ring of Steel Protection+2", ngp=True),
+                        "Ring of Steel Protection+2", omit=disable_ngp),
         DS3LocationData("CC: Thunder Stoneplate Ring+1 - crypt upper, among pots",
-                        "Thunder Stoneplate Ring+1", ngp=True),
+                        "Thunder Stoneplate Ring+1", omit=disable_ngp),
         DS3LocationData("CC: Undead Bone Shard - crypt upper, skeleton ball drop",
                         "Undead Bone Shard", hidden=True),  # Skeleton Ball puzzle
         DS3LocationData("CC: Dark Gem - crypt lower, skeleton ball drop", "Dark Gem",
@@ -1476,9 +1508,10 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Dragonrider Bow", hidden=True),  # Hidden fall
         DS3LocationData("SL: Estus Shard - antechamber, illusory wall", "Estus Shard",
                         hidden=True),
-        DS3LocationData("SL: Bloodbite Ring+1 - behind ballista", "Bloodbite Ring+1", ngp=True),
+        DS3LocationData("SL: Bloodbite Ring+1 - behind ballista", "Bloodbite Ring+1",
+                        omit=disable_ngp),
         DS3LocationData("SL: Flame Stoneplate Ring+2 - ruins main lower, illusory wall in far hall",
-                        "Flame Stoneplate Ring+2", ngp=True, hidden=True),
+                        "Flame Stoneplate Ring+2", omit=disable_ngp, hidden=True),
         DS3LocationData("SL: Large Titanite Shard - ruins basement, illusory wall in upper hall",
                         "Large Titanite Shard x3", hidden=True),
         DS3LocationData("SL: Undead Bone Shard - lake, miniboss drop", "Undead Bone Shard",
@@ -1610,11 +1643,12 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("IBV: Rusted Gold Coin - Distant Manor, drop after stairs",
                         "Rusted Gold Coin"),
         DS3LocationData("IBV: Chloranthy Ring+1 - plaza, behind altar", "Chloranthy Ring+1",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("IBV: Covetous Gold Serpent Ring+1 - descent, drop after dark room",
-                        "Covetous Gold Serpent Ring+1", ngp=True, hidden=True),  # Hidden fall
+                        "Covetous Gold Serpent Ring+1", omit=disable_ngp,
+                        hidden=True),  # Hidden fall
         DS3LocationData("IBV: Wood Grain Ring+2 - ascent, right after great hall", "Wood Grain Ring+2",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("IBV: Divine Blessing - great hall, chest", "Divine Blessing"),
         DS3LocationData("IBV: Smough's Great Hammer - great hall, chest",
                         "Smough's Great Hammer"),
@@ -1656,8 +1690,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Pale Shade Trousers", missable=True, hostile_npc=True),
 
         # Anri of Astora
-        DS3LocationData("IBV: Ring of the Evil Eye - Anri", "Ring of the Evil Eye", missable=True,
-                        npc=True),
+        DS3LocationData("IBV: Ring of the Evil Eye - Anri", "Ring of the Evil Eye",
+                        missable=missable_quest, conditional=True, npc=True),
 
         # Sirris quest after killing Creighton
         DS3LocationData("FS: Mail Breaker - Sirris for killing Creighton", "Mail Breaker",
@@ -1731,7 +1765,7 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Rusted Gold Coin"),
         DS3LocationData("ID: Old Cell Key - stairs between pit and B3", "Old Cell Key"),
         DS3LocationData("ID: Covetous Silver Serpent Ring+1 - pit lift, middle platform",
-                        "Covetous Silver Serpent Ring+1", ngp=True),
+                        "Covetous Silver Serpent Ring+1", omit=disable_ngp),
         DS3LocationData("ID: Dragon Torso Stone - B3, outside lift", "Dragon Torso Stone"),
         DS3LocationData("ID: Prisoner Chief's Ashes - B2 near, locked cell by stairs",
                         "Prisoner Chief's Ashes", progression=True),
@@ -1797,9 +1831,9 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         progression=True),
         DS3LocationData("PC: Ember - palace, far room", "Ember"),
         DS3LocationData("PC: Flame Stoneplate Ring+1 - chapel, drop from roof towards entrance",
-                        "Flame Stoneplate Ring+1", ngp=True, hidden=True),  # Hidden fall
+                        "Flame Stoneplate Ring+1", omit=disable_ngp, hidden=True),  # Hidden fall
         DS3LocationData("PC: Magic Stoneplate Ring+2 - tower base", "Magic Stoneplate Ring+2",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("PC: Court Sorcerer Hood - chapel, second floor", "Court Sorcerer Hood"),
         DS3LocationData("PC: Court Sorcerer Robe - chapel, second floor", "Court Sorcerer Robe"),
         DS3LocationData("PC: Court Sorcerer Gloves - chapel, second floor", "Court Sorcerer Gloves"),
@@ -1825,7 +1859,7 @@ location_tables: Dict[str, List[DS3LocationData]] = {
 
         # Siegward drops (kill or quest)
         DS3LocationData("PC: Storm Ruler - Siegward", "Storm Ruler", static='02,0:50006218::',
-                        missable=True, drop=True, npc=True),
+                        omit=is_unrandomized_and_missable, missable=True, drop=True, npc=True),
         DS3LocationData("PC: Pierce Shield - Siegward", "Pierce Shield", missable=True,
                         drop=True, npc=True),
     ],
@@ -1898,10 +1932,10 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("AL: Large Soul of a Weary Warrior - left of dark cathedral entrance",
                         "Large Soul of a Weary Warrior"),
         DS3LocationData("AL: Giant's Coal - by giant near dark cathedral", "Giant's Coal"),
-        DS3LocationData("AL: Havel's Ring+2 - prison tower, rafters", "Havel's Ring+2", ngp=True,
-                        hidden=True),  # Invisible walkway
+        DS3LocationData("AL: Havel's Ring+2 - prison tower, rafters", "Havel's Ring+2",
+                        omit=disable_ngp, hidden=True),  # Invisible walkway
         DS3LocationData("AL: Ring of Favor+1 - light cathedral, upstairs", "Ring of Favor+1",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("AL: Sun Princess Ring - dark cathedral, after boss", "Sun Princess Ring"),
         DS3LocationData("AL: Reversal Ring - tomb, chest in corner", "Reversal Ring",
                         hidden=True),  # Behind illusory wall
@@ -1954,10 +1988,13 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Leggings of Favor", hidden=True, miniboss=True, shop=True),
 
         # Anri of Astora
-        DS3LocationData("AL: Chameleon - tomb after marrying Anri", "Chameleon", missable=True,
+        DS3LocationData("AL: Sword of Avowal - tomb before marrying Anri", "Sword of Avowal",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("AL: Chameleon - tomb after marrying Anri", "Chameleon",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("AL: Anri's Straight Sword - tomb after marrying Anri",
+                        "Anri's Straight Sword", missable=missable_quest, conditional=True,
                         npc=True),
-        DS3LocationData("AL: Anri's Straight Sword - Anri quest", "Anri's Straight Sword",
-                        missable=True, npc=True),
 
         # Shrine Handmaid after killing Ringfinger Leonhard
         # This is listed here even though you can kill Leonhard immediately because we want the
@@ -2073,11 +2110,11 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("LC: Twinkling Titanite - basement, chest #1", "Twinkling Titanite"),
         DS3LocationData("LC: Twinkling Titanite - basement, chest #2", "Twinkling Titanite x2"),
         DS3LocationData("LC: Life Ring+2 - dark room mid, out door opposite wyvern, drop down",
-                        "Life Ring+2", ngp=True, hidden=True),  # Hidden fall
+                        "Life Ring+2", omit=disable_ngp, hidden=True),  # Hidden fall
         DS3LocationData("LC: Dark Stoneplate Ring+1 - wyvern room, balcony",
-                        "Dark Stoneplate Ring+1", ngp=True, hidden=True),  # Hidden fall
+                        "Dark Stoneplate Ring+1", omit=disable_ngp, hidden=True),  # Hidden fall
         DS3LocationData("LC: Thunder Stoneplate Ring+2 - chapel, drop onto roof",
-                        "Thunder Stoneplate Ring+2", ngp=True),
+                        "Thunder Stoneplate Ring+2", omit=disable_ngp),
         DS3LocationData("LC: Sunlight Straight Sword - wyvern room, mimic",
                         "Sunlight Straight Sword", mimic=True, hidden=True),  # Hidden fall
         DS3LocationData("LC: Titanite Scale - dark room, upper, mimic", "Titanite Scale x3",
@@ -2153,9 +2190,9 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("CKG: Titanite Chunk - right of shortcut lift bottom", "Titanite Chunk"),
         DS3LocationData("CKG: Ring of Sacrifice - under balcony", "Ring of Sacrifice"),
         DS3LocationData("CKG: Wood Grain Ring+1 - by first elevator bottom", "Wood Grain Ring+1",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("CKG: Sage Ring+2 - balcony, drop onto rubble, jump back", "Sage Ring+2",
-                        ngp=True, hidden=True),
+                        omit=disable_ngp, hidden=True),
         DS3LocationData("CKG: Titanite Scale - tomb, chest #1", "Titanite Scale"),
         DS3LocationData("CKG: Titanite Scale - tomb, chest #2", "Titanite Scale"),
         DS3LocationData("CKG: Magic Stoneplate Ring - mob drop before boss",
@@ -2236,9 +2273,10 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Divine Pillars of Light"),
         DS3LocationData("GA: Power Within - dark room, behind retractable bookshelf",
                         "Power Within", hidden=True),  # Switch in darkened room
-        DS3LocationData("GA: Sage Ring+1 - rafters, second level down", "Sage Ring+1", ngp=True),
+        DS3LocationData("GA: Sage Ring+1 - rafters, second level down", "Sage Ring+1",
+                        omit=disable_ngp),
         DS3LocationData("GA: Lingering Dragoncrest Ring+2 - dome, room behind spire",
-                        "Lingering Dragoncrest Ring+2", ngp=True),
+                        "Lingering Dragoncrest Ring+2", omit=disable_ngp),
         DS3LocationData("GA: Divine Blessing - rafters, down lower level ladder",
                         "Divine Blessing"),
         DS3LocationData("GA: Twinkling Titanite - rafters, down lower level ladder",
@@ -2354,9 +2392,10 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Hornet Ring", conditional=True),
         DS3LocationData("UG: Coiled Sword Fragment - shrine, dead bonfire", "Coiled Sword Fragment",
                         boss=True),
-        DS3LocationData("UG: Life Ring+3 - shrine, behind big throne", "Life Ring+3", ngp=True),
+        DS3LocationData("UG: Life Ring+3 - shrine, behind big throne", "Life Ring+3",
+                        omit=disable_ngp),
         DS3LocationData("UG: Ring of Steel Protection+1 - environs, behind bell tower",
-                        "Ring of Steel Protection+1", ngp=True),
+                        "Ring of Steel Protection+1", omit=disable_ngp),
 
         # Yuria shop, or Shrine Handmaiden with Hollow's Ashes
         # This is here because this is where the ashes end up if you kill Yoel or Yuria
@@ -2460,9 +2499,9 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("AP: Ring of Steel Protection - fort overlook, beside stairs",
                         "Ring of Steel Protection"),
         DS3LocationData("AP: Havel's Ring+1 - summit, after building", "Havel's Ring+1",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("AP: Covetous Gold Serpent Ring+2 - plaza", "Covetous Gold Serpent Ring+2",
-                        ngp=True),
+                        omit=disable_ngp),
         DS3LocationData("AP: Titanite Scale - walkway building", "Titanite Scale x3"),
         DS3LocationData("AP: Twinkling Titanite - belfry, by ladder to roof",
                         "Twinkling Titanite x3"),
@@ -2510,13 +2549,13 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Firelink Leggings", boss=True, shop=True),
 
         # Yuria (quest, after Soul of Cinder)
-        DS3LocationData("FS: Billed Mask - Yuria after killing KFF boss", "Billed Mask",
+        DS3LocationData("FS: Billed Mask - shop after killing Yuria", "Billed Mask",
                         missable=True, npc=True),
-        DS3LocationData("FS: Black Dress - Yuria after killing KFF boss", "Black Dress",
+        DS3LocationData("FS: Black Dress - shop after killing Yuria", "Black Dress",
                         missable=True, npc=True),
-        DS3LocationData("FS: Black Gauntlets - Yuria after killing KFF boss", "Black Gauntlets",
+        DS3LocationData("FS: Black Gauntlets - shop after killing Yuria", "Black Gauntlets",
                         missable=True, npc=True),
-        DS3LocationData("FS: Black Leggings - Yuria after killing KFF boss", "Black Leggings",
+        DS3LocationData("FS: Black Leggings - shop after killing Yuria", "Black Leggings",
                         missable=True, npc=True),
     ],
 
@@ -3059,7 +3098,7 @@ for region in [
     "Ringed City",
 ]:
     for location in location_tables[region]:
-        location.dlc = True
+        location.omit = disable_dlc
 
 for region in [
     "Firelink Shrine Bell Tower",

@@ -63,7 +63,17 @@ all_bosses = [
     DS3BossInfo("Deacons of the Deep", 3500800, locations = {
         "CD: Soul of the Deacons of the Deep",
         "CD: Small Doll - boss drop",
+        "CD: Archdeacon White Crown - boss room after killing boss",
+        "CD: Archdeacon Holy Garb - boss room after killing boss",
+        "CD: Archdeacon Skirt - boss room after killing boss",
+        # Anri and Horace only leave Road of Sacrifices once Deacons is defeated
+        "IBV: Ring of the Evil Eye - Anri",
         "FS: Hawkwood's Shield - gravestone after Hawkwood leaves",
+        "SL: Llewellyn Shield - Horace drop",
+        "FS: Executioner Helm - shop after killing Horace",
+        "FS: Executioner Armor - shop after killing Horace",
+        "FS: Executioner Gauntlets - shop after killing Horace",
+        "FS: Executioner Leggings - shop after killing Horace",
     }),
     DS3BossInfo("Abyss Watchers", 3300801, before_storm_ruler = True, locations = {
         "FK: Soul of the Blood of the Wolf",
@@ -248,13 +258,7 @@ all_bosses = [
         "RC: Shira's Gloves - Shira's room after killing ashes NPC",
         "RC: Shira's Trousers - Shira's room after killing ashes NPC",
     }),
-    DS3BossInfo("Lords of Cinder", 4100800, locations = {
-        "KFF: Soul of the Lords",
-        "FS: Billed Mask - Yuria after killing KFF boss",
-        "FS: Black Dress - Yuria after killing KFF boss",
-        "FS: Black Gauntlets - Yuria after killing KFF boss",
-        "FS: Black Leggings - Yuria after killing KFF boss"
-    }),
+    DS3BossInfo("Lords of Cinder", 4100800, locations = {"KFF: Soul of the Lords"}),
 ]
 
 default_yhorm_location = DS3BossInfo("Yhorm the Giant", 3900800, locations = {

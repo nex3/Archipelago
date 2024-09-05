@@ -1,6 +1,7 @@
 # world/dark_souls_3/__init__.py
 from collections.abc import Sequence
 from collections import defaultdict
+from enum import Enum
 import json
 from logging import warning
 from typing import cast, Any, Callable, Dict, Set, List, Optional, TextIO, Union
@@ -41,6 +42,51 @@ class DarkSouls3Web(WebWorld):
     option_groups = option_groups
     item_descriptions = item_descriptions
     rich_text_options_doc = True
+
+
+class _LocationStatus(Enum):
+    """An enum representing different possible states a location may be in given a player's options.
+    """
+
+    ABSENT = 0b000
+    """The location is totally inaccessible from the game.
+
+    For example: DLC locations with `enable_dlc: false`.
+    """
+
+    UNRANDOMIZED_UNMISSABLE = 0b001
+    """The location is unrandomized but not missable.
+
+    For example, an unmissable but explicitly excluded location with
+    `exluced_location_behavior: do_not_randomize`.
+    """
+
+    UNRANDOMIZED_MISSABLE = 0b011
+    """The location is unrandomized as well as missable.
+
+    For example, any missable location with `missable_location_behavior: do_not_randomize`.
+    """
+
+    RANDOMIZED_UNMISSABLE = 0b101
+    """The location is accessible from the game, randomized, and can't be missed."""
+
+    RANDOMIZED_MISSABLE = 0b111
+    """The location is accessible from the game, randomized, but can be missed."""
+
+    @property
+    def is_absent(self) -> bool:
+        """Returns whether this location is totally inaccessible from the game."""
+        return self == _LocationStatus.ABSENT
+
+    @property
+    def is_randomized(self) -> bool:
+        """Returns whether this location is accessible and can contain a random item."""
+        return self.value & 0b101 == 0b101
+
+    @property
+    def is_missable(self) -> bool:
+        """Returns whether this location is accessible but also missable."""
+        return self.value & 0b011 == 0b011
 
 
 class DarkSouls3World(World):
@@ -120,7 +166,7 @@ class DarkSouls3World(World):
 
         if not self.options.enable_dlc and boss.dlc: return False
 
-        if not self._is_location_available("PC: Storm Ruler - boss room"):
+        if not self._location_status("PC: Storm Ruler - boss room").is_randomized:
             # If the Storm Ruler isn't randomized, make sure the player can get to the normal Storm
             # Ruler location before they need to get through Yhorm.
             if boss.before_storm_ruler: return False
@@ -128,7 +174,7 @@ class DarkSouls3World(World):
             # If the Small Doll also wasn't randomized, make sure Yhorm isn't blocking access to it
             # or it won't be possible to get into Profaned Capital before beating him.
             if (
-                not self._is_location_available("CD: Small Doll - boss drop")
+                not self._location_status("CD: Small Doll - boss drop").is_randomized
                 and boss.name in {"Crystal Sage", "Deacons of the Deep"}
             ):
                 return False
@@ -138,7 +184,7 @@ class DarkSouls3World(World):
         # Cemetery of Ash has very few locations and all of them are excluded by default, so only
         # allow Yhorm as Iudex Gundyr if there's at least one available location.
         return any(
-            self._is_location_available(location)
+            self._location_status(location).is_randomized
             and location.name not in self.all_excluded_locations
             and location.name != "CA: Coiled Sword - boss drop"
             for location in location_tables["Cemetery of Ash"]
@@ -239,7 +285,10 @@ class DarkSouls3World(World):
         excluded = self.options.exclude_locations.value
 
         for location in location_table:
-            if self._is_location_available(location):
+            status = self._location_status(location)
+            if status.is_absent:
+                continue
+            elif status.is_randomized:
                 new_location = DarkSouls3Location(self.player, location, new_region)
                 if (
                     # Exclude missable locations that don't allow useful items
@@ -251,27 +300,27 @@ class DarkSouls3World(World):
                         and self.options.missable_location_behavior < self.options.excluded_location_behavior
                     )
                 ) or (
-                    # Lift Chamber Key is missable. Exclude Lift-Chamber-Key-Locked locations if it isn't randomized
-                    not self._is_location_available("FS: Lift Chamber Key - Leonhard")
+                    # Exclude locations that are unlocked by items that only appear in missable,
+                    # unrandomized locations.
+                    self._location_status(
+                        "FS: Lift Chamber Key - Leonhard"
+                    ) == _LocationStatus.UNRANDOMIZED_MISSABLE
                     and location.name == "HWL: Red Eye Orb - wall tower, miniboss"
                 ) or (
-                    # Chameleon is missable. Exclude Chameleon-locked locations if it isn't randomized
-                    not self._is_location_available("AL: Chameleon - tomb after marrying Anri")
-                    and location.name in {"RC: Dragonhead Shield - streets monument, across bridge",
-                                          "RC: Large Soul of a Crestfallen Knight - streets monument, across bridge",
-                                          "RC: Divine Blessing - streets monument, mob drop", "RC: Lapp's Helm - Lapp",
-                                          "RC: Lapp's Armor - Lapp",
-                                          "RC: Lapp's Gauntlets - Lapp",
-                                          "RC: Lapp's Leggings - Lapp"}
+                    self._location_status(
+                        "AL: Chameleon - tomb after marrying Anri"
+                    ) == _LocationStatus.UNRANDOMIZED_MISSABLE
+                    and location.name in {
+                        "RC: Dragonhead Shield - streets monument, across bridge",
+                        "RC: Large Soul of a Crestfallen Knight - streets monument, across bridge",
+                        "RC: Divine Blessing - streets monument, mob drop", "RC: Lapp's Helm - Lapp",
+                        "RC: Lapp's Armor - Lapp",
+                        "RC: Lapp's Gauntlets - Lapp",
+                        "RC: Lapp's Leggings - Lapp"
+                    }
                 ):
                     new_location.progress_type = LocationProgressType.EXCLUDED
             else:
-                # Don't allow missable duplicates of progression items to be expected progression.
-                if location.name in {"PC: Storm Ruler - Siegward",
-                                     "US: Pyromancy Flame - Cornyx",
-                                     "US: Tower Key - kill Irina"}:
-                    continue
-
                 # Replace non-randomized items with events that give the default item
                 event_item = (
                     self.create_item(location.default_item_name) if location.default_item_name
@@ -300,17 +349,24 @@ class DarkSouls3World(World):
     def create_items(self) -> None:
         # Just used to efficiently deduplicate items
         item_set: Set[str] = set()
+        for location in cast(List[DarkSouls3Location], self.multiworld.get_filled_locations(self.player)):
+            if (
+                not location.data.is_missable(self.options)
+                and isinstance(location.item, DarkSouls3Item)
+                and location.item.data.unique
+            ):
+                item_set.add(location.item.name)
 
         # Gather all default items on randomized locations
         self.local_itempool = []
         num_required_extra_items = 0
         for location in cast(List[DarkSouls3Location], self.multiworld.get_unfilled_locations(self.player)):
-            if not self._is_location_available(location.name):
+            if not self._location_status(location.name).is_randomized:
                 raise Exception("DS3 generation bug: Added an unavailable location.")
 
             default_item_name = cast(str, location.data.default_item_name)
             item = item_dictionary[default_item_name]
-            if item.skip:
+            if item.should_skip(self.options):
                 num_required_extra_items += 1
             elif not item.unique:
                 self.local_itempool.append(self.create_item(default_item_name))
@@ -442,13 +498,13 @@ class DarkSouls3World(World):
         # If the Coiled Sword is vanilla, it is early enough and doesn't need to be placed.
         # Don't place this in the multiworld because it's necessary almost immediately, and don't
         # mark it as a blocker for HWL because having a miniscule Sphere 1 screws with progression balancing.
-        if self._is_location_available("CA: Coiled Sword - boss drop"):
+        if self._location_status("CA: Coiled Sword - boss drop").is_randomized:
             self._fill_local_item("Coiled Sword", ["Cemetery of Ash", "Firelink Shrine"])
 
         # If the HWL Raw Gem is vanilla, it is early enough and doesn't need to be removed. If
         # upgrade smoothing is enabled, make sure one raw gem is available early for SL1 players
         if (
-            self._is_location_available("HWL: Raw Gem - fort roof, lizard")
+            self._location_status("HWL: Raw Gem - fort roof, lizard").is_randomized
             and self.options.smooth_upgrade_items
         ):
             self._fill_local_item("Raw Gem", [
@@ -477,8 +533,7 @@ class DarkSouls3World(World):
                 self.multiworld.get_location(location.name, self.player)
                 for region in regions
                 for location in location_tables[region]
-                if self._is_location_available(location)
-                and not location.is_missable(self.options)
+                if self._location_status(location) == _LocationStatus.RANDOMIZED_UNMISSABLE
                 and not location.conditional
                 and (not additional_condition or additional_condition(location))
             )
@@ -619,9 +674,8 @@ class DarkSouls3World(World):
                 self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
 
         # Define the access rules to some specific locations
-        if self._is_location_available("FS: Lift Chamber Key - Leonhard"):
-            self._add_location_rule("HWL: Red Eye Orb - wall tower, miniboss",
-                                    "Lift Chamber Key")
+        self._add_location_rule("HWL: Red Eye Orb - wall tower, miniboss",
+                                "Lift Chamber Key")
         self._add_location_rule("ID: Bellowing Dragoncrest Ring - drop from B1 towards pit",
                                 "Jailbreaker's Key")
         self._add_location_rule("ID: Covetous Gold Serpent Ring - Siegward's cell", "Old Cell Key")
@@ -720,11 +774,10 @@ class DarkSouls3World(World):
 
         # This particular location is bugged, and will drop two copies of whatever item is placed
         # there.
-        if self._is_location_available("US: Young White Branch - by white tree #2"):
-            self._add_item_rule(
-                "US: Young White Branch - by white tree #2",
-                lambda item: item.player == self.player and not item.data.unique
-            )
+        self._add_item_rule(
+            "US: Young White Branch - by white tree #2",
+            lambda item: item.player == self.player and not item.data.unique
+        )
         
         # Make sure the Storm Ruler is available BEFORE Yhorm the Giant
         if self.yhorm_location.name == "Ancient Wyvern":
@@ -1105,23 +1158,46 @@ class DarkSouls3World(World):
 
         ## Anri
 
-        # Anri only leaves Road of Sacrifices once Deacons is defeated
-        self._add_location_rule([
-            "IBV: Ring of the Evil Eye - Anri",
-            "AL: Chameleon - tomb after marrying Anri",
-        ], lambda state: self._can_get(state, "CD: Soul of the Deacons of the Deep"))
+        # Starting the marriage ceremony requires moving Anri into the church
+        # and then beating Pontiff Sulyvahn
+        self._add_location_rule(
+            "AL: Sword of Avowal - tomb before marrying Anri",
+            lambda state: (
+                self._can_get(state, "IBV: Ring of the Evil Eye - Anri")
+                and self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
+            )
+        )
 
         # If the player does Anri's non-marriage quest, they'll need to defeat the AL boss as well
         # before it's complete.
         self._add_location_rule([
-            "AL: Anri's Straight Sword - Anri quest",
+            "AL: Chameleon - tomb after marrying Anri",
+            "AL: Anri's Straight Sword - tomb after marrying Anri",
             "FS: Elite Knight Helm - shop after Anri quest",
             "FS: Elite Knight Armor - shop after Anri quest",
             "FS: Elite Knight Gauntlets - shop after Anri quest",
             "FS: Elite Knight Leggings - shop after Anri quest",
+            # We consider Yuria's quest finished after you marry Anri. Technically there is one last
+            # step, defeating Soul of Cinder with her assistance, but since that'll end the game
+            # entirely we put killing her in logic earlier.
+            "FS: Billed Mask - shop after killing Yuria",
+            "FS: Black Dress - shop after killing Yuria",
+            "FS: Black Gauntlets - shop after killing Yuria",
+            "FS: Black Leggings - shop after killing Yuria",
+            "FS: Darkdrift - kill Yuria"
         ], lambda state: (
-            self._can_get(state, "IBV: Ring of the Evil Eye - Anri") and
-            self._can_get(state, "AL: Soul of Aldrich")
+            state.has("Sword of Avowal", self.player)
+            and self._can_get(state, "AL: Sword of Avowal - tomb before marrying Anri")
+            and (
+                # In unmissable quests mode, Anri's quest always ends in marriage, but in vanilla
+                # logic they can also fight Aldrich after reaching the church. In that case, we
+                # want to make sure that the logic allows for either branch.
+                self.options.unmissable_quests
+                or (
+                    self._can_get(state, "IBV: Ring of the Evil Eye - Anri")
+                    and self._can_get(state, "AL: Soul of Aldrich")
+                )
+            )
         ))
 
 
@@ -1296,17 +1372,13 @@ class DarkSouls3World(World):
         )
 
     def _add_location_rule(self, location: Union[str, List[str]], rule: Union[CollectionRule, str]) -> None:
-        """Sets a rule for the given location if it that location is randomized.
+        """Sets a rule for the given location if that location is randomized.
 
         The rule can just be a single item/event name as well as an explicit rule lambda.
         """
         locations = location if isinstance(location, list) else [location]
         for location in locations:
-            data = location_dictionary[location]
-            if data.dlc and not self.options.enable_dlc: continue
-            if data.ngp and not self.options.enable_ngp: continue
-
-            if not self._is_location_available(location): continue
+            if self._location_status(location).is_absent: continue
             if isinstance(rule, str):
                 assert item_dictionary[rule].classification == ItemClassification.progression
                 rule = lambda state, item=rule: state.has(item, self.player)
@@ -1324,7 +1396,7 @@ class DarkSouls3World(World):
 
     def _add_item_rule(self, location: str, rule: ItemRule) -> None:
         """Sets a rule for what items are allowed in a given location."""
-        if not self._is_location_available(location): return
+        if not self._location_status(location).is_randomized: return
         add_item_rule(self.multiworld.get_location(location, self.player), rule)
 
     def _can_go_to(self, state, region) -> bool:
@@ -1335,11 +1407,11 @@ class DarkSouls3World(World):
         """Returns whether state can access the given location name."""
         return state.can_reach_location(location, self.player)
 
-    def _is_location_available(
+    def _location_status(
         self,
-        location: Union[str, DS3LocationData, DarkSouls3Location]
-    ) -> bool:
-        """Returns whether the given location is being randomized."""
+        location: Union[str, DS3LocationData, DarkSouls3Location],
+    ) -> _LocationStatus:
+        """Returns the status of the given location given the player's optiosn."""
         if isinstance(location, DS3LocationData):
             data = location
         elif isinstance(location, DarkSouls3Location):
@@ -1347,19 +1419,29 @@ class DarkSouls3World(World):
         else:
             data = location_dictionary[location]
 
-        return (
-            not data.is_event
-            and (not data.dlc or bool(self.options.enable_dlc))
-            and (not data.ngp or bool(self.options.enable_ngp))
-            and not (
-                self.options.excluded_location_behavior == "do_not_randomize"
-                and data.name in self.all_excluded_locations
+        if data.should_omit(self.options): return _LocationStatus.ABSENT
+        if data.is_event: return _LocationStatus.UNRANDOMIZED_UNMISSABLE
+
+        missable = data.is_missable(self.options)
+        if (
+            self.options.missable_location_behavior == "do_not_randomize"
+            and missable
+        ):
+            return _LocationStatus.UNRANDOMIZED_MISSABLE
+        elif (
+            self.options.excluded_location_behavior == "do_not_randomize"
+            and data.name in self.all_excluded_locations
+        ):
+            return (
+                _LocationStatus.UNRANDOMIZED_MISSABLE if missable
+                else _LocationStatus.UNRANDOMIZED_UNMISSABLE
             )
-            and not (
-                self.options.missable_location_behavior == "do_not_randomize"
-                and data.is_missable(self.options)
+        else:
+            return (
+                _LocationStatus.RANDOMIZED_MISSABLE if missable
+                else _LocationStatus.RANDOMIZED_UNMISSABLE
             )
-        )
+
 
     def write_spoiler(self, spoiler_handle: TextIO) -> None:
         text = ""
@@ -1374,7 +1456,7 @@ class DarkSouls3World(World):
             text = "\n" + text + "\n"
             spoiler_handle.write(text)
 
-    def post_fill(self):
+    def post_fill(self) -> None:
         """If item smoothing is enabled, rearrange items so they scale up smoothly through the run.
 
         This determines the approximate order a given silo of items (say, soul items) show up in the
@@ -1383,6 +1465,8 @@ class DarkSouls3World(World):
         items, later spheres get higher-level ones. Within a sphere, items in DS3 are distributed in
         region order, and then the best items in a sphere go into the multiworld.
         """
+        if not (self.options.smooth_upgrade_items or self.options.smooth_soul_items or self.options.smooth_upgraded_weapons):
+            return
 
         locations_by_sphere = [
             sorted(loc for loc in sphere if loc.item.player == self.player and not loc.locked)
@@ -1395,14 +1479,14 @@ class DarkSouls3World(World):
             for region in region_order
             # Shuffle locations within each region.
             for location in self._shuffle(location_tables[region])
-            if self._is_location_available(location)
+            if self._location_status(location).is_randomized
         ]
 
         # All DarkSouls3Items for this world that have been assigned anywhere, grouped by name
         full_items_by_name: Dict[str, List[DarkSouls3Item]] = defaultdict(list)
         for location in self.multiworld.get_filled_locations():
             if location.item.player == self.player and (
-                location.player != self.player or self._is_location_available(location)
+                location.player != self.player or self._location_status(location).is_randomized
             ):
                 full_items_by_name[location.item.name].append(location.item)
 
@@ -1566,6 +1650,7 @@ class DarkSouls3World(World):
                 "scale_enemies": self.options.scale_enemies.value,
                 "all_chests_are_mimics": self.options.all_chests_are_mimics.value,
                 "impatient_mimics": self.options.impatient_mimics.value,
+                "anri_gender": self.options.anri_gender.value,
             },
             "seed": self.multiworld.seed_name,  # to verify the server's multiworld
             "slot": self.multiworld.player_name[self.player],  # to connect to server
