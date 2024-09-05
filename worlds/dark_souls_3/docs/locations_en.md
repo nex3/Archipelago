@@ -130,6 +130,16 @@ following NPCs' quests are supported:
   starting class. He can't be killed for his drops until you've given him all
   three Pyromancy Tomes that he accepts.
 
+* **Yoel** won't die until you get five levels of hollowing.
+
+* **Yuria** can't be killed until after you've married Anri. No Fire Keeper Soul
+  is available, so you can't fail her quest by reversing your hollowing.
+
+* **Anri** will not die or go hollow if you tell them where Horace is. Their
+  quest will always take the "dark" path that leads to you marrying them.
+
+* **Horace** can't be killed until he goes hollow.
+
 ### `unmissable_invasions`
 
 This option changes how scripted invasions work so that their rewards are
@@ -820,7 +830,7 @@ static _Dark Souls III_ randomizer].
 <table><tr><th>Location name</th><th>Detailed description</th>
 <tr><td>AL: Aldrich Faithful - water reserves, talk to McDonnel</td><td>Given by Archdeacon McDonnel in Water Reserves.</td></tr>
 <tr><td>AL: Aldrich&#x27;s Ruby - dark cathedral, miniboss</td><td>Dropped by the Deep Accursed who drops down when you open the Anor Londo Cathedral shortcut</td></tr>
-<tr><td>AL: Anri&#x27;s Straight Sword - Anri quest</td><td>Dropped by Anri of Astora upon death or completing quest. In the Darkmoon Tomb with Lord of Hollows route, or given by Ludleth if summoned to defeat Aldrich.</td></tr>
+<tr><td>AL: Anri&#x27;s Straight Sword - tomb after marrying Anri</td><td>Dropped by Anri of Astora upon death or completing quest. In the Darkmoon Tomb with Lord of Hollows route, or given by Ludleth if summoned to defeat Aldrich.</td></tr>
 <tr><td>AL: Blade of the Darkmoon - Yorshka with Darkmoon Loyalty</td><td>Given by Yorshka after learning the Darkmoon Loyalty gesture from Sirris, or by killing her</td></tr>
 <tr><td>AL: Brass Armor - tomb</td><td>Behind the illusory statue in the hallway leading to the Darkmoon Tomb</td></tr>
 <tr><td>AL: Brass Gauntlets - tomb</td><td>Behind the illusory statue in the hallway leading to the Darkmoon Tomb</td></tr>
@@ -866,6 +876,7 @@ static _Dark Souls III_ randomizer].
 <tr><td>AL: Soul of a Crestfallen Knight - right of dark cathedral entrance</td><td>To the right of the Anor Londo cathedral entrance, past the red-eyed Silver Knight</td></tr>
 <tr><td>AL: Soul of a Weary Warrior - plaza, nearer</td><td>After the Pontiff fight, in the middle of the area with the Giant Slaves</td></tr>
 <tr><td>AL: Sun Princess Ring - dark cathedral, after boss</td><td>In the Anor Londo cathedral after defeating Aldrich, up the elevators in Gwynevere&#x27;s Chamber</td></tr>
+<tr><td>AL: Sword of Avowal - tomb before marrying Anri</td><td>Given by the Stone-humped Hag assassin in order to marry Anri</td></tr>
 <tr><td>AL: Titanite Scale - top of ladder up to buttresses</td><td>On the platform after the stairs leading up to Anor Londo from the Water Reserves building</td></tr>
 <tr><td>AL: Twinkling Titanite - lizard after light cathedral #1</td><td>Dropped a Crystal Lizard straight after the Pontiff fight</td></tr>
 <tr><td>AL: Twinkling Titanite - lizard after light cathedral #2</td><td>Dropped a Crystal Lizard straight after the Pontiff fight</td></tr>
@@ -2319,6 +2330,7 @@ static _Dark Souls III_ randomizer].
 <tr><td>US: Tower Key - kill Irina</td><td>Dropped by Irina of Carim</td></tr>
 <tr><td>US: Transposing Kiln - boss drop</td><td>Dropped by Curse Rotted Greatwood</td></tr>
 <tr><td>US: Undead Bone Shard - by white tree</td><td>In the area past the Dilapidated Bridge bonfire, where the Giant is shooting arrows, jumping to the floating platform on the right</td></tr>
+<tr><td>US: Vertebra Shackle - Hodrick drop</td><td>Dropped by Hodrick when he invades in Undead Settlement</td></tr>
 <tr><td>US: Wargod Wooden Shield - Pit of Hollows</td><td>In the Pit of Hollows</td></tr>
 <tr><td>US: Warrior of Sunlight - hanging corpse room, drop through hole</td><td>Dropping through a hole in the floor in the first building after the burning tree.</td></tr>
 <tr><td>US: Whip - back alley, behind wooden wall</td><td>In one of the houses between building after the burning tree and the Dilapidated Bridge bonfire</td></tr>

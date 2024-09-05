@@ -366,7 +366,7 @@ class DarkSouls3World(World):
 
             default_item_name = cast(str, location.data.default_item_name)
             item = item_dictionary[default_item_name]
-            if item.skip:
+            if item.should_skip(self.options):
                 num_required_extra_items += 1
             elif not item.unique:
                 self.local_itempool.append(self.create_item(default_item_name))
@@ -1158,23 +1158,46 @@ class DarkSouls3World(World):
 
         ## Anri
 
-        # Anri only leaves Road of Sacrifices once Deacons is defeated
-        self._add_location_rule([
-            "IBV: Ring of the Evil Eye - Anri",
-            "AL: Chameleon - tomb after marrying Anri",
-        ], lambda state: self._can_get(state, "CD: Soul of the Deacons of the Deep"))
+        # Starting the marriage ceremony requires moving Anri into the church
+        # and then beating Pontiff Sulyvahn
+        self._add_location_rule(
+            "AL: Sword of Avowal - tomb before marrying Anri",
+            lambda state: (
+                self._can_get(state, "IBV: Ring of the Evil Eye - Anri")
+                and self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
+            )
+        )
 
         # If the player does Anri's non-marriage quest, they'll need to defeat the AL boss as well
         # before it's complete.
         self._add_location_rule([
-            "AL: Anri's Straight Sword - Anri quest",
+            "AL: Chameleon - tomb after marrying Anri",
+            "AL: Anri's Straight Sword - tomb after marrying Anri",
             "FS: Elite Knight Helm - shop after Anri quest",
             "FS: Elite Knight Armor - shop after Anri quest",
             "FS: Elite Knight Gauntlets - shop after Anri quest",
             "FS: Elite Knight Leggings - shop after Anri quest",
+            # We consider Yuria's quest finished after you marry Anri. Technically there is one last
+            # step, defeating Soul of Cinder with her assistance, but since that'll end the game
+            # entirely we put killing her in logic earlier.
+            "FS: Billed Mask - shop after killing Yuria",
+            "FS: Black Dress - shop after killing Yuria",
+            "FS: Black Gauntlets - shop after killing Yuria",
+            "FS: Black Leggings - shop after killing Yuria",
+            "FS: Darkdrift - kill Yuria"
         ], lambda state: (
-            self._can_get(state, "IBV: Ring of the Evil Eye - Anri") and
-            self._can_get(state, "AL: Soul of Aldrich")
+            state.has("Sword of Avowal", self.player)
+            and self._can_get(state, "AL: Sword of Avowal - tomb before marrying Anri")
+            and (
+                # In unmissable quests mode, Anri's quest always ends in marriage, but in vanilla
+                # logic they can also fight Aldrich after reaching the church. In that case, we
+                # want to make sure that the logic allows for either branch.
+                self.options.unmissable_quests
+                or (
+                    self._can_get(state, "IBV: Ring of the Evil Eye - Anri")
+                    and self._can_get(state, "AL: Soul of Aldrich")
+                )
+            )
         ))
 
 

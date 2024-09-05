@@ -828,29 +828,32 @@ location_tables: Dict[str, List[DS3LocationData]] = {
 
         # Yoel/Yuria of Londor
         DS3LocationData("FS: Soul Arrow - Yoel/Yuria shop", "Soul Arrow",
-                        static='99,0:-1:50000,110000,70000116:', missable=True, npc=True,
-                        shop=True),
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest, npc=True,
+                        conditional=True, shop=True),
         DS3LocationData("FS: Heavy Soul Arrow - Yoel/Yuria shop", "Heavy Soul Arrow",
                         static='99,0:-1:50000,110000,70000116:',
-                        missable=True, npc=True, shop=True),
+                        missable=missable_quest, conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Magic Weapon - Yoel/Yuria shop", "Magic Weapon",
-                        static='99,0:-1:50000,110000,70000116:', missable=True, npc=True,
-                        shop=True),
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Magic Shield - Yoel/Yuria shop", "Magic Shield",
-                        static='99,0:-1:50000,110000,70000116:', missable=True, npc=True,
-                        shop=True),
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Soul Greatsword - Yoel/Yuria shop", "Soul Greatsword",
-                        static='99,0:-1:50000,110000,70000450,70000475:', missable=True,
-                        npc=True, shop=True),
-        DS3LocationData("FS: Dark Hand - Yuria shop", "Dark Hand", missable=True, npc=True),
-        DS3LocationData("FS: Untrue White Ring - Yuria shop", "Untrue White Ring", missable=True,
-                        npc=True),
-        DS3LocationData("FS: Untrue Dark Ring - Yuria shop", "Untrue Dark Ring", missable=True,
-                        npc=True),
+                        static='99,0:-1:50000,110000,70000450,70000475:', missable=missable_quest,
+                        conditional=True, npc=True, shop=True),
+        DS3LocationData("FS: Dark Hand - Yuria shop", "Dark Hand", missable=missable_quest,
+                        conditional=True, npc=True),
+        DS3LocationData("FS: Untrue White Ring - Yuria shop", "Untrue White Ring",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("FS: Untrue Dark Ring - Yuria shop", "Untrue Dark Ring",
+                        missable=missable_quest, conditional=True, npc=True),
         DS3LocationData("FS: Londor Braille Divine Tome - Yuria shop", "Londor Braille Divine Tome",
-                        static='99,0:-1:40000,110000,70000116:', missable=True, npc=True),
-        DS3LocationData("FS: Darkdrift - kill Yuria", "Darkdrift", missable=True, drop=True,
-                        npc=True),  # kill her or kill Soul of Cinder
+                        static='99,0:-1:40000,110000,70000116:', missable=missable_quest,
+                        conditional=True, npc=True),
+        DS3LocationData("FS: Darkdrift - kill Yuria", "Darkdrift", missable=missable_quest,
+                        conditional=True, drop=True,
+                        npc=True),  # kill her or kill Soul of Cinder with her aid
 
         # Cornyx of the Great Swamp
         # These aren't missable because the Shrine Handmaid will carry them if you kill Cornyx.
@@ -992,7 +995,7 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("RS: Great Swamp Ring - miniboss drop, by Farron Keep",
                         "Great Swamp Ring", miniboss=True),  # Giant Crab drop
         DS3LocationData("RS: Blue Sentinels - Horace", "Blue Sentinels",
-                        missable=True, npc=True),  # Horace quest
+                        missable=missable_quest, npc=True),  # Horace quest
         DS3LocationData("RS: Crystal Gem - stronghold, lizard", "Crystal Gem"),
         DS3LocationData("RS: Fading Soul - woods by Crucifixion Woods bonfire", "Fading Soul",
                         static='03,0:53300210::'),
@@ -1687,8 +1690,8 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Pale Shade Trousers", missable=True, hostile_npc=True),
 
         # Anri of Astora
-        DS3LocationData("IBV: Ring of the Evil Eye - Anri", "Ring of the Evil Eye", missable=True,
-                        npc=True),
+        DS3LocationData("IBV: Ring of the Evil Eye - Anri", "Ring of the Evil Eye",
+                        missable=missable_quest, conditional=True, npc=True),
 
         # Sirris quest after killing Creighton
         DS3LocationData("FS: Mail Breaker - Sirris for killing Creighton", "Mail Breaker",
@@ -1985,10 +1988,13 @@ location_tables: Dict[str, List[DS3LocationData]] = {
                         "Leggings of Favor", hidden=True, miniboss=True, shop=True),
 
         # Anri of Astora
-        DS3LocationData("AL: Chameleon - tomb after marrying Anri", "Chameleon", missable=True,
+        DS3LocationData("AL: Sword of Avowal - tomb before marrying Anri", "Sword of Avowal",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("AL: Chameleon - tomb after marrying Anri", "Chameleon",
+                        missable=missable_quest, conditional=True, npc=True),
+        DS3LocationData("AL: Anri's Straight Sword - tomb after marrying Anri",
+                        "Anri's Straight Sword", missable=missable_quest, conditional=True,
                         npc=True),
-        DS3LocationData("AL: Anri's Straight Sword - Anri quest", "Anri's Straight Sword",
-                        missable=True, npc=True),
 
         # Shrine Handmaid after killing Ringfinger Leonhard
         # This is listed here even though you can kill Leonhard immediately because we want the
