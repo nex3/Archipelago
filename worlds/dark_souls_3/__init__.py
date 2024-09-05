@@ -1419,8 +1419,8 @@ class DarkSouls3World(World):
         else:
             data = location_dictionary[location]
 
-        if data.is_event: return _LocationStatus.UNRANDOMIZED_UNMISSABLE
         if data.should_omit(self.options): return _LocationStatus.ABSENT
+        if data.is_event: return _LocationStatus.UNRANDOMIZED_UNMISSABLE
 
         missable = data.is_missable(self.options)
         if (
@@ -1456,7 +1456,7 @@ class DarkSouls3World(World):
             text = "\n" + text + "\n"
             spoiler_handle.write(text)
 
-    def post_fill(self):
+    def post_fill(self) -> None:
         """If item smoothing is enabled, rearrange items so they scale up smoothly through the run.
 
         This determines the approximate order a given silo of items (say, soul items) show up in the
@@ -1465,6 +1465,8 @@ class DarkSouls3World(World):
         items, later spheres get higher-level ones. Within a sphere, items in DS3 are distributed in
         region order, and then the best items in a sphere go into the multiworld.
         """
+        if not (self.options.smooth_upgrade_items or self.options.smooth_soul_items or self.options.smooth_upgraded_weapons):
+            return
 
         locations_by_sphere = [
             sorted(loc for loc in sphere if loc.item.player == self.player and not loc.locked)
