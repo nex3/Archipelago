@@ -135,6 +135,7 @@ class DarkSouls3World(World):
         self.all_excluded_locations = set()
 
     def generate_early(self) -> None:
+        self.created_regions = set()
         self.all_excluded_locations.update(self.options.exclude_locations.value)
 
         # Inform Universal Tracker where Yhorm is being randomized to.
@@ -344,6 +345,7 @@ class DarkSouls3World(World):
             new_region.locations.append(new_location)
 
         self.multiworld.regions.append(new_region)
+        self.created_regions.add(region_name)
         return new_region
 
     def create_items(self) -> None:
@@ -674,8 +676,7 @@ class DarkSouls3World(World):
                 self._add_entrance_rule("Painted World of Ariandel (Before Contraption)", "Basin of Vows")
 
         # Define the access rules to some specific locations
-        self._add_location_rule("HWL: Red Eye Orb - wall tower, miniboss",
-                                "Lift Chamber Key")
+        self._add_location_rule("HWL: Red Eye Orb - wall tower, miniboss", "Lift Chamber Key")
         self._add_location_rule("ID: Bellowing Dragoncrest Ring - drop from B1 towards pit",
                                 "Jailbreaker's Key")
         self._add_location_rule("ID: Covetous Gold Serpent Ring - Siegward's cell", "Old Cell Key")
@@ -1339,6 +1340,9 @@ class DarkSouls3World(World):
                 lambda item: not item.advancement
             )
 
+        # Prevent the player from prioritizing and "excluding" the same location
+        self.options.priority_locations.value -= allow_useful_locations
+
         if self.options.excluded_location_behavior == "allow_useful":
             self.options.exclude_locations.value.clear()
 
@@ -1387,7 +1391,7 @@ class DarkSouls3World(World):
     def _add_entrance_rule(self, region: str, rule: Union[CollectionRule, str]) -> None:
         """Sets a rule for the entrance to the given region."""
         assert region in location_tables
-        if not any(region == reg for reg in self.multiworld.regions.region_cache[self.player]): return
+        if region not in self.created_regions: return
         if isinstance(rule, str):
             if " -> " not in rule:
                 assert item_dictionary[rule].classification == ItemClassification.progression
@@ -1664,6 +1668,16 @@ class DarkSouls3World(World):
             "apIdsToItemIds": ap_ids_to_ds3_ids,
             "itemCounts": item_counts,
             "locationIdsToKeys": location_ids_to_keys,
+            # The range of versions of the static randomizer that are compatible
+            # with this slot data. Incompatible versions should have at least a
+            # minor version bump. Pre-release versions should generally only be
+            # compatible with a single version, except very close to a stable
+            # release when no changes are expected.
+            #
+            # This is checked by the static randomizer, which will surface an
+            # error to the user if its version doesn't fall into the allowed
+            # range.
+            "versions": ">=3.0.0-beta.24 <3.1.0",
         }
 
         return slot_data
