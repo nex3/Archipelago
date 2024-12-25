@@ -1448,7 +1448,7 @@ class DarkSouls3World(World):
                 sorted_spheres.extend(onworld + offworld)
 
             converted_item_order.reverse()
-            remaining_fill(self.multiworld, sorted_spheres, converted_item_order, name="DS3 Smoothing")  # , check_location_can_fill=True)
+            remaining_fill(self.multiworld, sorted_spheres, converted_item_order, name="DS3 Smoothing", check_location_can_fill=True)
 
 
         if self.options.smooth_upgrade_items:
