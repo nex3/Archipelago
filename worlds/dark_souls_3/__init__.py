@@ -182,7 +182,8 @@ class DarkSouls3World(World):
             "Consumed King's Garden",
             "Grand Archives",
             "Untended Graves",
-            "Archdragon Peak",
+            "Archdragon Peak (Through Fort)",
+            "Archdragon Peak (After Fort)",
             "Kiln of the First Flame",
             "Greirat's Shop",
             "Karla's Shop",
@@ -229,9 +230,11 @@ class DarkSouls3World(World):
         create_connection("Irithyll of the Boreal Valley", "Irithyll Dungeon")
         create_connection("Irithyll of the Boreal Valley", "Anor Londo")
 
-        create_connection("Irithyll Dungeon", "Archdragon Peak")
+        create_connection("Irithyll Dungeon", "Archdragon Peak (Through Fort)")
         create_connection("Irithyll Dungeon", "Profaned Capital")
         create_connection("Irithyll Dungeon", "Karla's Shop")
+
+        create_connection("Archdragon Peak (Through Fort)", "Archdragon Peak (After Fort)")
 
         create_connection("Lothric Castle", "Consumed King's Garden")
         create_connection("Lothric Castle", "Grand Archives")
@@ -575,7 +578,7 @@ class DarkSouls3World(World):
             "Anor Londo",
             lambda state: self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
         )
-        self._add_entrance_rule("Archdragon Peak", "Path of the Dragon")
+        self._add_entrance_rule("Archdragon Peak (Through Fort)", "Path of the Dragon")
         self._add_entrance_rule("Grand Archives", lambda state: (
             state.has("Grand Archives Key", self.player)
             and self._can_get(state, "LC: Soul of Dragonslayer Armour")
@@ -703,14 +706,14 @@ class DarkSouls3World(World):
             "CKG: Drakeblood Armor - tomb, after killing AP mausoleum NPC",
             "CKG: Drakeblood Gauntlets - tomb, after killing AP mausoleum NPC",
             "CKG: Drakeblood Leggings - tomb, after killing AP mausoleum NPC",
-        ], lambda state: self._can_go_to(state, "Archdragon Peak"))
+        ], lambda state: self._can_go_to(state, "Archdragon Peak (After Fort)"))
 
         self._add_location_rule([
             "FK: Havel's Helm - upper keep, after killing AP belfry roof NPC",
             "FK: Havel's Armor - upper keep, after killing AP belfry roof NPC",
             "FK: Havel's Gauntlets - upper keep, after killing AP belfry roof NPC",
             "FK: Havel's Leggings - upper keep, after killing AP belfry roof NPC",
-        ], lambda state: self._can_go_to(state, "Archdragon Peak"))
+        ], lambda state: self._can_go_to(state, "Archdragon Peak (After Fort)"))
 
         self._add_location_rule([
             "RC: Dragonhead Shield - streets monument, across bridge",
@@ -743,11 +746,6 @@ class DarkSouls3World(World):
             )
         
         # Make sure the Storm Ruler is available BEFORE Yhorm the Giant
-        if self.yhorm_location.name == "Ancient Wyvern":
-            # This is a white lie, you can get to a bunch of items in AP before you beat the Wyvern,
-            # but this saves us from having to split the entire region in two just to mark which
-            # specific items are before and after.
-            self._add_entrance_rule("Archdragon Peak", "Storm Ruler")
         for location in self.yhorm_location.locations:
             self._add_location_rule(location, "Storm Ruler")
 
@@ -1301,6 +1299,13 @@ class DarkSouls3World(World):
             elif self.options.early_banner == "early_local":
                 self.multiworld.local_early_items[self.player]["Small Lothric Banner"] = 1
 
+    def _is_complete(self, state: CollectionState) -> bool:
+        """Whether the given state has achieved the victory condition."""
+        all(
+            state.can_reach_location(next(boss.locations), self.player)
+            for boss in self._goal_bosses()
+        )
+
     def _has_any_scroll(self, state: CollectionState) -> bool:
         """Returns whether the given state has any scroll item."""
         return (
@@ -1376,6 +1381,18 @@ class DarkSouls3World(World):
                 and data.missable
             )
         )
+
+    def _goal_bosses(self) -> [DS3BossInfo]:
+        """Returns all the boses that are goals for this run."""
+        result = []
+        for name in self.options.goal:
+            assert name.endswith(" Boss")
+            region = name[:-len(" Boss")]
+            boss = next(boss for boss in reversed(all_bosses) if boss.region == region)
+            assert boss
+            assert boss.flag
+            result.append(boss)
+        return result
 
     def write_spoiler(self, spoiler_handle: TextIO) -> None:
         text = ""
@@ -1590,6 +1607,7 @@ class DarkSouls3World(World):
             },
             "seed": self.multiworld.seed_name,  # to verify the server's multiworld
             "slot": self.multiworld.player_name[self.player],  # to connect to server
+            "goal": [boss.flag for boss in self._goal_bosses()],
             # Reserializing here is silly, but it's easier for the static randomizer.
             "random_enemy_preset": json.dumps(self.options.random_enemy_preset.value),
             "yhorm": (
@@ -1609,7 +1627,7 @@ class DarkSouls3World(World):
             # This is checked by the static randomizer, which will surface an
             # error to the user if its version doesn't fall into the allowed
             # range.
-            "versions": ">=3.0.0-beta.24 <3.1.0",
+            "versions": ">=4.0.0-alpha.9 <5.0.0",
         }
 
         return slot_data

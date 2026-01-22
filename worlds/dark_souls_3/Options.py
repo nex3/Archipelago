@@ -3,9 +3,38 @@ import json
 from typing import Any, Dict
 
 from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
-    OptionGroup, PerGameCommonOptions, Range, Removed, Toggle
+    OptionGroup, OptionSet, PerGameCommonOptions, Range, Removed, Toggle
+
+from .Bosses import all_bosses
 
 ## Game Options
+
+
+class GoalOption(OptionSet):
+    """Which bosses must be defeated in order to win the game, of ther form "<Region> Boss".
+
+    A few regions have more than one boss:
+
+    - **Archdragon Peak:** "Archdragon Peak Fort" is Ancient Wyvern in vanilla,
+      "Archdragon Peak End" is Nameless King in vanilla.
+    - **Painted World of Ariandel:** "Painted World of Ariendel Lower" is
+      Champion's Gravetender and Gravetender Greatwolf in vanilla, "Painted
+      World of Ariendel End" is Sister Friede in vanilla.
+    - **Ringed City:** "Ringed City Midway" is Halflight, Spear of the Church in
+      vanilla, "Ringed City Hidden" is Darkeater Midir in vanilla, and "Ringed
+      City End" is SLave Knight Gael in vanilla.
+
+    If multiple bosses are selected, all of them must be defeated in order to
+    achieve your goal. By default, only "Kiln of the First Flame Boss" is
+    selected.
+    """
+    display_name = "Goal"
+    valid_keys = {boss.region + " Boss" for boss in all_bosses if boss.flag}
+    default = frozenset({"Kiln of the First Flame Boss"})
+
+    def verify_keys(self) -> None:
+        super().verify_keys()
+        if not set(self.value): raise OptionError("You must set at least one Goal.")
 
 
 class EarlySmallLothricBanner(Choice):
@@ -368,6 +397,7 @@ class MissableLocationBehaviorOption(Choice):
 @dataclass
 class DarkSouls3Options(PerGameCommonOptions):
     # Game Options
+    goal: GoalOption
     early_banner: EarlySmallLothricBanner
     late_basin_of_vows: LateBasinOfVowsOption
     late_dlc: LateDLCOption
