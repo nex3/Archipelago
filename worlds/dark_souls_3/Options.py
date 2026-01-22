@@ -104,19 +104,6 @@ class RequireOneHandedStartingWeapons(DefaultOnToggle):
     display_name = "Require One-Handed Starting Weapons"
 
 
-class AutoEquipOption(Toggle):
-    """Automatically equips any received armor or left/right weapons."""
-    display_name = "Auto-Equip"
-
-
-class LockEquipOption(Toggle):
-    """Lock the equipment slots so you cannot change your armor or your left/right weapons.
-
-    Works great with the Auto-equip option.
-    """
-    display_name = "Lock Equipment Slots"
-
-
 class NoEquipLoadOption(Toggle):
     """Disable the equip load constraint from the game."""
     display_name = "No Equip Load"
@@ -408,8 +395,6 @@ class DarkSouls3Options(PerGameCommonOptions):
     # Equipment
     random_starting_loadout: RandomizeStartingLoadout
     require_one_handed_starting_weapons: RequireOneHandedStartingWeapons
-    auto_equip: AutoEquipOption
-    lock_equip: LockEquipOption
     no_equip_load: NoEquipLoadOption
     no_weapon_requirements: NoWeaponRequirementsOption
     no_spell_requirements: NoSpellRequirementsOption
@@ -467,8 +452,6 @@ option_groups = [
     OptionGroup("Equipment", [
         RandomizeStartingLoadout,
         RequireOneHandedStartingWeapons,
-        AutoEquipOption,
-        LockEquipOption,
         NoEquipLoadOption,
         NoWeaponRequirementsOption,
         NoSpellRequirementsOption,

@@ -1586,8 +1586,6 @@ class DarkSouls3World(World):
             "options": {
                 "random_starting_loadout": self.options.random_starting_loadout.value,
                 "require_one_handed_starting_weapons": self.options.require_one_handed_starting_weapons.value,
-                "auto_equip": self.options.auto_equip.value,
-                "lock_equip": self.options.lock_equip.value,
                 "no_weapon_requirements": self.options.no_weapon_requirements.value,
                 "death_link": self.options.death_link.value,
                 "no_spell_requirements": self.options.no_spell_requirements.value,
