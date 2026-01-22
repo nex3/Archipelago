@@ -1,12 +1,12 @@
 # This workflow updates the DS3 documentation mirror at
 # https://nex-3.com/ds3/info/.
 
-name: Release
+name: Release DS3
 
 on:
   push:
     tags:
-      - 'ds3-[0-9]+.[0-9]+.[0-9]*(-.*)?'
+      - 'ds3-[0-9]+.[0-9]+.[0-9]+(-.*)?'
 
 jobs:
   update-nex3:
