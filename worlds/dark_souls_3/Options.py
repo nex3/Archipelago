@@ -79,6 +79,14 @@ class LateDLCOption(Choice):
     option_after_basin = 2
 
 
+class DeathLinkAmnesty(Range):
+    """How many times you have to die before sending a death link."""
+    display_name = "Death Link Amnesty"
+    range_start = 1
+    range_end = 30
+    default = 0
+
+
 class EnableDLCOption(Toggle):
     """Include DLC locations, items, and enemies in the randomized pools.
 
@@ -389,6 +397,7 @@ class DarkSouls3Options(PerGameCommonOptions):
     late_basin_of_vows: LateBasinOfVowsOption
     late_dlc: LateDLCOption
     death_link: DeathLink
+    death_link_amnesty: DeathLinkAmnesty
     enable_dlc: EnableDLCOption
     enable_ngp: EnableNGPOption
 

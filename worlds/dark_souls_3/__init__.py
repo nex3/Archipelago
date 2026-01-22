@@ -1588,6 +1588,7 @@ class DarkSouls3World(World):
                 "require_one_handed_starting_weapons": self.options.require_one_handed_starting_weapons.value,
                 "no_weapon_requirements": self.options.no_weapon_requirements.value,
                 "death_link": self.options.death_link.value,
+                "death_link_amnesty": self.options.death_link_amnesty.value,
                 "no_spell_requirements": self.options.no_spell_requirements.value,
                 "no_equip_load": self.options.no_equip_load.value,
                 "enable_dlc": self.options.enable_dlc.value,
