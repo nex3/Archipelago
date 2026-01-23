@@ -11,7 +11,7 @@ from .Bosses import all_bosses
 
 
 class GoalOption(OptionSet):
-    """Which bosses must be defeated in order to win the game, of ther form "<Region> Boss".
+    """Which bosses must be defeated in order to win the game, of the form "<Region> Boss".
 
     A few regions have more than one boss:
 
@@ -22,7 +22,7 @@ class GoalOption(OptionSet):
       World of Ariendel End" is Sister Friede in vanilla.
     - **Ringed City:** "Ringed City Midway" is Halflight, Spear of the Church in
       vanilla, "Ringed City Hidden" is Darkeater Midir in vanilla, and "Ringed
-      City End" is SLave Knight Gael in vanilla.
+      City End" is Slave Knight Gael in vanilla.
 
     If multiple bosses are selected, all of them must be defeated in order to
     achieve your goal. By default, only "Kiln of the First Flame Boss" is
