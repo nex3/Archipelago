@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 from typing import Any, Dict
 
-from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
+from Options import Choice, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
     OptionGroup, OptionSet, PerGameCommonOptions, Range, Removed, Toggle
 
 from .Bosses import all_bosses
@@ -79,12 +79,29 @@ class LateDLCOption(Choice):
     option_after_basin = 2
 
 
+class DeathLink(Choice):
+    """When you die, everyone who enabled death link dies. Of course, the reverse is true too.
+
+    - **Off:** Death link is disabled. (The default.)
+    - **Any Death:** Death link triggers for any death.
+    - **Lost Souls:** Death link only triggers if you die without collecting
+      your last bloodstain.
+    """
+    display_name = "Death Link Amnesty"
+    option_off = 0
+    alias_false = 0
+    option_any_death = 1
+    alias_true = 1
+    option_lost_souls = 2
+    default = 0
+
+
 class DeathLinkAmnesty(Range):
     """How many times you have to die before sending a death link."""
     display_name = "Death Link Amnesty"
     range_start = 1
     range_end = 30
-    default = 0
+    default = 1
 
 
 class EnableDLCOption(Toggle):
