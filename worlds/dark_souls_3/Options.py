@@ -3,7 +3,7 @@ import json
 from typing import Any, Dict
 
 from Options import Choice, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
-    OptionGroup, OptionSet, PerGameCommonOptions, Range, Removed, Toggle
+    OptionGroup, OptionSet, PerGameCommonOptions, Range, Removed, Toggle, OptionError
 
 from .Bosses import all_bosses
 
