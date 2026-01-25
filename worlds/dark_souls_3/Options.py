@@ -17,6 +17,8 @@ class GoalOption(OptionSet):
 
     - **Archdragon Peak:** "Archdragon Peak Fort" is Ancient Wyvern in vanilla,
       "Archdragon Peak End" is Nameless King in vanilla.
+    - **Lothric Castle:** "Lothric Castle Entrance" is Dancer of the Boreal
+      Valley in vanilla, "Lothric Castle End" is Dragonslayer Armor in vanilla.
     - **Painted World of Ariandel:** "Painted World of Ariendel Lower" is
       Champion's Gravetender and Gravetender Greatwolf in vanilla, "Painted
       World of Ariendel End" is Sister Friede in vanilla.
