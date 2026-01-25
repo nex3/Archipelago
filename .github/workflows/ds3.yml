@@ -5,8 +5,7 @@ name: Release DS3
 
 on:
   push:
-    tags:
-      - 'ds3-[0-9]+.[0-9]+.[0-9]+(-.*)?'
+    branches: ["ds3-4.0"]
 
 jobs:
   update-nex3:
