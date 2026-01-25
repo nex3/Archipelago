@@ -7,6 +7,7 @@ from logging import warning
 from typing import cast, Any, Callable, Dict, Set, List, Optional, TextIO, Union
 
 from BaseClasses import CollectionState, MultiWorld, Region, Location, LocationProgressType, Entrance, Tutorial, ItemClassification
+from Fill import remaining_fill
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
@@ -26,19 +27,10 @@ class DarkSouls3Web(WebWorld):
         "English",
         "setup_en.md",
         "setup/en",
-        ["Marech"]
+        ["Natalie", "Marech"]
     )
 
-    setup_fr = Tutorial(
-        setup_en.tutorial_name,
-        setup_en.description,
-        "Français",
-        "setup_fr.md",
-        "setup/fr",
-        ["Marech"]
-    )
-
-    tutorials = [setup_en, setup_fr]
+    tutorials = [setup_en]
     option_groups = option_groups
     item_descriptions = item_descriptions
     rich_text_options_doc = True
@@ -138,6 +130,22 @@ class DarkSouls3World(World):
         self.created_regions = set()
         self.all_excluded_locations.update(self.options.exclude_locations.value)
 
+        # This code doesn't work because tests don't verify options
+        # Don't consider disabled locations to be AP-excluded
+        # if not self.options.enable_dlc:
+            # self.options.exclude_locations.value = {
+                # location
+                # for location in self.options.exclude_locations
+                # if not location_dictionary[location].dlc
+            # }
+
+        # if not self.options.enable_ngp:
+            # self.options.exclude_locations.value = {
+                # location for
+                # location in self.options.exclude_locations
+                # if not location_dictionary[location].ngp
+            # }
+
         # Inform Universal Tracker where Yhorm is being randomized to.
         if hasattr(self.multiworld, "re_gen_passthrough"):
             if "Dark Souls III" in self.multiworld.re_gen_passthrough:
@@ -213,7 +221,8 @@ class DarkSouls3World(World):
             "Consumed King's Garden",
             "Grand Archives",
             "Untended Graves",
-            "Archdragon Peak",
+            "Archdragon Peak (Through Fort)",
+            "Archdragon Peak (After Fort)",
             "Kiln of the First Flame",
             "Greirat's Shop",
             "Karla's Shop",
@@ -260,9 +269,11 @@ class DarkSouls3World(World):
         create_connection("Irithyll of the Boreal Valley", "Irithyll Dungeon")
         create_connection("Irithyll of the Boreal Valley", "Anor Londo")
 
-        create_connection("Irithyll Dungeon", "Archdragon Peak")
+        create_connection("Irithyll Dungeon", "Archdragon Peak (Through Fort)")
         create_connection("Irithyll Dungeon", "Profaned Capital")
         create_connection("Irithyll Dungeon", "Karla's Shop")
+
+        create_connection("Archdragon Peak (Through Fort)", "Archdragon Peak (After Fort)")
 
         create_connection("Lothric Castle", "Consumed King's Garden")
         create_connection("Lothric Castle", "Grand Archives")
@@ -322,6 +333,13 @@ class DarkSouls3World(World):
                 ):
                     new_location.progress_type = LocationProgressType.EXCLUDED
             else:
+                # Don't consider non-randomized locations to be AP-excluded
+                if location.name in excluded:
+                    excluded.remove(location.name)
+                    # Only remove from all_excluded if excluded does not have priority over missable
+                    if not (self.options.missable_location_behavior < self.options.excluded_location_behavior):
+                        self.all_excluded_locations.remove(location.name)
+
                 # Replace non-randomized items with events that give the default item
                 event_item = (
                     self.create_item(location.default_item_name) if location.default_item_name
@@ -332,15 +350,8 @@ class DarkSouls3World(World):
                     self.player,
                     location,
                     parent = new_region,
-                    event = True,
                 )
-                event_item.code = None
                 new_location.place_locked_item(event_item)
-                if location.name in excluded:
-                    excluded.remove(location.name)
-                    # Only remove from all_excluded if excluded does not have priority over missable
-                    if not (self.options.missable_location_behavior < self.options.excluded_location_behavior):
-                        self.all_excluded_locations.remove(location.name)
 
             new_region.locations.append(new_location)
 
@@ -616,7 +627,7 @@ class DarkSouls3World(World):
             "Anor Londo",
             lambda state: self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
         )
-        self._add_entrance_rule("Archdragon Peak", "Path of the Dragon")
+        self._add_entrance_rule("Archdragon Peak (Through Fort)", "Path of the Dragon")
         self._add_entrance_rule("Grand Archives", lambda state: (
             state.has("Grand Archives Key", self.player)
             and self._can_get(state, "LC: Soul of Dragonslayer Armour")
@@ -737,19 +748,26 @@ class DarkSouls3World(World):
             self._can_get(state, "FK: Soul of the Blood of the Wolf")
         ))
 
+        #Yoel dies spawning the Hollow's Ashes after entering the Catacombs, so require Abyss Watchers
+        self._add_location_rule([
+            "FS: Ring of Sacrifice - Yuria shop"
+        ], lambda state: (
+            self._can_get(state, "FK: Soul of the Blood of the Wolf")
+        ))
+        
         self._add_location_rule([
             "CKG: Drakeblood Helm - tomb, after killing AP mausoleum NPC",
             "CKG: Drakeblood Armor - tomb, after killing AP mausoleum NPC",
             "CKG: Drakeblood Gauntlets - tomb, after killing AP mausoleum NPC",
             "CKG: Drakeblood Leggings - tomb, after killing AP mausoleum NPC",
-        ], lambda state: self._can_go_to(state, "Archdragon Peak"))
+        ], lambda state: self._can_go_to(state, "Archdragon Peak (After Fort)"))
 
         self._add_location_rule([
             "FK: Havel's Helm - upper keep, after killing AP belfry roof NPC",
             "FK: Havel's Armor - upper keep, after killing AP belfry roof NPC",
             "FK: Havel's Gauntlets - upper keep, after killing AP belfry roof NPC",
             "FK: Havel's Leggings - upper keep, after killing AP belfry roof NPC",
-        ], lambda state: self._can_go_to(state, "Archdragon Peak"))
+        ], lambda state: self._can_go_to(state, "Archdragon Peak (After Fort)"))
 
         self._add_location_rule([
             "RC: Dragonhead Shield - streets monument, across bridge",
@@ -777,15 +795,10 @@ class DarkSouls3World(World):
         # there.
         self._add_item_rule(
             "US: Young White Branch - by white tree #2",
-            lambda item: item.player == self.player and not item.data.unique
+            lambda item: item.player != self.player or not item.data.unique
         )
         
         # Make sure the Storm Ruler is available BEFORE Yhorm the Giant
-        if self.yhorm_location.name == "Ancient Wyvern":
-            # This is a white lie, you can get to a bunch of items in AP before you beat the Wyvern,
-            # but this saves us from having to split the entire region in two just to mark which
-            # specific items are before and after.
-            self._add_entrance_rule("Archdragon Peak", "Storm Ruler")
         for location in self.yhorm_location.locations:
             self._add_location_rule(location, "Storm Ruler")
 
@@ -1366,6 +1379,13 @@ class DarkSouls3World(World):
             elif self.options.early_banner == "early_local":
                 self.multiworld.local_early_items[self.player]["Small Lothric Banner"] = 1
 
+    def _is_complete(self, state: CollectionState) -> bool:
+        """Whether the given state has achieved the victory condition."""
+        all(
+            state.can_reach_location(next(boss.locations), self.player)
+            for boss in self._goal_bosses()
+        )
+
     def _has_any_scroll(self, state: CollectionState) -> bool:
         """Returns whether the given state has any scroll item."""
         return (
@@ -1383,6 +1403,7 @@ class DarkSouls3World(World):
         locations = location if isinstance(location, list) else [location]
         for location in locations:
             if self._location_status(location).is_absent: continue
+
             if isinstance(rule, str):
                 assert item_dictionary[rule].classification == ItemClassification.progression
                 rule = lambda state, item=rule: state.has(item, self.player)
@@ -1447,20 +1468,33 @@ class DarkSouls3World(World):
             )
 
 
+    def _goal_bosses(self) -> [DS3BossInfo]:
+        """Returns all the bosses that are goals for this run."""
+        result = []
+        for name in self.options.goal:
+            assert name.endswith(" Boss")
+            region = name[:-len(" Boss")]
+            boss = next(boss for boss in reversed(all_bosses) if boss.region == region)
+            assert boss
+            assert boss.flag
+            result.append(boss)
+        return result
+
     def write_spoiler(self, spoiler_handle: TextIO) -> None:
         text = ""
 
         if self.yhorm_location != default_yhorm_location:
             text += f"\nYhorm takes the place of {self.yhorm_location.name} in {self.player_name}'s world\n"
 
-        if self.options.excluded_location_behavior == "allow_useful":
+        if self.options.excluded_location_behavior != "forbid_useful":
             text += f"\n{self.player_name}'s world excluded: {sorted(self.all_excluded_locations)}\n"
 
         if text:
             text = "\n" + text + "\n"
             spoiler_handle.write(text)
 
-    def post_fill(self) -> None:
+    @classmethod
+    def stage_post_fill(cls, multiworld: MultiWorld):
         """If item smoothing is enabled, rearrange items so they scale up smoothly through the run.
 
         This determines the approximate order a given silo of items (say, soul items) show up in the
@@ -1469,127 +1503,133 @@ class DarkSouls3World(World):
         items, later spheres get higher-level ones. Within a sphere, items in DS3 are distributed in
         region order, and then the best items in a sphere go into the multiworld.
         """
-        if not (self.options.smooth_upgrade_items or self.options.smooth_soul_items or self.options.smooth_upgraded_weapons):
+        ds3_worlds = [world for world in cast(List[DarkSouls3World], multiworld.get_game_worlds(cls.game)) if
+                      world.options.smooth_upgrade_items
+                      or world.options.smooth_soul_items
+                      or world.options.smooth_upgraded_weapons]
+        if not ds3_worlds:
+            # No worlds need item smoothing.
             return
 
-        locations_by_sphere = [
-            sorted(loc for loc in sphere if loc.item.player == self.player and not loc.locked)
-            for sphere in self.multiworld.get_spheres()
-        ]
+        spheres_per_player: Dict[int, List[List[Location]]] = {world.player: [] for world in ds3_worlds}
+        for sphere in multiworld.get_spheres():
+            locations_per_item_player: Dict[int, List[Location]] = {player: [] for player in spheres_per_player.keys()}
+            for location in sphere:
+                if location.locked:
+                    continue
+                item_player = location.item.player
+                if item_player in locations_per_item_player:
+                    locations_per_item_player[item_player].append(location)
+            for player, locations in locations_per_item_player.items():
+                # Sort for deterministic results.
+                locations.sort()
+                spheres_per_player[player].append(locations)
 
-        # All items in the base game in approximately the order they appear
-        all_item_order: List[DS3ItemData] = [
-            item_dictionary[location.default_item_name]
-            for region in region_order
-            # Shuffle locations within each region.
-            for location in self._shuffle(location_tables[region])
-            if self._location_status(location).is_randomized
-        ]
+        for ds3_world in ds3_worlds:
+            locations_by_sphere = spheres_per_player[ds3_world.player]
 
-        # All DarkSouls3Items for this world that have been assigned anywhere, grouped by name
-        full_items_by_name: Dict[str, List[DarkSouls3Item]] = defaultdict(list)
-        for location in self.multiworld.get_filled_locations():
-            if location.item.player == self.player and (
-                location.player != self.player or self._location_status(location).is_randomized
-            ):
-                full_items_by_name[location.item.name].append(location.item)
+            # All items in the base game in approximately the order they appear
+            all_item_order: List[DS3ItemData] = [
+                item_dictionary[location.default_item_name]
+                for region in region_order
+                # Shuffle locations within each region.
+                for location in ds3_world._shuffle(location_tables[region])
+                if ds3_world._location_status(location).is_randomized
+            ]
 
-        def smooth_items(item_order: List[Union[DS3ItemData, DarkSouls3Item]]) -> None:
-            """Rearrange all items in item_order to match that order.
+            # All DarkSouls3Items for this world that have been assigned anywhere, grouped by name
+            full_items_by_name: Dict[str, List[DarkSouls3Item]] = defaultdict(list)
+            for location in multiworld.get_filled_locations():
+                if location.item.player == ds3_world.player and (
+                    location.player != ds3_world.player
+                    or ds3_world._location_status(location).is_randomized
+                ):
+                    full_items_by_name[location.item.name].append(location.item)
 
-            Note: this requires that item_order exactly matches the number of placed items from this
-            world matching the given names.
-            """
+            def smooth_items(item_order: List[Union[DS3ItemData, DarkSouls3Item]]) -> None:
+                """Rearrange all items in item_order to match that order.
 
-            # Convert items to full DarkSouls3Items.
-            converted_item_order: List[DarkSouls3Item] = [
-                item for item in (
-                    (
-                        # full_items_by_name won't contain DLC items if the DLC is disabled.
-                        (full_items_by_name[item.name] or [None]).pop(0)
-                        if isinstance(item, DS3ItemData) else item
+                Note: this requires that item_order exactly matches the number of placed items from this
+                world matching the given names.
+                """
+
+                # Convert items to full DarkSouls3Items.
+                converted_item_order: List[DarkSouls3Item] = [
+                    item for item in (
+                        (
+                            # full_items_by_name won't contain DLC items if the DLC is disabled.
+                            (full_items_by_name[item.name] or [None]).pop(0)
+                            if isinstance(item, DS3ItemData) else item
+                        )
+                        for item in item_order
                     )
-                    for item in item_order
-                )
-                # Never re-order event items, because they weren't randomized in the first place.
-                if item and item.code is not None
-            ]
+                    # Never re-order event items, because they weren't randomized in the first place.
+                    if item and item.code is not None
+                ]
 
-            names = {item.name for item in converted_item_order}
+                names = {item.name for item in converted_item_order}
 
-            all_matching_locations = [
-                loc
-                for sphere in locations_by_sphere
-                for loc in sphere
-                if loc.item.name in names
-            ]
+                all_matching_locations = [
+                    loc
+                    for sphere in locations_by_sphere
+                    for loc in sphere
+                    if loc.item.name in names
+                ]
 
-            # It's expected that there may be more total items than there are matching locations if
-            # the player has chosen a more limited accessibility option, since the matching
-            # locations *only* include items in the spheres of accessibility.
-            if len(converted_item_order) < len(all_matching_locations):
-                raise Exception(
-                    f"DS3 bug: there are {len(all_matching_locations)} locations that can " +
-                    f"contain smoothed items, but only {len(converted_item_order)} items to smooth."
-                )
+                # It's expected that there may be more total items than there are matching locations if
+                # the player has chosen a more limited accessibility option, since the matching
+                # locations *only* include items in the spheres of accessibility.
+                if len(converted_item_order) < len(all_matching_locations):
+                    raise Exception(
+                        f"DS3 bug: there are {len(all_matching_locations)} locations that can " +
+                        f"contain smoothed items, but only {len(converted_item_order)} items to smooth."
+                    )
 
-            for sphere in locations_by_sphere:
-                locations = [loc for loc in sphere if loc.item.name in names]
+                sorted_spheres = []
+                for sphere in locations_by_sphere:
+                    locations = [loc for loc in sphere if loc.item.name in names]
 
-                # Check the game, not the player, because we know how to sort within regions for DS3
-                offworld = self._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
-                onworld = sorted((loc for loc in locations if loc.game == "Dark Souls III"),
-                                 key=lambda loc: loc.data.region_value)
+                    # Check the game, not the player, because we know how to sort within regions for DS3
+                    offworld = ds3_world._shuffle([loc for loc in locations if loc.game != "Dark Souls III"])
+                    onworld = sorted((loc for loc in locations if loc.game == "Dark Souls III"),
+                                     key=lambda loc: loc.data.region_value)
+                    # Give offworld regions the last (best) items within a given sphere
+                    sorted_spheres.extend(onworld)
+                    sorted_spheres.extend(offworld)
 
-                # Give offworld regions the last (best) items within a given sphere
-                for location in onworld + offworld:
-                    new_item = self._pop_item(location, converted_item_order)
-                    location.item = new_item
-                    new_item.location = location
+                converted_item_order.reverse()
+                remaining_fill(multiworld, sorted_spheres, converted_item_order, name="DS3 Smoothing", check_location_can_fill=True)
 
-        if self.options.smooth_upgrade_items:
-            base_names = {
-                "Titanite Shard", "Large Titanite Shard", "Titanite Chunk", "Titanite Slab",
-                "Titanite Scale", "Twinkling Titanite", "Farron Coal", "Sage's Coal", "Giant's Coal",
-                "Profaned Coal"
-            }
-            smooth_items([item for item in all_item_order if item.base_name in base_names])
+            if ds3_world.options.smooth_upgrade_items:
+                base_names = {
+                    "Titanite Shard", "Large Titanite Shard", "Titanite Chunk", "Titanite Slab",
+                    "Titanite Scale", "Twinkling Titanite", "Farron Coal", "Sage's Coal", "Giant's Coal",
+                    "Profaned Coal"
+                }
+                smooth_items([item for item in all_item_order if item.base_name in base_names])
 
-        if self.options.smooth_soul_items:
-            smooth_items([
-                item for item in all_item_order
-                if item.souls and item.classification != ItemClassification.progression
-            ])
+            if ds3_world.options.smooth_soul_items:
+                smooth_items([
+                    item for item in all_item_order
+                    if item.souls and item.classification != ItemClassification.progression
+                ])
 
-        if self.options.smooth_upgraded_weapons:
-            upgraded_weapons = [
-                location.item
-                for location in self.multiworld.get_filled_locations()
-                if location.item.player == self.player
-                and location.item.level and location.item.level > 0
-                and location.item.classification != ItemClassification.progression
-            ]
-            upgraded_weapons.sort(key=lambda item: item.level)
-            smooth_items(upgraded_weapons)
+            if ds3_world.options.smooth_upgraded_weapons:
+                upgraded_weapons = [
+                    location.item
+                    for location in multiworld.get_filled_locations()
+                    if location.item.player == ds3_world.player
+                    and location.item.level and location.item.level > 0
+                    and location.item.classification != ItemClassification.progression
+                ]
+                upgraded_weapons.sort(key=lambda item: item.level)
+                smooth_items(upgraded_weapons)
 
     def _shuffle(self, seq: Sequence) -> List:
         """Returns a shuffled copy of a sequence."""
         copy = list(seq)
         self.random.shuffle(copy)
         return copy
-
-    def _pop_item(
-        self,
-        location: Location,
-        items: List[DarkSouls3Item]
-    ) -> DarkSouls3Item:
-        """Returns the next item in items that can be assigned to location."""
-        for i, item in enumerate(items):
-            if location.can_fill(self.multiworld.state, item, False):
-                return items.pop(i)
-
-        # If we can't find a suitable item, give up and assign an unsuitable one.
-        return items.pop(0)
 
     def _get_our_locations(self) -> List[DarkSouls3Location]:
         return cast(List[DarkSouls3Location], self.multiworld.get_locations(self.player))
@@ -1636,10 +1676,9 @@ class DarkSouls3World(World):
                 "unmissable_transpositions": self.options.unmissable_transpositions.value,
                 "random_starting_loadout": self.options.random_starting_loadout.value,
                 "require_one_handed_starting_weapons": self.options.require_one_handed_starting_weapons.value,
-                "auto_equip": self.options.auto_equip.value,
-                "lock_equip": self.options.lock_equip.value,
                 "no_weapon_requirements": self.options.no_weapon_requirements.value,
                 "death_link": self.options.death_link.value,
+                "death_link_amnesty": self.options.death_link_amnesty.value,
                 "no_spell_requirements": self.options.no_spell_requirements.value,
                 "no_equip_load": self.options.no_equip_load.value,
                 "enable_dlc": self.options.enable_dlc.value,
@@ -1658,6 +1697,7 @@ class DarkSouls3World(World):
             },
             "seed": self.multiworld.seed_name,  # to verify the server's multiworld
             "slot": self.multiworld.player_name[self.player],  # to connect to server
+            "goal": [boss.flag for boss in self._goal_bosses()],
             # Reserializing here is silly, but it's easier for the static randomizer.
             "random_enemy_preset": json.dumps(self.options.random_enemy_preset.value),
             "yhorm": (
@@ -1677,7 +1717,7 @@ class DarkSouls3World(World):
             # This is checked by the static randomizer, which will surface an
             # error to the user if its version doesn't fall into the allowed
             # range.
-            "versions": ">=3.0.0-beta.24 <3.1.0",
+            "versions": ">=4.0.0-alpha.9 <5.0.0",
         }
 
         return slot_data

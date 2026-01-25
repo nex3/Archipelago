@@ -2,10 +2,39 @@ from dataclasses import dataclass
 import json
 from typing import Any, Dict
 
-from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
-    OptionGroup, PerGameCommonOptions, Range, Removed, Toggle
+from Options import Choice, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
+    OptionGroup, OptionSet, PerGameCommonOptions, Range, Removed, Toggle, OptionError
+
+from .Bosses import all_bosses
 
 ## Game Options
+
+
+class GoalOption(OptionSet):
+    """Which bosses must be defeated in order to win the game, of the form "<Region> Boss".
+
+    A few regions have more than one boss:
+
+    - **Archdragon Peak:** "Archdragon Peak Fort" is Ancient Wyvern in vanilla,
+      "Archdragon Peak End" is Nameless King in vanilla.
+    - **Painted World of Ariandel:** "Painted World of Ariendel Lower" is
+      Champion's Gravetender and Gravetender Greatwolf in vanilla, "Painted
+      World of Ariendel End" is Sister Friede in vanilla.
+    - **Ringed City:** "Ringed City Midway" is Halflight, Spear of the Church in
+      vanilla, "Ringed City Hidden" is Darkeater Midir in vanilla, and "Ringed
+      City End" is Slave Knight Gael in vanilla.
+
+    If multiple bosses are selected, all of them must be defeated in order to
+    achieve your goal. By default, only "Kiln of the First Flame Boss" is
+    selected.
+    """
+    display_name = "Goal"
+    valid_keys = {boss.region + " Boss" for boss in all_bosses if boss.flag}
+    default = frozenset({"Kiln of the First Flame Boss"})
+
+    def verify_keys(self) -> None:
+        super().verify_keys()
+        if not set(self.value): raise OptionError("You must set at least one Goal.")
 
 
 class EarlySmallLothricBanner(Choice):
@@ -48,6 +77,31 @@ class LateDLCOption(Choice):
     option_after_small_doll = 1
     alias_true = 1
     option_after_basin = 2
+
+
+class DeathLink(Choice):
+    """When you die, everyone who enabled death link dies. Of course, the reverse is true too.
+
+    - **Off:** Death link is disabled. (The default.)
+    - **Any Death:** Death link triggers for any death.
+    - **Lost Souls:** Death link only triggers if you die without collecting
+      your last bloodstain.
+    """
+    display_name = "Death Link Amnesty"
+    option_off = 0
+    alias_false = 0
+    option_any_death = 1
+    alias_true = 1
+    option_lost_souls = 2
+    default = 0
+
+
+class DeathLinkAmnesty(Range):
+    """How many times you have to die before sending a death link."""
+    display_name = "Death Link Amnesty"
+    range_start = 1
+    range_end = 30
+    default = 1
 
 
 class UnmissableQuestsOption(DefaultOnToggle):
@@ -110,19 +164,6 @@ class RandomizeStartingLoadout(DefaultOnToggle):
 class RequireOneHandedStartingWeapons(DefaultOnToggle):
     """Require starting equipment to be usable one-handed."""
     display_name = "Require One-Handed Starting Weapons"
-
-
-class AutoEquipOption(Toggle):
-    """Automatically equips any received armor or left/right weapons."""
-    display_name = "Auto-Equip"
-
-
-class LockEquipOption(Toggle):
-    """Lock the equipment slots so you cannot change your armor or your left/right weapons.
-
-    Works great with the Auto-equip option.
-    """
-    display_name = "Lock Equipment Slots"
 
 
 class NoEquipLoadOption(Toggle):
@@ -255,10 +296,11 @@ class RandomizeEnemiesOption(DefaultOnToggle):
 
 
 class SimpleEarlyBossesOption(DefaultOnToggle):
-    """Avoid replacing Iudex Gundyr and Vordt with late bosses.
+    """Avoid replacing Iudex Gundyr and Vordt with difficult bosses.
 
-    This excludes all bosses after Dancer of the Boreal Valley from these two boss fights. Disable
-    it for a chance at a much harder early game.
+    This limits these boss fights to bosses that are known to scale gracefully to low-level fights.
+    This doesn't necessarily mean that those bosses will be from the early game, just that they're
+    not too difficult when scaled down.
 
     This is ignored unless enemies are randomized.
     """
@@ -332,10 +374,8 @@ class ImpatientMimicsOption(Toggle):
 class RandomEnemyPresetOption(OptionDict):
     """The YAML preset for the static enemy randomizer.
 
-    See the static randomizer documentation in `randomizer\\presets\\README.txt` for details.
+    See the online enemy randomization documentation for all available options.
     Include this as nested YAML. For example:
-
-    .. code-block:: YAML
 
       random_enemy_preset:
         RemoveSource: Ancient Wyvern; Darkeater Midir
@@ -406,10 +446,12 @@ class MissableLocationBehaviorOption(Choice):
 @dataclass
 class DarkSouls3Options(PerGameCommonOptions):
     # Game Options
+    goal: GoalOption
     early_banner: EarlySmallLothricBanner
     late_basin_of_vows: LateBasinOfVowsOption
     late_dlc: LateDLCOption
     death_link: DeathLink
+    death_link_amnesty: DeathLinkAmnesty
     unmissable_quests: UnmissableQuestsOption
     unmissable_invasions: UnmissableInvasionsOption
     unmissable_transpositions: UnmissableTranspositionsOption
@@ -420,8 +462,6 @@ class DarkSouls3Options(PerGameCommonOptions):
     # Equipment
     random_starting_loadout: RandomizeStartingLoadout
     require_one_handed_starting_weapons: RequireOneHandedStartingWeapons
-    auto_equip: AutoEquipOption
-    lock_equip: LockEquipOption
     no_equip_load: NoEquipLoadOption
     no_weapon_requirements: NoWeaponRequirementsOption
     no_spell_requirements: NoSpellRequirementsOption
@@ -479,8 +519,6 @@ option_groups = [
     OptionGroup("Equipment", [
         RandomizeStartingLoadout,
         RequireOneHandedStartingWeapons,
-        AutoEquipOption,
-        LockEquipOption,
         NoEquipLoadOption,
         NoWeaponRequirementsOption,
         NoSpellRequirementsOption,

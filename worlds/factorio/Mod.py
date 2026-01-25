@@ -37,8 +37,8 @@ base_info = {
     "description": "Integration client for the Archipelago Randomizer",
     "factorio_version": "2.0",
     "dependencies": [
-        "base >= 2.0.15",
-        "? quality >= 2.0.15",
+        "base >= 2.0.28",
+        "? quality >= 2.0.28",
         "! space-age",
         "? science-not-invited",
         "? factory-levels"
@@ -63,10 +63,11 @@ recipe_time_ranges = {
 }
 
 
-class FactorioModFile(worlds.Files.APContainer):
+class FactorioModFile(worlds.Files.APPlayerContainer):
     game = "Factorio"
     compression_method = zipfile.ZIP_DEFLATED  # Factorio can't load LZMA archives
     writing_tasks: List[Callable[[], Tuple[str, Union[str, bytes]]]]
+    patch_file_ending = ".zip"
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
@@ -111,7 +112,7 @@ def generate_mod(world: "Factorio", output_directory: str):
             settings_template = template_env.get_template("settings.lua")
     # get data for templates
     locations = [(location, location.item)
-                 for location in world.science_locations]
+                 for location in world.science_locations + world.craftsanity_locations]
     mod_name = f"AP-{multiworld.seed_name}-P{player}-{multiworld.get_file_safe_player_name(player)}"
     versioned_mod_name = mod_name + "_" + Utils.__version__
 
