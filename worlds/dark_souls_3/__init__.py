@@ -1383,7 +1383,7 @@ class DarkSouls3World(World):
         )
 
     def _goal_bosses(self) -> [DS3BossInfo]:
-        """Returns all the boses that are goals for this run."""
+        """Returns all the bosses that are goals for this run."""
         result = []
         for name in self.options.goal:
             assert name.endswith(" Boss")
