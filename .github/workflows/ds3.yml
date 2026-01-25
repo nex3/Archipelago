@@ -20,7 +20,7 @@ jobs:
         with:
           path: Archipelago
       - run: cp -r Archipelago/worlds/dark_souls_3/docs/*.md source/ds3/
-      - uses: EndBug/add-and-commit@
+      - uses: EndBug/add-and-commit@v9
         with:
           add: source/ds3
           author_name: Nattlebot Robobaum
