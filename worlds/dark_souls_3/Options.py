@@ -89,7 +89,7 @@ class DeathLink(Choice):
     - **Lost Souls:** Death link only triggers if you die without collecting
       your last bloodstain.
     """
-    display_name = "Death Link Amnesty"
+    display_name = "Death Link"
     option_off = 0
     alias_false = 0
     option_any_death = 1
