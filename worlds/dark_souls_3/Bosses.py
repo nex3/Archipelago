@@ -158,7 +158,7 @@ all_bosses = [
         },
     ),
     DS3BossInfo(
-        "Dragonslayer Armour", "Lothric Castle", 3010800, 13010800,
+        "Dragonslayer Armour", "Lothric Castle End", 3010800, 13010800,
         locations = {
             "LC: Soul of Dragonslayer Armour",
             "FS: Morne's Helm - shop after killing Eygon or LC boss",
