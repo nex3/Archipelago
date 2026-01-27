@@ -927,7 +927,7 @@ class DarkSouls3World(World):
                     self._can_get(state, "IBV: Soul of Pontiff Sulyvahn")
                     or self._can_get(state, "PC: Soul of Yhorm the Giant")
                 )
-                if self.options.unmissable_quests
+                if self.options.unmissable_quests > 0
                 # Either Patches or Siegward can save Greirat, but we assume the player will want
                 # to use Patches because it's harder to screw up
                 else self._can_get(state, "CD: Shotel - Patches")
@@ -1206,7 +1206,7 @@ class DarkSouls3World(World):
                 # In unmissable quests mode, Anri's quest always ends in marriage, but in vanilla
                 # logic they can also fight Aldrich after reaching the church. In that case, we
                 # want to make sure that the logic allows for either branch.
-                self.options.unmissable_quests
+                self.options.unmissable_quests == 2
                 or (
                     self._can_get(state, "IBV: Ring of the Evil Eye - Anri")
                     and self._can_get(state, "AL: Soul of Aldrich")

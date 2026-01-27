@@ -115,7 +115,7 @@ will be added in future releases.
 
 This option makes quest-related NPCs immortal and updates their quests to
 remove places where they can be missed or failed entirely. Currently the
-following NPCs' quests are supported:
+following NPCs' quests are supported in "Shops Only" mode:
 
 * **Greirat** will always survive pillaging Irithyll, regardless of what you do
   with Siegward or Patches. Instead of returning from his trips after you beat
@@ -133,6 +133,8 @@ following NPCs' quests are supported:
   three Pyromancy Tomes that he accepts.
 
 * **Yoel** won't die until you get five levels of hollowing.
+
+The following NPCs quests are supported as well in "All" mode:
 
 * **Yuria** can't be killed until after you've married Anri. No Fire Keeper Soul
   is available, so you can't fail her quest by reversing your hollowing.

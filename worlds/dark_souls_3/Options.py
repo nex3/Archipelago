@@ -106,13 +106,26 @@ class DeathLinkAmnesty(Range):
     default = 1
 
 
-class UnmissableQuestsOption(DefaultOnToggle):
+class UnmissableQuestsOption(Choice):
     """Tweak the way quest progression works to make NPC quests impossible to fail.
 
     This allows progression items to be obtained in all NPC quest locations. See the DS3 Locations
     page for detailed information on how the quests differ from vanilla.
+
+    - **Off:** NPC quest logic is not modified from the base game, and most quest locations are
+      missable.
+    - **Shops Only:** NPC quest logic is only modified to ensure that shopkeepers are immortal until
+      all of their shop items are available.
+    - **All:** NPC quest logic is modified to make as many NPC-related locations available as
+      possible.
     """
     display_name = "Unmissable Quests"
+    option_off = 0
+    alias_false = 0
+    option_shops_only = 1
+    option_all = 2
+    alias_true = 2
+    default = 2
 
 
 class UnmissableInvasionsOption(DefaultOnToggle):

@@ -259,9 +259,14 @@ def is_unrandomized_and_missable(self: DS3LocationData, options: PerGameCommonOp
     )
 
 
+def missable_shop(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
+    """A utility function for locations that are only missable when shops are missable."""
+    return options.unmissable_quests.value == 0
+
+
 def missable_quest(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
-    """A utility function for locations that are only missable when unmissable_quests is False."""
-    return not options.unmissable_quests
+    """A utility function for locations that are only missable when NPC quests are missable."""
+    return options.unmissable_quests.value < 2
 
 
 def missable_transposition(self: DS3LocationData, options: PerGameCommonOptions) -> bool:
@@ -678,7 +683,7 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("US: Transposing Kiln - boss drop", "Transposing Kiln", boss=True),
         # Missable because it's unavailable if you start as a Pyromancer
         DS3LocationData("US: Pyromancy Flame - Cornyx", "Pyromancy Flame",
-                        omit=is_unrandomized_and_missable, missable=missable_quest, npc=True),
+                        omit=is_unrandomized_and_missable, missable=missable_shop, npc=True),
         DS3LocationData("US: Old Sage's Blindfold - kill Cornyx", "Old Sage's Blindfold",
                         npc=True),
         DS3LocationData("US: Cornyx's Garb - kill Cornyx", "Cornyx's Garb",
@@ -688,7 +693,7 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("US: Cornyx's Skirt - kill Cornyx", "Cornyx's Skirt",
                         static='02,0:50006141::', npc=True),
         DS3LocationData("US: Tower Key - kill Irina", "Tower Key",
-                        omit=is_unrandomized_and_missable, missable=missable_quest, npc=True),
+                        omit=is_unrandomized_and_missable, missable=missable_shop, npc=True),
         DS3LocationData("US: Flynn's Ring - tower village, rooftop", "Flynn's Ring"),
         DS3LocationData("US: Undead Bone Shard - by white tree", "Undead Bone Shard"),
         DS3LocationData("US: Alluring Skull - foot, behind carriage", "Alluring Skull x2"),
@@ -830,30 +835,30 @@ location_tables: Dict[str, List[DS3LocationData]] = {
 
         # Yoel/Yuria of Londor
         DS3LocationData("FS: Soul Arrow - Yoel/Yuria shop", "Soul Arrow",
-                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_shop,
                         conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Heavy Soul Arrow - Yoel/Yuria shop", "Heavy Soul Arrow",
                         static='99,0:-1:50000,110000,70000116:',
-                        missable=missable_quest, conditional=True, npc=True, shop=True),
+                        missable=missable_shop, conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Magic Weapon - Yoel/Yuria shop", "Magic Weapon",
-                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_shop,
                         conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Magic Shield - Yoel/Yuria shop", "Magic Shield",
-                        static='99,0:-1:50000,110000,70000116:', missable=missable_quest,
+                        static='99,0:-1:50000,110000,70000116:', missable=missable_shop,
                         conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Soul Greatsword - Yoel/Yuria shop", "Soul Greatsword",
-                        static='99,0:-1:50000,110000,70000450,70000475:', missable=missable_quest,
+                        static='99,0:-1:50000,110000,70000450,70000475:', missable=missable_shop,
                         conditional=True, npc=True, shop=True),
-        DS3LocationData("FS: Dark Hand - Yuria shop", "Dark Hand", missable=missable_quest,
+        DS3LocationData("FS: Dark Hand - Yuria shop", "Dark Hand", missable=missable_shop,
                         conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Untrue White Ring - Yuria shop", "Untrue White Ring",
-                        missable=missable_quest, conditional=True, npc=True, shop=True),
+                        missable=missable_shop, conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Untrue Dark Ring - Yuria shop", "Untrue Dark Ring",
-                        missable=missable_quest, conditional=True, npc=True, shop=True),
+                        missable=missable_shop, conditional=True, npc=True, shop=True),
         DS3LocationData("FS: Londor Braille Divine Tome - Yuria shop", "Londor Braille Divine Tome",
-                        static='99,0:-1:40000,110000,70000116:', missable=missable_quest,
+                        static='99,0:-1:40000,110000,70000116:', missable=missable_shop,
                         conditional=True, npc=True),
-        DS3LocationData("FS: Darkdrift - kill Yuria", "Darkdrift", missable=missable_quest,
+        DS3LocationData("FS: Darkdrift - kill Yuria", "Darkdrift", missable=missable_shop,
                         conditional=True, drop=True, npc=True),  # kill her or kill Soul of Cinder
 
         # Cornyx of the Great Swamp
@@ -865,23 +870,23 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: Flash Sweat - Cornyx", "Flash Sweat", npc=True, shop=True),
         # These are missable if you kill Cornyx before giving him the right tomes.
         DS3LocationData("FS: Poison Mist - Cornyx for Great Swamp Tome", "Poison Mist",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Fire Orb - Cornyx for Great Swamp Tome", "Fire Orb",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Profuse Sweat - Cornyx for Great Swamp Tome", "Profuse Sweat",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Bursting Fireball - Cornyx for Great Swamp Tome", "Bursting Fireball",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Acid Surge - Cornyx for Carthus Tome", "Acid Surge",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Carthus Flame Arc - Cornyx for Carthus Tome", "Carthus Flame Arc",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Carthus Beacon - Cornyx for Carthus Tome", "Carthus Beacon",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Great Chaos Fire Orb - Cornyx for Izalith Tome",
-                        "Great Chaos Fire Orb", missable=missable_quest, npc=True, shop=True),
+                        "Great Chaos Fire Orb", missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Chaos Storm - Cornyx for Izalith Tome", "Chaos Storm",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
 
         # Irina of Carim
         # These aren't in their own location because you don't actually need the Grave Key to access
@@ -892,17 +897,17 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         DS3LocationData("FS: Caressing Tears - Irina", "Caressing Tears", npc=True, shop=True),
         DS3LocationData("FS: Homeward - Irina", "Homeward", npc=True, shop=True),
         DS3LocationData("FS: Med Heal - Irina for Tome of Carim", "Med Heal",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Tears of Denial - Irina for Tome of Carim", "Tears of Denial",
-                        missable=missable_quest, npc=True, shop=True),
-        DS3LocationData("FS: Force - Irina for Tome of Carim", "Force", missable=missable_quest,
+                        missable=missable_shop, npc=True, shop=True),
+        DS3LocationData("FS: Force - Irina for Tome of Carim", "Force", missable=missable_shop,
                         npc=True, shop=True),
         DS3LocationData("FS: Bountiful Light - Irina for Tome of Lothric", "Bountiful Light",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Magic Barrier - Irina for Tome of Lothric", "Magic Barrier",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
         DS3LocationData("FS: Blessed Weapon - Irina for Tome of Lothric", "Blessed Weapon",
-                        missable=missable_quest, npc=True, shop=True),
+                        missable=missable_shop, npc=True, shop=True),
     ],
     "Road of Sacrifices": [
         DS3LocationData("RS: Soul of a Crystal Sage", "Soul of a Crystal Sage", prominent=True,
@@ -3053,29 +3058,29 @@ location_tables: Dict[str, List[DS3LocationData]] = {
         # Undead Settlement rewards
         DS3LocationData("FS: Divine Blessing - Greirat from US", "Divine Blessing",
                         static='99,0:-1:110000,120000,70000150,70000175:',
-                        missable=missable_quest, conditional=True, shop=True, npc=True),
+                        missable=missable_shop, conditional=True, shop=True, npc=True),
         DS3LocationData("FS: Ember - Greirat from US", "Ember",
                         static='99,0:-1:110000,120000,70000150,70000175:',
-                        missable=missable_quest, conditional=True,  shop=True, npc=True),
+                        missable=missable_shop, conditional=True,  shop=True, npc=True),
 
         # Irityhll rewards
         DS3LocationData("FS: Divine Blessing - Greirat from IBV", "Divine Blessing",
                         static='99,0:-1:110000,120000,70000151,70000176:',
-                        missable=missable_quest, conditional=True,  shop=True, npc=True),
+                        missable=missable_shop, conditional=True,  shop=True, npc=True),
         DS3LocationData("FS: Hidden Blessing - Greirat from IBV", "Hidden Blessing",
                         static='99,0:-1:110000,120000,70000151,70000176:',
-                        missable=missable_quest, conditional=True,  shop=True, npc=True),
+                        missable=missable_shop, conditional=True,  shop=True, npc=True),
         DS3LocationData("FS: Titanite Scale - Greirat from IBV", "Titanite Scale",
                         static='99,0:-1:110000,120000,70000151,70000176:',
-                        missable=missable_quest, conditional=True,  shop=True, npc=True),
+                        missable=missable_shop, conditional=True,  shop=True, npc=True),
         DS3LocationData("FS: Twinkling Titanite - Greirat from IBV", "Twinkling Titanite",
                         static='99,0:-1:110000,120000,70000151,70000176:',
-                        missable=missable_quest, conditional=True,  shop=True, npc=True),
+                        missable=missable_shop, conditional=True,  shop=True, npc=True),
 
         # Lothric rewards (from Shrine Handmaid)
         DS3LocationData("FS: Ember - shop for Greirat's Ashes", "Twinkling Titanite",
                         static='99,0:-1:110000,120000,70000152,70000177:',
-                        missable=missable_quest, conditional=True,  shop=True, npc=True),
+                        missable=missable_shop, conditional=True,  shop=True, npc=True),
     ],
     "Karla's Shop": [
         DS3LocationData("FS: Affinity - Karla", "Affinity", shop=True, npc=True),
