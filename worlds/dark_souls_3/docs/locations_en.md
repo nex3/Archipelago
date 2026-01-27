@@ -132,6 +132,12 @@ following NPCs' quests are supported in "Shops Only" mode:
   starting class. He can't be killed for his drops until you've given him all
   three Pyromancy Tomes that he accepts.
 
+* **Orbeck** will always give a Young Dragon Ring replacement regardless of your
+  starting class. He won't leave Firelink because you didn't give him a scroll
+  quiickly enough. He can't be killed for his drops until you've given him all
+  four Scrolls *and* you've received the Slumbering Dragoncrest Ring
+  replacement.
+
 * **Yoel** won't die until you get five levels of hollowing.
 
 The following NPCs quests are supported as well in "All" mode:
