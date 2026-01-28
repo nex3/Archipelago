@@ -197,6 +197,8 @@ class DS3LocationData:
         if self.hostile_npc: names.append("Hostile NPC Rewards")
         if self.npc: names.append("Friendly NPC Rewards")
         if self.lizard: names.append("Small Crystal Lizards")
+        if self.drop: names.append("Drops")
+        if self.shop: names.append("Shops")
         if self.hidden: names.append("Hidden")
 
         default_item = item_dictionary[cast(str, self.default_item_name)]
@@ -3084,6 +3086,8 @@ location_name_groups: Dict[str, Set[str]] = {
     "Hostile NPC Rewards": set(),
     "Friendly NPC Rewards": set(),
     "Small Crystal Lizards": set(),
+    "Drops": set(),
+    "Shops": set(),
     "Upgrade": set(),
     "Small Souls": set(),
     "Boss Souls": set(),
@@ -3110,6 +3114,9 @@ location_descriptions = {
                            "invaders and initially-friendly NPCs that must be fought as part of their quest.",
     "Friendly NPC Rewards": "Items given by friendly NPCs as part of their quests or from " + \
                             "non-violent interaction.",
+    "Drops": "Drops from anything other than bosses, including minibosses, mimics, lizards, " + \
+             "NPCs, or just normal enemies.",
+    "Shops": "Locations in NPC shops such as the Shrine Handmaiden, Greirat, Cornyx, and so on.",
     "Upgrade": "Locations that contain upgrade items in vanilla, including titanite, gems, and " + \
                "Shriving Stones.",
     "Small Souls": "Locations that contain soul items in vanilla, not including boss souls.",
