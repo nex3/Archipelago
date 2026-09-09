@@ -1499,8 +1499,7 @@ class EldenRing(World):
         self.multiworld.completion_condition[self.player] = lambda state: self._is_complete(state)
     
     def _has_key_or_shards(self, state: CollectionState, item: str, addionital_state=True) -> bool:
-        """Input item name and shard option and output state
-        \naddionital_state is so if the shard is enabled; overshadow other logic"""
+        """addionital_state is so if the shard is enabled; overshadow other logic"""
         if shard_list[f"{item} Shard"] in self.options.key_item_shards.value:
             option = self.options.key_item_shards.value[shard_list[f"{item} Shard"]]
             if option['Max'] > 1: return state.has(f"{item} Shard", self.player, min(option['Req'], option['Max']))
@@ -1623,30 +1622,31 @@ class EldenRing(World):
             "AP/(SHG): Dragoncrest Shield Talisman +1 - ride up first cleaver, behind imp statue", # 1b
             "AP/WhR: Pearldrake Talisman +1 - in chest underground behind a imp statue", # 1c
             "AP/GLE: Godfrey Icon - boss drop Evergaol", # 1d
-            ], lambda state: self._choose_key_rules(state, 22, "Altus Master Key"))
-        self._add_entrance_rule("Old Altus Tunnel", lambda state: self._choose_key_rules(state, 22, "Altus Master Key")) # 2
+            ], lambda state: self._choose_key_rules(state, 24, "Altus Master Key"))
+        self._add_entrance_rule("Old Altus Tunnel", lambda state: self._choose_key_rules(state, 24, "Altus Master Key")) # 2
+        self._add_entrance_rule("Unsightly Catacombs", lambda state: self._choose_key_rules(state, 24, "Altus Master Key")) # 2
         
-        #self._add_entrance_rule("Caelid", lambda state: self._has_enough_keys(state, 22))
+        #self._add_entrance_rule("Caelid", lambda state: self._has_enough_keys(state, 24))
         # caelid
-        self._add_entrance_rule("Gaol Cave", lambda state: self._choose_key_rules(state, 25, "Caelid Master Key")) # 2
+        self._add_entrance_rule("Gaol Cave", lambda state: self._choose_key_rules(state, 27, "Caelid Master Key")) # 2
         self._add_location_rule("CL/(FR): Sword of St. Trina - in chest underground behind imp statue", 
-                                lambda state: self._choose_key_rules(state, 25, "Caelid Master Key")) # 1
+                                lambda state: self._choose_key_rules(state, 27, "Caelid Master Key")) # 1
         
-        #self._add_entrance_rule("Nokron, Eternal City Start", lambda state: self._has_enough_keys(state, 25))
+        #self._add_entrance_rule("Nokron, Eternal City Start", lambda state: self._has_enough_keys(state, 27))
         # nokron
         self._add_location_rule([
             "NR/(NSG): Mimic Tear Ashes - in chest behind imp statue upper interior", # 1a
             "NR/(NSG): Smithing Stone [3] - behind imp statue upper interior", # 1a
-            ], lambda state: self._choose_key_rules(state, 26, "Nokron Master Key"))
+            ], lambda state: self._choose_key_rules(state, 28, "Nokron Master Key"))
         
-        #self._add_entrance_rule("Mt. Gelmir", lambda state: self._has_enough_keys(state, 26))
+        #self._add_entrance_rule("Mt. Gelmir", lambda state: self._has_enough_keys(state, 28))
         # mt gelmir
         self._add_location_rule([
             "MtG/(WC): Lightning Scorpion Charm - behind imp statue", # 1
             ], lambda state: self._choose_key_rules(state, 29, "Mt. Gelmir Master Key"))
-        self._add_entrance_rule("Seethewater Cave", lambda state: self._choose_key_rules(state, 29, "Mt. Gelmir Master Key")) # 2
+        self._add_entrance_rule("Seethewater Cave", lambda state: self._choose_key_rules(state, 31, "Mt. Gelmir Master Key")) # 2
         
-        #self._add_entrance_rule("Volcano Manor Entrance", lambda state: self._has_enough_keys(state, 29))
+        #self._add_entrance_rule("Volcano Manor Entrance", lambda state: self._has_enough_keys(state, 31))
         # volcano
         self._add_location_rule([
             "VM/PTC: Crimson Amber Medallion +1 - behind imp statue W of town", # 1
@@ -1655,35 +1655,35 @@ class EldenRing(World):
             "VM/TE: Somber Smithing Stone [7] - NW of shortcut elevator, after imp statue, lower part of big cage room outside to SW", # 2a
             "VM/TE: Dagger Talisman - NW of shortcut elevator, after imp statue, drop to hidden path top item", # 2a
             "VM/TE: Rune Arc - NW of shortcut elevator, after imp statue, drop to hidden path lower item", # 2a
-            ], lambda state: self._choose_key_rules(state, 32, "Volcano Master Key"))
+            ], lambda state: self._choose_key_rules(state, 34, "Volcano Master Key"))
         
-        #self._add_entrance_rule("Capital Outskirts", lambda state: self._has_enough_keys(state, 32))
+        #self._add_entrance_rule("Capital Outskirts", lambda state: self._has_enough_keys(state, 34))
         # capital outskirts
         self._add_location_rule([
             "CO/(AHG): Golden Epitaph - behind imp statue", # 1
-            ], lambda state: self._choose_key_rules(state, 33, "Capital Outskirts Master Key"))
+            ], lambda state: self._choose_key_rules(state, 35, "Capital Outskirts Master Key"))
         
-        #self._add_entrance_rule("Ainsel River Main", lambda state: self._has_enough_keys(state, 33))
+        #self._add_entrance_rule("Ainsel River Main", lambda state: self._has_enough_keys(state, 35))
         # nokstella
         self._add_location_rule([
             "NS/NEC: Nightmaiden & Swordstress Puppets - in chest behind imp statue to W up stairs, left before bridge", # 1
-            ], lambda state: self._choose_key_rules(state, 34, "Nokstella Master Key"))
+            ], lambda state: self._choose_key_rules(state, 36, "Nokstella Master Key"))
         
-        #self._add_entrance_rule("Moonlight Altar", lambda state: self._has_enough_keys(state, 34))
+        #self._add_entrance_rule("Moonlight Altar", lambda state: self._has_enough_keys(state, 36))
         # moonlight altar
         self._add_location_rule([
             "MA/(LER): Cerulean Amber Medallion +2 - in chest under illusory floor behind imp statue", # 1
-            ], lambda state: self._choose_key_rules(state, 35, "Moonlight Master Key"))
+            ], lambda state: self._choose_key_rules(state, 37, "Moonlight Master Key"))
         
-        #self._add_entrance_rule("Mountaintops of the Giants", lambda state: self._has_enough_keys(state, 35))
+        #self._add_entrance_rule("Mountaintops of the Giants", lambda state: self._has_enough_keys(state, 37))
         # mountaintops
         self._add_location_rule([
             "FP/(GCHG): Flame, Protect Me - behind imp statue", # 1a
             "FP/(GCHG): Cranial Vessel Candlestand - upper room after fire spitter, behind imp statue", # 1b
-            ], lambda state: self._choose_key_rules(state, 39, "Mountaintops Master Key"))
-        self._add_entrance_rule("Spiritcaller Cave", lambda state: self._choose_key_rules(state, 39, "Mountaintops Master Key")) # 2
+            ], lambda state: self._choose_key_rules(state, 41, "Mountaintops Master Key"))
+        self._add_entrance_rule("Spiritcaller Cave", lambda state: self._choose_key_rules(state, 41, "Mountaintops Master Key")) # 2
         
-        #self._add_entrance_rule("Farum Azula", lambda state: self._has_enough_keys(state, 39))
+        #self._add_entrance_rule("Farum Azula", lambda state: self._has_enough_keys(state, 41))
         # farum
         self._add_location_rule([ # entire area behind a imp staute lol
             "FA/DTL: Lord's Rune - to SE in fountain", # 2
@@ -1703,18 +1703,18 @@ class EldenRing(World):
             "FA/DTL: Dragonwound Grease x2 - to S under fallen building", # 2
             "FA/DTL: Shard of Alexander - fight Alexander to SW", # 2
             "FA/DTL: Alexander's Innards - fight Alexander to SW", # 2
-            ], lambda state: self._choose_key_rules(state, 41, "Farum Master Key"))
+            ], lambda state: self._choose_key_rules(state, 43, "Farum Master Key"))
         
-        #self._add_entrance_rule("Consecrated Snowfield", lambda state: self._has_enough_keys(state, 41))
+        #self._add_entrance_rule("Consecrated Snowfield", lambda state: self._has_enough_keys(state, 43))
         # snowfield
-        self._add_entrance_rule("Cave of the Forlorn", lambda state: self._choose_key_rules(state, 43, "Snowfield Master Key")) # 2
+        self._add_entrance_rule("Cave of the Forlorn", lambda state: self._choose_key_rules(state, 45, "Snowfield Master Key")) # 2
         
-        #self._add_entrance_rule("Miquella's Haligtree", lambda state: self._has_enough_keys(state, 43))
+        #self._add_entrance_rule("Miquella's Haligtree", lambda state: self._has_enough_keys(state, 45))
         # haligtree +3
         self._add_location_rule([
             "EBH/PR: Triple Rings of Light - drop down to E, in chest behind imp statue", # 1
             "EBH/EIW: Marika's Soreseal - to SE past the imp statue in lower section", # 2
-            ], lambda state: self._choose_key_rules(state, 46, "Haligtree Master Key"))
+            ], lambda state: self._choose_key_rules(state, 48, "Haligtree Master Key"))
         
     def _choose_key_rules(self, state: CollectionState, keys_required: int, master_key: str) -> bool:
         "choose key rules"
