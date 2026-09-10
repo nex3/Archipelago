@@ -3405,16 +3405,8 @@ class EldenRing(World):
             "seed": self.multiworld.seed_name,  # to verify the server's multiworld
             "slot": self.multiworld.player_name[self.player],  # to connect to server
             "random_enemy_preset": json.dumps(self.options.random_enemy_preset.value),
-            "rykard": (
-                f"{self.rykard_location.name} {self.rykard_location.id}"
-                if self.rykard_location != default_rykard_location
-                else None
-            ),
-            "serpent": (
-                f"{self.serpent_location.name} {self.serpent_location.id}"
-                if self.serpent_location != default_serpent_location
-                else None
-            ),
+            "rykard_flag": self.rykard_location.flag,
+            "serpent_flag": self.serpent_location.flag,
             "spiritspring_stone_locations": self.spiritspring_locations,
             "goal": [boss.flag for boss in self.goal_bosses],
             "requiredShards": { # item name: required amount
